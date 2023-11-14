@@ -7,7 +7,6 @@ Rails.application.routes.draw do
   get "up" => "rails/health#show", as: :rails_health_check
 
   # Defines the root path route ("/")
-  # root "skateparks#index"
-  root to: redirect('/healthcheck', status: 302)
+  root "skateparks#index"
   get "/healthcheck", to: proc { [200, {}, ["success"]] }
 end
