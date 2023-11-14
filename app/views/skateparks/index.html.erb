@@ -1,0 +1,14 @@
+<p style="color: green"><%= notice %></p>
+
+<h1>Skateparks</h1>
+
+<div id="skateparks">
+  <% @skateparks.each do |skatepark| %>
+    <%= render skatepark %>
+    <p>
+      <%= link_to "Show this skatepark", skatepark %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to "New skatepark", new_skatepark_path %>
