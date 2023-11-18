@@ -2,7 +2,7 @@ version: "3"
 services:
   skateparks-db:
     image: postgres:14.2-alpine
-    container_name: skateparks-postgres-14.2
+    container_name: postgres-14.2
     volumes:
       - postgres_data:/var/lib/postgresql/data
     command: "postgres -c 'max_connections=500'"
@@ -24,6 +24,7 @@ services:
       - RAILS_MASTER_KEY=${RAILS_MASTER_KEY}
     volumes:
       - app-storage:/rails/storage
+      - ${CODEBASE_VOLUME:-/nonexistent}:/rails
     depends_on:
       - skateparks-db
     ports:
