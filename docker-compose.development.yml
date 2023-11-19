@@ -14,7 +14,7 @@ services:
       - "5432:5432"
   skateparks:
     build: .
-    command: "./bin/rails server"
+    command: "./bin/rails server -b 0.0.0.0 -p 3000"
     environment:
       - RAILS_ENV=${RAILS_ENV}
       - POSTGRES_HOST=${POSTGRES_HOST}
@@ -24,6 +24,7 @@ services:
       - RAILS_MASTER_KEY=${RAILS_MASTER_KEY}
     volumes:
       - app-storage:/rails/storage
+      - ${CODEBASE_VOLUME}:/rails
     depends_on:
       - skateparks-db
     ports:
