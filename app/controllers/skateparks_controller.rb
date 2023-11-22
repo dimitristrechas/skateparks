@@ -1,5 +1,6 @@
 class SkateparksController < ApplicationController
   before_action :set_skatepark, only: %i[ show edit update destroy ]
+  http_basic_authenticate_with name: "skateparks", password: "mnomno", except: [:index, :show]
 
   # GET /skateparks or /skateparks.json
   def index
