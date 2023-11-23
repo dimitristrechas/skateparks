@@ -1,0 +1,16 @@
+<header><%= link_to 'homepage', root_path %></header>
+
+<p style="color: green"><%= notice %></p>
+
+<h1>List of skateparks</h1>
+
+<div id="skateparks">
+  <% @skateparks.each do |skatepark| %>
+    <%= render skatepark %>
+    <p>
+      <%= link_to "Show this skatepark", admin_skatepark_path(skatepark.id) %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to "New skatepark", new_admin_skatepark_path %>

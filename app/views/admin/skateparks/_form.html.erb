@@ -1,0 +1,38 @@
+<%= form_with(url: skatepark&.id ? admin_skatepark_path(skatepark.id) : admin_skateparks_path,
+              model: skatepark) do |form| %>
+  <% if skatepark.errors.any? %>
+    <div style="color: red">
+      <h2><%= pluralize(skatepark.errors.count, "error") %> prohibited this skatepark from being saved:</h2>
+
+      <ul>
+        <% skatepark.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.label :name, style: "display: block" %>
+    <%= form.text_field :name %>
+  </div>
+
+  <div>
+    <%= form.label :images, style: "display: block" %>
+    <%= form.file_field :images, multiple: true %>
+  </div>
+
+  <div>
+    <%= form.label :lat, style: "display: block" %>
+    <%= form.text_field :lat %>
+  </div>
+
+  <div>
+    <%= form.label :lng, style: "display: block" %>
+    <%= form.text_field :lng %>
+  </div>
+
+  <div>
+    <%= form.submit %>
+  </div>
+<% end %>
