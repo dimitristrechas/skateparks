@@ -1,8 +1,10 @@
 Rails.application.routes.draw do
-  
-  scope '/admin' do
+
+  namespace :admin do
     resources :skateparks
   end
+
+  resources :skateparks
 
   get "healthcheck" => "rails/health#show", as: :rails_health_check
 

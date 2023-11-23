@@ -1,3 +1,16 @@
-Welcome to skateparks.gr
+<header><%= link_to 'admin dashboard', admin_skateparks_path %></header>
 
-<%= link_to 'admin dashboard', skateparks_path %>
+<main>
+<h1>Welcome to skateparks.gr</h1>
+
+
+
+<div id="skateparks">
+  <% @skateparks.each do |skatepark| %>
+    <%= render skatepark %>
+    <p>
+      <%= link_to "Show this skatepark", admin_skatepark_path(skatepark.id) %>
+    </p>
+  <% end %>
+</div>
+</main>
