@@ -8,7 +8,7 @@
   <% @skateparks.each do |skatepark| %>
     <%= render skatepark %>
     <p class='mb-3'>
-      <%= link_to "Show this skatepark", skatepark_path(skatepark.id) %>
+      <%= link_to "Show this skatepark", skatepark_path(skatepark.id), class: 'text-blue-500 underline' %>
     </p>
   <% end %>
 </div>
