@@ -1,0 +1,24 @@
+<div id="<%= dom_id skatepark %>">
+  <p>
+    <strong>Name:</strong>
+    <%= skatepark.name %>
+  </p>
+
+  <p>
+    <strong>Images:</strong>
+    <% skatepark.images.each do |image| %>
+      <div><%= link_to image.filename, image %></div>
+    <% end %>
+  </p>
+
+  <p>
+    <strong>Lat:</strong>
+    <%= skatepark.lat %>
+  </p>
+
+  <p>
+    <strong>Lng:</strong>
+    <%= skatepark.lng %>
+  </p>
+
+</div>

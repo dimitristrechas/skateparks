@@ -1,0 +1,10 @@
+<h1>Editing a skatepark</h1>
+
+<%= render "form", skatepark: @skatepark %>
+
+<br>
+
+<div>
+  <%= link_to "Show this skatepark", admin_skatepark_path(@skatepark.id) %> 
+  <%= link_to "Back to skateparks", admin_skateparks_path %>
+</div>

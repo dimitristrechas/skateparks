@@ -1,0 +1,10 @@
+<p style="color: green"><%= notice %></p>
+
+<%= render @skatepark %>
+
+<div>
+  <%= link_to "Edit this skatepark", edit_admin_skatepark_path(@skatepark) %> |
+  <%= link_to "Back to skateparks", admin_skateparks_path %>
+
+  <%= button_to "Destroy this skatepark", admin_skatepark_path(@skatepark.id), method: :delete %>
+</div>
