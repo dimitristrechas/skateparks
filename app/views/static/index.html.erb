@@ -1,16 +1,14 @@
-<header><%= link_to 'admin dashboard', admin_skateparks_path %></header>
+<header><%= link_to 'admin dashboard', admin_skateparks_path, class: 'text-blue-500 underline' %></header>
 
-<main>
-<h1>Welcome to skateparks.gr</h1>
+<h1 class="text-3xl font-bold mt-3 mb-6">Welcome to skateparks.gr</h1>
 
 
 
 <div id="skateparks">
   <% @skateparks.each do |skatepark| %>
     <%= render skatepark %>
-    <p>
-      <%= link_to "Show this skatepark", admin_skatepark_path(skatepark.id) %>
+    <p class='mb-3'>
+      <%= link_to "Show this skatepark", skatepark_path(skatepark.id) %>
     </p>
   <% end %>
 </div>
-</main>
