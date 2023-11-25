@@ -71,3 +71,5 @@ gem "sidekiq", "~> 7.2"
 gem "aws-sdk-s3", require: false
 
 gem "tailwindcss-rails", "~> 2.0"
+
+gem "view_component"

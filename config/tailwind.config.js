@@ -12,6 +12,10 @@ module.exports = {
       fontFamily: {
         sans: ["Montserrat", ...defaultTheme.fontFamily.sans],
       },
+      colors: {
+        transparent: "transparent",
+        current: "currentColor",
+      },
     },
   },
   plugins: [
