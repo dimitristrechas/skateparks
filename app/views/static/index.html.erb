@@ -1,14 +1,19 @@
-<header><%= link_to 'admin dashboard', admin_skateparks_path, class: 'text-blue-500 underline' %></header>
+<header><%= link_to 'admin dashboard', admin_skateparks_path, class: 'text-blue-700 underline' %></header>
 
-<h1 class="text-3xl font-bold mt-3 mb-6">Welcome to skateparks.gr</h1>
-
-
+<%= image_tag("skateparks_logo_dark.svg", height: '161', width: '834', alt: 'skateparks.gr logo') %>
 
 <div id="skateparks">
   <% @skateparks.each do |skatepark| %>
     <%= render skatepark %>
+
     <p class='mb-3'>
-      <%= link_to "Show this skatepark", skatepark_path(skatepark.id), class: 'text-blue-500 underline' %>
+      <%= render(
+        LinkComponent.new(
+          title: "Show this skatepark",
+          url: skatepark_path(skatepark.id),
+          classNames: "text-blue-700 underline",
+        )
+      ) %>
     </p>
   <% end %>
 </div>
