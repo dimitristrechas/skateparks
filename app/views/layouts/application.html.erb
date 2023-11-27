@@ -11,10 +11,27 @@
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
     <%= favicon_link_tag asset_path('favicon/favicon.ico') %>
+
+    <script>
+      if (
+        localStorage.theme === "dark" ||
+        (!("theme" in localStorage) &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches)
+      ) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    </script>
   </head>
 
-  <body class="">
-    <main class="container mx-auto mt-12 px-5 flex-row">
+  <body class="container mx-auto mt-2 px-5 flex-row">
+    <header>
+      <%= image_tag("skateparks_logo_dark.svg", height: '161', width: '834', alt: 'skateparks.gr logo') %>
+
+      <%= render "static/dark_mode" %>
+    </header>
+    <main>
       <%= yield %>
     </main>
   </body>
