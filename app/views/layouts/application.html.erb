@@ -22,15 +22,13 @@
       } else {
         document.documentElement.classList.remove('dark');
       }
+
     </script>
   </head>
 
-  <body class="container mx-auto mt-2 px-5 flex-row">
-    <header>
-      <%= image_tag("skateparks_logo_dark.svg", height: '161', width: '834', alt: 'skateparks.gr logo') %>
+  <body class="container mx-auto mt-2 px-5 flex-row dark:bg-neutral-800">
+    <%= render "static/header/header" %>
 
-      <%= render "static/dark_mode" %>
-    </header>
     <main>
       <%= yield %>
     </main>
