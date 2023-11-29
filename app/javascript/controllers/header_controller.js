@@ -3,12 +3,7 @@ import { Controller } from "@hotwired/stimulus";
 export default class extends Controller {
   static targets = ["image", "toggleButton", "lightIcon", "darkIcon"];
 
-  connect() {
-    console.log("connect logo controller");
-  }
-
   imageTargetConnected() {
-    console.log("logo", this.imageTarget);
     if (
       localStorage.theme === "dark" ||
       (!("theme" in localStorage) &&
@@ -30,17 +25,21 @@ export default class extends Controller {
       if (localStorage.getItem("theme") === "light") {
         document.documentElement.classList.add("dark");
         localStorage.setItem("theme", "dark");
+        this.imageTarget.src = "/assets/skateparks_logo_dark.svg";
       } else {
         document.documentElement.classList.remove("dark");
         localStorage.setItem("theme", "light");
+        this.imageTarget.src = "/assets/skateparks_logo_light.svg";
       }
     } else {
       if (document.documentElement.classList.contains("dark")) {
         document.documentElement.classList.remove("dark");
         localStorage.setItem("theme", "light");
+        this.imageTarget.src = "/assets/skateparks_logo_light.svg";
       } else {
         document.documentElement.classList.add("dark");
         localStorage.setItem("theme", "dark");
+        this.imageTarget.src = "/assets/skateparks_logo_dark.svg";
       }
     }
   };
