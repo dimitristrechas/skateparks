@@ -10,10 +10,10 @@ export default class extends Controller {
         window.matchMedia("(prefers-color-scheme: dark)").matches)
     ) {
       this.lightIconTarget.classList.remove("hidden");
-      this.imageTarget.src = "/assets/skateparks_logo_dark.svg";
+      // this.imageTarget.src = "/assets/skateparks_logo_dark.svg";
     } else {
       this.darkIconTarget.classList.remove("hidden");
-      this.imageTarget.src = "/assets/skateparks_logo_light.svg";
+      // this.imageTarget.src = "/assets/skateparks_logo_light.svg";
     }
   }
 
@@ -25,21 +25,21 @@ export default class extends Controller {
       if (localStorage.getItem("theme") === "light") {
         document.documentElement.classList.add("dark");
         localStorage.setItem("theme", "dark");
-        this.imageTarget.src = "/assets/skateparks_logo_dark.svg";
+        // this.imageTarget.src = "/assets/skateparks_logo_dark.svg";
       } else {
         document.documentElement.classList.remove("dark");
         localStorage.setItem("theme", "light");
-        this.imageTarget.src = "/assets/skateparks_logo_light.svg";
+        // this.imageTarget.src = "/assets/skateparks_logo_light.svg";
       }
     } else {
       if (document.documentElement.classList.contains("dark")) {
         document.documentElement.classList.remove("dark");
         localStorage.setItem("theme", "light");
-        this.imageTarget.src = "/assets/skateparks_logo_light.svg";
+        // this.imageTarget.src = "/assets/skateparks_logo_light.svg";
       } else {
         document.documentElement.classList.add("dark");
         localStorage.setItem("theme", "dark");
-        this.imageTarget.src = "/assets/skateparks_logo_dark.svg";
+        // this.imageTarget.src = "/assets/skateparks_logo_dark.svg";
       }
     }
   };
