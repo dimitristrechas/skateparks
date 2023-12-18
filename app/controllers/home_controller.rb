@@ -1,4 +1,4 @@
-class StaticController < ApplicationController
+class HomeController < ApplicationController
     def index
         @skateparks = Skatepark.all
     end
