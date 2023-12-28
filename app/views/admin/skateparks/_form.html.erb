@@ -1,5 +1,7 @@
 <%= form_with(url: skatepark&.id ? admin_skatepark_path(skatepark.id) : admin_skateparks_path,
-              model: skatepark) do |form| %>
+              model: skatepark,
+              class: "my-8 p-4 border border-neutral-500 rounded-md") do |form| %>
+
   <% if skatepark.errors.any? %>
     <div style="color: red">
       <h2><%= pluralize(skatepark.errors.count, "error") %> prohibited this skatepark from being saved:</h2>
@@ -12,27 +14,40 @@
     </div>
   <% end %>
 
-  <div>
-    <%= form.label :name, style: "display: block" %>
-    <%= form.text_field :name %>
+    <%= render(
+    TextFieldComponent.new(
+      name: 'name',
+      title: 'Name',
+      form: form 
+    )
+  ) %>
+
+  <%= render(
+    TextFieldComponent.new(
+      name: 'lat',
+      title: 'Latitude',
+      form: form 
+    )
+  ) %>
+
+  <%= render(
+    TextFieldComponent.new(
+      name: 'lng',
+      title: 'Longitude',
+      form: form 
+    )
+  ) %>
+
+  <div class="mb-4">
+    <%= form.label :images, 'Images', class: "block text-neutral-600 dark:text-neutral-300" %>
+    <%= form.file_field :images,
+                        multiple: true,
+                        accept:'image/*',
+                        class: "p-1 text-neutral-600 dark:text-neutral-300" %>
   </div>
 
-  <div>
-    <%= form.label :images, style: "display: block" %>
-    <%= form.file_field :images, multiple: true %>
+  <div class="">
+    <%= render(ButtonComponent.new(title: "Create skatepark", form: form, type: 'submit')) %>
   </div>
 
-  <div>
-    <%= form.label :lat, style: "display: block" %>
-    <%= form.text_field :lat %>
-  </div>
-
-  <div>
-    <%= form.label :lng, style: "display: block" %>
-    <%= form.text_field :lng %>
-  </div>
-
-  <div>
-    <%= form.submit %>
-  </div>
 <% end %>

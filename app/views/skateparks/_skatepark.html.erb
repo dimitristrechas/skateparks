@@ -1,26 +1,17 @@
 <div id="<%= dom_id skatepark %>">
-  <p>
-    <strong>Name:</strong>
+  <h2 class="text-2xl text-neutral-600 dark:text-neutral-300 font-semibold mb-4">
     <%= skatepark.name %>
-  </p>
+  </h2>
 
-  <p>
-    <strong>Images:</strong>
+  <div class="flex align-center gap-x-2 text-neutral-600 dark:text-neutral-300 mb-2">
+    <span>Latitude: <%= skatepark.lat %></span>
+    <span>Longitude: <%= skatepark.lng %></span>
+  </div>
+  <div class="grid grid-cols-2 gap-8">
     <% skatepark.images.each do |image| %>
-      <div><%= link_to image.filename, image %></div>
+      <div><%= image_tag image, class: "w-full h-auto" %></div>
     <% end %>
-  </p>
-
-  <p>
-    <strong>Lat:</strong>
-    <%= skatepark.lat %>
-  </p>
-
-  <p>
-    <strong>Lng:</strong>
-    <%= skatepark.lng %>
-  </p>
-
+  </div>
 </div>
 
 
