@@ -1,8 +1,26 @@
+<div class="mb-8">
+  <%= render(TitleComponent.new(title: "Welcome to skateparks.gr!")) %>
+</div>
 
+<% @skateparks.each do |skatepark| %>
 
-<div id="skateparks">
-  <% @skateparks.each do |skatepark| %>
-    <%= render skatepark %>
+  <div class="border border-neutral-500 rounded-md p-4 shadow text-neutral-600 dark:text-neutral-300">
+    <h2 class="text-xl font-medium mb-4">
+      <%= skatepark.name %>
+    </h2>
+
+    <div class="flex align-center gap-x-2 mb-2">
+      <span>Latitude: <%= skatepark.lat %></span>
+      <span>Longitude: <%= skatepark.lng %></span>
+    </div>
+
+    <div class="grid grid-cols-8">
+      <% skatepark.images.each_with_index do |image, index| %>
+        <div class="">
+          <%= image_tag image, class: "w-40 h-auto" %>
+        </div>
+      <% end %>
+    </div>
 
     <p class='mb-3'>
       <%= render(
@@ -12,5 +30,6 @@
         )
       ) %>
     </p>
-  <% end %>
-</div>
+
+  </div>
+<% end %>
