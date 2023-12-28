@@ -1,16 +1,25 @@
-<%= link_to 'homepage', root_path %>
-
 <p style="color: green"><%= notice %></p>
 
-<h1>List of skateparks</h1>
+
+<%= render(TitleComponent.new(title: "List of skateparks")) %>
 
 <div id="skateparks">
   <% @skateparks.each do |skatepark| %>
     <%= render skatepark %>
     <p>
-      <%= link_to "Show this skatepark", admin_skatepark_path(skatepark.id) %>
+      <%= render(
+        LinkComponent.new(
+          title: "Edit this skatepark",
+          url: edit_admin_skatepark_path(skatepark.id)
+        )
+      ) %>
     </p>
   <% end %>
 </div>
 
-<%= link_to "New skatepark", new_admin_skatepark_path %>
+<%= render(
+  LinkComponent.new(
+    title: "New skatepark",
+    url: new_admin_skatepark_path
+  )
+) %>

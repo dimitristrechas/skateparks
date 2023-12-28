@@ -1,10 +1,13 @@
-<h1>Editing a skatepark</h1>
+<%= render(TitleComponent.new(title: "Edit skatepark: #{@skatepark.name}")) %>
 
 <%= render "form", skatepark: @skatepark %>
 
-<br>
 
-<div>
-  <%= link_to "Show this skatepark", admin_skatepark_path(@skatepark.id) %> 
-  <%= link_to "Back to skateparks", admin_skateparks_path %>
+<div class="flex">
+  <%= render(
+    LinkComponent.new(
+      title: "Back to skateparks",
+      url: admin_skateparks_path
+    )
+  ) %>
 </div>
