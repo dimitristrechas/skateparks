@@ -19,6 +19,9 @@ module.exports = {
         transparent: "transparent",
         current: "currentColor",
       },
+      opacity: {
+        90: ".9",
+      },
     },
   },
   plugins: [
