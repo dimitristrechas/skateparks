@@ -1,12 +1,11 @@
 <%= form_with(url: skatepark&.id ? admin_skatepark_path(skatepark.id) : admin_skateparks_path,
               model: skatepark,
-              class: "my-8 p-4 border border-neutral-500 rounded-md") do |form| %>
+              class: "my-8") do |form| %>
 
   <% if skatepark.errors.any? %>
-    <div style="color: red">
-      <h2><%= pluralize(skatepark.errors.count, "error") %> prohibited this skatepark from being saved:</h2>
-
-      <ul>
+    <div class="mb-4">
+      <h2 class="text-xl font-semibold mb-1">Errors</h2>
+      <ul class="list-inside list-disc text-red-600">
         <% skatepark.errors.each do |error| %>
           <li><%= error.full_message %></li>
         <% end %>
@@ -14,40 +13,56 @@
     </div>
   <% end %>
 
+  <div class="grid grid-cols-2 gap-8">
     <%= render(
-    TextFieldComponent.new(
-      name: 'name',
-      title: 'Name',
-      form: form 
-    )
-  ) %>
+      TextFieldComponent.new(
+        name: 'name',
+        title: 'Name',
+        form: form
+      )
+    ) %>
 
-  <%= render(
-    TextFieldComponent.new(
-      name: 'lat',
-      title: 'Latitude',
-      form: form 
-    )
-  ) %>
+    <%= render(
+      TextFieldComponent.new(
+        name: 'lat',
+        title: 'Latitude',
+        form: form,
+        classnames: 'col-start-1'
+      )
+    ) %>
 
-  <%= render(
-    TextFieldComponent.new(
-      name: 'lng',
-      title: 'Longitude',
-      form: form 
-    )
-  ) %>
+    <%= render(
+      TextFieldComponent.new(
+        name: 'lng',
+        title: 'Longitude',
+        form: form
+      )
+    ) %>
 
-  <div class="mb-4">
-    <%= form.label :images, 'Images', class: "block text-neutral-600 dark:text-neutral-300" %>
-    <%= form.file_field :images,
-                        multiple: true,
-                        accept:'image/*',
-                        class: "p-1 text-neutral-600 dark:text-neutral-300" %>
+    <div class="col-start-1">
+      <%= form.label :description, 'Description', class: "block text-neutral-600 dark:text-neutral-300  mb-1" %>
+      <%= form.rich_text_area(:description, class: 'bg-white text-neutral-600') %>
+    </div>
+
+    <div class="col-start-1">
+      <%= form.label :cover_image, 'Cover image', class: "block text-neutral-600 dark:text-neutral-300  mb-1" %>
+
+      <%= form.file_field :cover_image,
+                          multiple: false,
+                          accept:'image/*',
+                          class: "p-1 text-neutral-600 dark:text-neutral-300" %>
+    </div>
+
+    <div>
+      <%= form.label :images, 'Skatepark images', class: "block text-neutral-600 dark:text-neutral-300  mb-1" %>
+      <%= form.file_field :images,
+                          multiple: true,
+                          accept:'image/*',
+                          class: "p-1 text-neutral-600 dark:text-neutral-300" %>
+    </div>
+
+    <div class="col-span-2 justify-self-end">
+      <%= render(ButtonComponent.new(title: "Create", form: form, type: 'submit')) %>
+    </div>
   </div>
-
-  <div class="">
-    <%= render(ButtonComponent.new(title: "Create skatepark", form: form, type: 'submit')) %>
-  </div>
-
 <% end %>

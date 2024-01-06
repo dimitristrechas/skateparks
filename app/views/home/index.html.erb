@@ -1,35 +1,22 @@
-<div class="mb-8">
-  <%= render(TitleComponent.new(title: "Welcome to skateparks.gr!")) %>
+<div class="mb-12">
+  <%= render(TitleComponent.new(title: "Welcome!")) %>
 </div>
 
+<div class="grid grid-cols-3 gap-4">
 <% @skateparks.each do |skatepark| %>
 
-  <div class="border border-neutral-500 rounded-md p-4 shadow text-neutral-600 dark:text-neutral-300">
-    <h2 class="text-xl font-medium mb-4">
+  <figure class="relative cursor-pointer hover:drop-shadow-md">
+
+    <%= link_to skatepark_path(skatepark.id) do %>
+      <%= image_tag skatepark.cover_image.variant(:thumb),
+                    size: "600x450",
+                    class: "rounded",
+                    alt: "#{skatepark.name} cover image" %>
+    <% end %>
+
+    <figcaption class="bg-neutral-900 text-neutral-50 opacity-90 absolute px-8 pt-1 pb-2 text-2xl font-semibold bottom-4 rounded-r">
       <%= skatepark.name %>
-    </h2>
-
-    <div class="flex align-center gap-x-2 mb-2">
-      <span>Latitude: <%= skatepark.lat %></span>
-      <span>Longitude: <%= skatepark.lng %></span>
-    </div>
-
-    <div class="grid grid-cols-8">
-      <% skatepark.images.each_with_index do |image, index| %>
-        <div class="">
-          <%= image_tag image, class: "w-40 h-auto" %>
-        </div>
-      <% end %>
-    </div>
-
-    <p class='mb-3'>
-      <%= render(
-        LinkComponent.new(
-          title: "Show this skatepark",
-          url: skatepark_path(skatepark.id)
-        )
-      ) %>
-    </p>
-
-  </div>
+    </figcaption>
+  </figure>
 <% end %>
+</div>

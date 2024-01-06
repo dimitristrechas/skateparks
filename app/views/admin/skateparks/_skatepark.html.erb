@@ -1,24 +1,29 @@
-<div id="<%= dom_id skatepark %>">
-  <p>
-    <strong>Name:</strong>
-    <%= skatepark.name %>
-  </p>
+<div class="mb-2">
+  <strong>Name:</strong>
+  <%= skatepark.name %>
+</div>
 
-  <p>
-    <strong>Images:</strong>
+<div class="mb-2">
+  <strong>Cover:</strong>
+  <%= link_to skatepark.cover_image.filename, skatepark.cover_image %>
+</div>
+
+
+<div class="mb-2">
+  <strong>Images:</strong>
+  <div class="grid grid-cols-4">
     <% skatepark.images.each do |image| %>
-      <div><%= link_to image.filename, image %></div>
+      <%= link_to image.filename, image %>
     <% end %>
-  </p>
+  </div>
+</div>
 
-  <p>
-    <strong>Lat:</strong>
-    <%= skatepark.lat %>
-  </p>
+<div class="mb-2">
+  <strong>Lat:</strong>
+  <%= skatepark.lat %>
+</div>
 
-  <p>
-    <strong>Lng:</strong>
-    <%= skatepark.lng %>
-  </p>
-
+<div class="mb-2">
+  <strong>Lng:</strong>
+  <%= skatepark.lng %>
 </div>

@@ -3,23 +3,33 @@
 
 <%= render(TitleComponent.new(title: "List of skateparks")) %>
 
+<div class="my-4">
+  <%= render(
+    LinkComponent.new(
+      title: "New skatepark",
+      url: new_admin_skatepark_path
+    )
+  ) %>
+</div>
+
 <div id="skateparks">
   <% @skateparks.each do |skatepark| %>
-    <%= render skatepark %>
-    <p>
-      <%= render(
-        LinkComponent.new(
-          title: "Edit this skatepark",
-          url: edit_admin_skatepark_path(skatepark.id)
-        )
-      ) %>
-    </p>
+    <div id="<%= dom_id skatepark %>" class="my-8 p-8 border border-neutral-500/50 rounded">
+      <%= render skatepark %>
+      <div class="flex gap-4 justify-end">
+        <%= button_to "Destroy this skatepark",
+                      admin_skatepark_path(skatepark.id),
+                      method: :delete,
+                      class: 'text-red-500 hover:underline' %>
+
+        <%= render(
+          LinkComponent.new(
+            title: "Edit this skatepark",
+            url: edit_admin_skatepark_path(skatepark.id)
+          )
+        ) %>
+      </div>
+    </div>
   <% end %>
 </div>
 
-<%= render(
-  LinkComponent.new(
-    title: "New skatepark",
-    url: new_admin_skatepark_path
-  )
-) %>

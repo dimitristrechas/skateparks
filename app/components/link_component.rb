@@ -3,13 +3,13 @@ class LinkComponent < ViewComponent::Base
   erb_template <<-ERB
     <%= link_to @title,
                 @url,
-                class: "text-blue-700 dark:text-blue-400 hover:underline #{@classNames}".rstrip %>
+                class: ("text-blue-700 dark:text-blue-400 hover:underline " + @classnames.to_s).rstrip %>
   ERB
 
-  def initialize(title:, url:, classNames: nil)
+  def initialize(title:, url:, classnames: nil)
     @title = title
     @url = url
-    @classNames = classNames
+    @classnames = classnames
   end
 
 end
