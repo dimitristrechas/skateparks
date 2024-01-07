@@ -15,11 +15,11 @@
       <div class="<%= index == 0 ? 'col-span-2': '' %>">
         <%= image_tag image,
                       class: "w-full h-auto",
-                      srcset: [
-                        [url_for(image.variant(:sm)), "400w"],
-                        [url_for(image.variant(:md)), "1200w"],
-                        [url_for(image.variant(:lg)), "1600w"]
-                      ],
+                      # srcset: [
+                      #   [url_for(image.variant(:sm)), "400w"],
+                      #   [url_for(image.variant(:md)), "1200w"],
+                      #   [url_for(image.variant(:lg)), "1600w"]
+                      # ],
                       sizes: "100vw" %>
       </div>
     <% end %>
