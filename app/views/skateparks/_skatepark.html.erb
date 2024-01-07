@@ -13,7 +13,7 @@
   <div class="grid grid-cols-4 gap-4">
     <% skatepark.images.each_with_index do |image, index| %>
       <div class="<%= index == 0 ? 'col-span-2': '' %>">
-        <%= image_tag url_for(image),
+        <%= image_tag image,
                       class: "w-full h-auto",
                       srcset: [
                         [url_for(image.variant(:sm)), "400w"],
