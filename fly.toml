@@ -46,6 +46,3 @@ console_command = "/rails/bin/rails console"
   sidekiq = "bundle exec sidekiq"
 [deploy]
   release_command = "./bin/rails db:prepare"
-[mounts]
-  source="skateparks_data"
-  destination="/data"
