@@ -75,3 +75,5 @@ gem "tailwindcss-rails", "~> 2.0"
 gem "view_component"
 
 gem "dockerfile-rails", ">= 1.6", :group => :development
+
+gem 'active_storage-postgresql'
