@@ -28,4 +28,13 @@
 #       enabled: "ON"
 
 en:
-  hello: "Hello world"
+  welcome_homepage: "Find skateparks in Greece!"
+  made_with: "Made with"
+  city_of_origin: "Kavala, Greece"
+  more_skateparks_soon: "More skateparks soon!"
+  show_details: "Show details"
+  photos: "photos"
+  latitude: "latitude"
+  longitude: "longitude"
+  back_to_homepage: "Back to homepage"
+  open_in_google_maps: "Open skatepark in google maps"

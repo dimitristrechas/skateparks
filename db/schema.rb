@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_01_06_192708) do
+ActiveRecord::Schema[7.2].define(version: 2024_01_09_181057) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -21,7 +21,8 @@ ActiveRecord::Schema[7.2].define(version: 2024_01_06_192708) do
     t.bigint "record_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["record_type", "record_id", "name"], name: "index_action_text_rich_texts_uniqueness", unique: true
+    t.string "locale"
+    t.index ["record_type", "record_id", "name", "locale"], name: "index_action_text_rich_texts_uniqueness", unique: true
   end
 
   create_table "active_storage_attachments", force: :cascade do |t|
@@ -46,31 +47,41 @@ ActiveRecord::Schema[7.2].define(version: 2024_01_06_192708) do
     t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
   end
 
+  create_table "active_storage_postgresql_files", force: :cascade do |t|
+    t.oid "oid"
+    t.string "key"
+    t.index ["key"], name: "index_active_storage_postgresql_files_on_key", unique: true
+  end
+
   create_table "active_storage_variant_records", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
-  create_table "admin_skateparks", force: :cascade do |t|
-    t.string "title"
-    t.decimal "lat", precision: 10, scale: 6
-    t.decimal "lng", precision: 10, scale: 6
-    t.string "description"
+  create_table "mobility_string_translations", force: :cascade do |t|
+    t.string "locale", null: false
+    t.string "key", null: false
+    t.string "value"
+    t.string "translatable_type"
+    t.bigint "translatable_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["translatable_id", "translatable_type", "key"], name: "index_mobility_string_translations_on_translatable_attribute"
+    t.index ["translatable_id", "translatable_type", "locale", "key"], name: "index_mobility_string_translations_on_keys", unique: true
+    t.index ["translatable_type", "key", "value", "locale"], name: "index_mobility_string_translations_on_query_keys"
   end
 
-  create_table "admins", force: :cascade do |t|
-    t.string "email", default: "", null: false
-    t.string "encrypted_password", default: "", null: false
-    t.string "reset_password_token"
-    t.datetime "reset_password_sent_at"
-    t.datetime "remember_created_at"
+  create_table "mobility_text_translations", force: :cascade do |t|
+    t.string "locale", null: false
+    t.string "key", null: false
+    t.text "value"
+    t.string "translatable_type"
+    t.bigint "translatable_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["email"], name: "index_admins_on_email", unique: true
-    t.index ["reset_password_token"], name: "index_admins_on_reset_password_token", unique: true
+    t.index ["translatable_id", "translatable_type", "key"], name: "index_mobility_text_translations_on_translatable_attribute"
+    t.index ["translatable_id", "translatable_type", "locale", "key"], name: "index_mobility_text_translations_on_keys", unique: true
   end
 
   create_table "skateparks", force: :cascade do |t|
@@ -79,7 +90,8 @@ ActiveRecord::Schema[7.2].define(version: 2024_01_06_192708) do
     t.decimal "lng", precision: 10, scale: 6
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.text "description"
+    t.string "google_url"
+    t.string "google_id"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"

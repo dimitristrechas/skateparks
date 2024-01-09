@@ -1,0 +1,11 @@
+el:
+  welcome_homepage: "Καλωσήρθες στα skateparks της Ελλάδας!"
+  made_with: "Φτιαγμένο με"
+  city_of_origin: "Καβάλα, Ελλάδα"
+  more_skateparks_soon: "Περισσότερα πάρκα σύντομα!"
+  show_details: "Δες λεπτομέρειες"
+  photos: "φωτογραφίες"
+  latitude: "γεωγραφικό πλάτος"
+  longitude: "γεωγραφικό μήκος"
+  back_to_homepage: "Πίσω στην αρχική"
+  open_in_google_maps: "Άνοιξε το πάρκο στο google maps"

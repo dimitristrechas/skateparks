@@ -1,28 +1,94 @@
 <div id="<%= dom_id skatepark %>">
-  <h2 class="text-2xl text-neutral-600 dark:text-neutral-300 font-semibold mb-4">
-    <%= skatepark.name %>
-  </h2>
 
-  <div class="flex align-center gap-x-2 text-neutral-600 dark:text-neutral-300 mb-2">
-    <span>Latitude: <%= skatepark.lat %></span>
-    <span>Longitude: <%= skatepark.lng %></span>
-  </div>
-  <div>
+  <%= render(TitleComponent.new(title: skatepark.name, classnames: 'mb-4')) %>
+
+  <div class="mb-4">
     <%= skatepark.description %>
   </div>
-  <div class="grid grid-cols-4 gap-4">
-    <% skatepark.images.each_with_index do |image, index| %>
-      <div class="<%= index == 0 ? 'col-span-2': '' %>">
-        <%= image_tag image,
-                      class: "w-full h-auto",
-                      srcset: [
-                        [url_for(image.variant(:sm)), "400w"],
-                        [url_for(image.variant(:md)), "1200w"],
-                        [url_for(image.variant(:lg)), "1600w"]
-                      ],
-                      sizes: "100vw" %>
-      </div>
-    <% end %>
+
+  <div id="default-carousel" class="relative w-full mb-8" data-carousel="slide">
+    <div class="relative overflow-hidden rounded-lg h-96 md:h-128">
+      <% skatepark.images.each_with_index do |image, index| %>
+        <div class="hidden duration-700 ease-in-out" data-carousel-item>
+            <%= image_tag image,
+                          class: "absolute block w-full -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2",
+                          srcset: [
+                            [url_for(image.variant(:sm)), ""],
+                            [url_for(image.variant(:md)), "1.5x"],
+                            [url_for(image.variant(:lg)), "2x"]
+                          ],
+                          sizes: "100vw" %>
+        </div>
+      <% end %>
+    </div>
+    <!-- Slider indicators -->
+    <div class="absolute z-30 flex -translate-x-1/2 bottom-5 left-1/2 space-x-3 rtl:space-x-reverse">
+      <% skatepark.images.each_with_index do |image, index| %>
+        <button type="button"
+                class="w-3 h-3 rounded-full"
+                aria-current="true" aria-label="Slide <%= index %>"
+                data-carousel-slide-to="<%= index %>">
+
+        </button>
+      <% end %>
+    </div>
+    <!-- Slider controls -->
+    <button type="button"
+            class="absolute top-0 start-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none"
+            data-carousel-prev>
+      <span class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none">
+        <svg class="w-4 h-4 text-white dark:text-gray-800 rtl:rotate-180"
+             aria-hidden="true"
+             xmlns="http://www.w3.org/2000/svg"
+             fill="none"
+             viewBox="0 0 6 10">
+          <path stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M5 1 1 5l4 4"/>
+        </svg>
+        <span class="sr-only">Previous</span>
+      </span>
+    </button>
+    <button type="button"
+            class="absolute top-0 end-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none"
+            data-carousel-next>
+      <span class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none">
+        <svg class="w-4 h-4 text-white dark:text-gray-800 rtl:rotate-180"
+             aria-hidden="true"
+             xmlns="http://www.w3.org/2000/svg"
+             fill="none"
+             viewBox="0 0 6 10">
+          <path stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="m1 9 4-4-4-4"/>
+        </svg>
+        <span class="sr-only">Next</span>
+      </span>
+    </button>
+  </div>
+
+  <div class="mb-2">
+    <%= render(
+      LinkComponent.new(
+        title: t('open_in_google_maps'),
+        target: "_blank",
+        url: skatepark.google_id.nil? ?
+              "https://www.google.com/maps/search/?api=1&query=#{skatepark.lat},#{skatepark.lng}" :
+              "https://maps.app.goo.gl/#{skatepark.google_id}"
+      )
+    ) %>
+  </div>
+
+  <div data-controller="skatepark"
+       data-target="skatepark.container"
+       data-skatepark-lat-value="<%= skatepark.lat %>"
+       data-skatepark-lng-value="<%= skatepark.lng %>"
+       class="leaflet-container rounded-lg"
+       style="min-height: 450px">
   </div>
 </div>
 

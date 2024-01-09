@@ -2,6 +2,13 @@
 
 <%= render @skatepark %>
 
-<div>
-  <%= link_to "Back to skateparks", skateparks_path, class: 'text-blue-500 underline' %>
+<div class="flex flex-row-reverse mt-8">
+  <%= render(
+    LinkComponent.new(
+      title: t('back_to_homepage'),
+      url: root_path
+    )
+  ) %>
 </div>
+
+

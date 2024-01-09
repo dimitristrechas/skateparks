@@ -22,6 +22,9 @@ module.exports = {
       opacity: {
         90: ".9",
       },
+      height: {
+        128: "32rem",
+      },
     },
   },
   plugins: [

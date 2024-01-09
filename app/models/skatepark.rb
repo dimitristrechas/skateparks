@@ -1,14 +1,16 @@
-require "image_processing/vips"
-
 class Skatepark < ApplicationRecord
+  extend Mobility
+  translates :name, type: :string
+  translates :description, backend: :action_text
+
   has_many_attached :images do |attachable|
     attachable.variant(:sm,
-                       resize_and_pad: [400, 300],
+                       resize_and_pad: [600, 450],
                        format: :webp,
                        saver: { strip: true, quality: 50, interlace: true }
                       )
     attachable.variant(:md,
-                       resize_and_pad: [800, 600],
+                       resize_and_pad: [1200, 900],
                        format: :webp,
                        saver: { strip: true, quality: 80, interlace: true }
                       )
@@ -20,13 +22,11 @@ class Skatepark < ApplicationRecord
   end
   has_one_attached :cover_image do |attachable|
     attachable.variant(:thumb,
-                       resize_and_pad: [600, 450],
+                       resize_and_pad: [1200, 900],
                        format: :webp,
                        saver: { strip: true, quality: 80, interlace: true }
                       )
   end
-
-  has_rich_text :description
 
   validates :name, presence: true
   validates :cover_image, presence: true 
