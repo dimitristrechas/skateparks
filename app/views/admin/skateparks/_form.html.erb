@@ -16,8 +16,16 @@
   <div class="grid grid-cols-2 gap-8">
     <%= render(
       TextFieldComponent.new(
-        name: 'name',
-        title: 'Name',
+        name: 'name_el',
+        title: 'Name greek',
+        form: form
+      )
+    ) %>
+
+    <%= render(
+      TextFieldComponent.new(
+        name: 'name_en',
+        title: 'Name english',
         form: form
       )
     ) %>
@@ -39,9 +47,22 @@
       )
     ) %>
 
+    <%= render(
+      TextFieldComponent.new(
+        name: 'google_id',
+        title: 'Google maps id',
+        form: form
+      )
+    ) %>
+
     <div class="col-start-1">
-      <%= form.label :description, 'Description', class: "block text-neutral-600 dark:text-neutral-300  mb-1" %>
-      <%= form.rich_text_area(:description, class: 'bg-white text-neutral-600') %>
+      <%= form.label :description_el, 'Description el', class: "block text-neutral-600 dark:text-neutral-300 mb-1" %>
+      <%= form.rich_text_area(:description_el, class: 'bg-white text-neutral-600') %>
+    </div>
+
+    <div>
+      <%= form.label :description_en, 'Description en', class: "block text-neutral-600 dark:text-neutral-300 mb-1" %>
+      <%= form.rich_text_area(:description_en, class: 'bg-white text-neutral-600') %>
     </div>
 
     <div class="col-start-1">
