@@ -7,14 +7,6 @@
                   ) %>
     <% end %>
 
-    <%= render(
-      LinkComponent.new(
-        title: "Admin",
-        url: admin_skateparks_path,
-        classnames: 'ms-auto'
-      )
-    ) if ENV["RAILS_ENV"] == 'development' %>
-
     <%= render "home/locale_selector" %>
 
     <%= render "home/dark_mode_switch" %>
