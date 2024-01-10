@@ -4,7 +4,7 @@
                 class: "flex flex-col items-stretch bg-white border border-gray-200 rounded-lg hover:drop-shadow-md md:flex-row dark:border-gray-700 dark:bg-gray-800" do %>
       <%= image_tag skatepark.cover_image,
                     size: "600x450",
-                    class: "object-cover w-full md:h-auto md:w-3/5 -skew-y-2 hover:brightness-105 rounded-lg origin-center shadow-lg",
+                    class: "object-cover w-full md:h-auto md:w-3/5 -skew-y-1 origin-bottom-left rounded-lg shadow-lg",
                     alt: "#{skatepark.name} cover image" %>
       <div class="flex flex-1 flex-col justify-start p-8 leading-normal">
         <h5 class="mb-3 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
@@ -13,6 +13,11 @@
         <p class="mb-1 font-normal text-gray-700 dark:text-gray-400">
           <%= "#{skatepark.images.size} #{t('photos')}" %>
         </p>
+
+        <svg class="w-6 h-6 mt-auto self-end hover:w-7 hover:h-7 transition-all" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 16">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 1h4m0 0v4m0-4-5 5.243M5 15H1m0 0v-4m0 4 5.243-5"/>
+        </svg>  
+  
     
       </div>
     <% end %>
