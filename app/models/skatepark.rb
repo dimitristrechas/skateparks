@@ -10,12 +10,12 @@ class Skatepark < ApplicationRecord
                        saver: { strip: true, quality: 50, interlace: true },
                        preprocessed: true
                       )
-    attachable.variant(:md,
-                       resize_and_pad: [1200, 900],
-                       format: :webp,
-                       saver: { strip: true, quality: 80, interlace: true },
-                       preprocessed: true
-                      )
+    # attachable.variant(:md,
+    #                    resize_and_pad: [1200, 900],
+    #                    format: :webp,
+    #                    saver: { strip: true, quality: 80, interlace: true },
+    #                    preprocessed: true
+    #                   )
     attachable.variant(:lg,
                        resize_and_pad: [1600, 1200],
                        format: :webp,

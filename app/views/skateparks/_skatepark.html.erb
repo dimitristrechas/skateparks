@@ -10,11 +10,11 @@
     <div class="relative overflow-hidden rounded-lg h-96 md:h-128">
       <% skatepark.images.each_with_index do |image, index| %>
         <div class="hidden duration-700 ease-in-out" data-carousel-item>
-            <%= image_tag image,
+            <%= image_tag image.variant(:sm),
                           class: "absolute block w-full -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2",
                           srcset: [
-                            [url_for(image.variant(:sm)), ""],
-                            [url_for(image.variant(:md)), "1.5x"],
+                            # [url_for(image.variant(:sm)), ""],
+                            # [url_for(image.variant(:md)), "1.5x"],
                             [url_for(image.variant(:lg)), "2x"]
                           ],
                           sizes: "100vw" %>
