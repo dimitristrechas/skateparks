@@ -2,7 +2,19 @@
 
 <%= render @skatepark %>
 
-<div class="flex flex-row-reverse mt-8">
+<div class="flex mt-8 gap-4 justify-end">
+  <%= render(
+    LinkComponent.new(
+      title: t('open_in_google_maps'),
+      target: "_blank",
+      url: @skatepark.google_id.nil? ?
+            "https://www.google.com/maps/search/?api=1&query=#{@skatepark.lat},#{@skatepark.lng}" :
+            "https://maps.app.goo.gl/#{@skatepark.google_id}"
+    )
+  ) %>
+
+  |
+
   <%= render(
     LinkComponent.new(
       title: t('back_to_homepage'),
