@@ -9,3 +9,5 @@ el:
   longitude: "γεωγραφικό μήκος"
   back_to_homepage: "Πίσω στην αρχική"
   open_in_google_maps: "Άνοιξε το πάρκο στο google maps"
+  previous: "Προηγούμενο"
+  next: "Επόμενο"

@@ -38,3 +38,5 @@ en:
   longitude: "longitude"
   back_to_homepage: "Back to homepage"
   open_in_google_maps: "Open skatepark in google maps"
+  previous: "Previous"
+  next: "Next"
