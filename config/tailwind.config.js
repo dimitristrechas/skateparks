@@ -25,6 +25,9 @@ module.exports = {
       height: {
         128: "32rem",
       },
+      gridTemplateRows: {
+        layout: "auto 1fr auto",
+      },
     },
   },
   plugins: [
