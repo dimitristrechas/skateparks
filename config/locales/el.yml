@@ -12,3 +12,10 @@ el:
   previous: "Προηγούμενο"
   next: "Επόμενο"
   discover_skateparks_in_greece: "Ανακάλυψε skateparks σε όλη την Ελλάδα!"
+  delete_confirm: "Είσαι σίγουρος;"
+  skatepark:
+    name: "Όνομα"
+    images: "Φωτογραφίες"
+    google_id: "Google ID"
+  edit: "Επεξεργασία"
+  create: "Δημιουργία"
