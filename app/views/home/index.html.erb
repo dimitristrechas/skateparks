@@ -6,7 +6,7 @@
                     size: "600x450",
                     class: "object-cover w-full md:h-auto md:w-3/5 -skew-y-1 origin-bottom-left rounded-lg shadow-lg",
                     alt: "#{skatepark.name} cover image" %>
-      <div class="flex flex-1 flex-col justify-between sm:justify-start items-start p-8 leading-normal">
+      <div class="flex flex-1 flex-col justify-between sm:justify-start items-start p-4 sm:p-8 leading-normal">
         <h5 class="sm:mb-3 text-2xl font-bold tracking-tight text-neutral-700 dark:text-neutral-200">
           <%= skatepark.name %>
         </h5>
@@ -24,11 +24,8 @@
     <svg class="w-1/2 h-1/2 text-neutral-700 dark:text-neutral-200 -skew-y-2 origin-center" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">
       <path d="M18 0H2a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2Zm-5.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm4.376 10.481A1 1 0 0 1 16 15H4a1 1 0 0 1-.895-1.447l3.5-7A1 1 0 0 1 7.468 6a.965.965 0 0 1 .9.5l2.775 4.757 1.546-1.887a1 1 0 0 1 1.618.1l2.541 4a1 1 0 0 1 .028 1.011Z"/>
     </svg>
-    <div class="flex flex-col justify-between pt-8 lg:pt-0 leading-normal self-start">
-      <h5 class="text-2xl font-bold tracking-tight text-neutral-700 dark:text-neutral-200">
-        <%= t('more_skateparks_soon') %>
-      </h5>
-      <p class="mb-3 font-normal"></p>
-    </div>
+    <h5 class="text-2xl font-bold tracking-tight text-neutral-700 dark:text-neutral-200 self-start mt-8">
+      <%= t('more_skateparks_soon') %>
+    </h5>
   </div>
 </div>
