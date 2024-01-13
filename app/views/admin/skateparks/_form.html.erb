@@ -21,14 +21,14 @@
       <%= render(
         TextFieldComponent.new(
           name: 'name_el',
-          title: 'Name greek',
+          title: t('name_el'),
           form: form
         )
       ) %>
       <%= render(
         TextFieldComponent.new(
           name: 'name_en',
-          title: 'Name english',
+          title: t('name_en'),
           form: form
         )
       ) %>
@@ -38,7 +38,7 @@
       <%= render(
         TextFieldComponent.new(
           name: 'lat',
-          title: 'Latitude',
+          title: t('latitude'),
           form: form,
           classnames: 'col-start-1'
         )
@@ -46,7 +46,7 @@
       <%= render(
         TextFieldComponent.new(
           name: 'lng',
-          title: 'Longitude',
+          title: t('longitude'),
           form: form
         )
       ) %>
@@ -88,7 +88,9 @@
     </div>
 
     <div class="col-start-1">
-      <%= form.label :images, 'Skatepark images', class: "block text-neutral-600 dark:text-neutral-300  mb-1" %>
+      <%= form.label :images,
+                     'Images',
+                     class: "block text-neutral-600 dark:text-neutral-300  mb-1" %>
       <%= form.file_field :images,
                           multiple: true,
                           accept:'image/*',
