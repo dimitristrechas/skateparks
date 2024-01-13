@@ -1,26 +1,10 @@
-
-
 <%= render @skatepark %>
 
-<div class="flex flex-col sm:flex-row my-8 gap-4 items-center sm:items-start justify-end">
-  <%= render(
-    LinkComponent.new(
-      title: t('open_in_google_maps'),
-      target: "_blank",
-      url: @skatepark.google_id.nil? ?
-            "https://www.google.com/maps/search/?api=1&query=#{@skatepark.lat},#{@skatepark.lng}" :
-            "https://maps.app.goo.gl/#{@skatepark.google_id}"
-    )
-  ) %>
-
-  <span class="hidden sm:block">|</span>
-
-  <%= render(
-    LinkComponent.new(
-      title: t('back_to_homepage'),
-      url: root_path
-    )
-  ) %>
-</div>
-
+<%= render(
+  LinkComponent.new(
+    title: t('back_to_homepage'),
+    url: root_path,
+    classnames: "flex flex-col sm:flex-row my-8 gap-4 items-center sm:items-start justify-end"
+  )
+) %>
 

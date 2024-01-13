@@ -48,3 +48,6 @@ en:
     google_id: "Google ID"
   edit: "Edit"
   create: "Create"
+  name_el: "Name in greek"
+  name_en: "Name in english"
+  description: "Description"
