@@ -17,38 +17,40 @@
   <% end %>
 
   <div class="grid grid-cols-2 gap-8">
-    <%= render(
-      TextFieldComponent.new(
-        name: 'name_el',
-        title: 'Name greek',
-        form: form
-      )
-    ) %>
+    <div class="flex flex-col gap-2">
+      <%= render(
+        TextFieldComponent.new(
+          name: 'name_el',
+          title: 'Name greek',
+          form: form
+        )
+      ) %>
+      <%= render(
+        TextFieldComponent.new(
+          name: 'name_en',
+          title: 'Name english',
+          form: form
+        )
+      ) %>
+    </div>
 
-    <%= render(
-      TextFieldComponent.new(
-        name: 'name_en',
-        title: 'Name english',
-        form: form
-      )
-    ) %>
-
-    <%= render(
-      TextFieldComponent.new(
-        name: 'lat',
-        title: 'Latitude',
-        form: form,
-        classnames: 'col-start-1'
-      )
-    ) %>
-
-    <%= render(
-      TextFieldComponent.new(
-        name: 'lng',
-        title: 'Longitude',
-        form: form
-      )
-    ) %>
+    <div class="flex flex-col gap-2">
+      <%= render(
+        TextFieldComponent.new(
+          name: 'lat',
+          title: 'Latitude',
+          form: form,
+          classnames: 'col-start-1'
+        )
+      ) %>
+      <%= render(
+        TextFieldComponent.new(
+          name: 'lng',
+          title: 'Longitude',
+          form: form
+        )
+      ) %>
+    </div>
 
     <%= render(
       TextFieldComponent.new(
@@ -77,7 +79,15 @@
                           class: "p-1 text-neutral-600 dark:text-neutral-300" %>
     </div>
 
-    <div>
+    <div class="flex gap-4 col-span-2 flex-wrap place-items-center">
+      <% if skatepark&.id %>
+        <%= image_tag skatepark.cover_image,
+                      size: "600x450",
+                      class: "rounded" %>
+      <% end %>
+    </div>
+
+    <div class="col-start-1">
       <%= form.label :images, 'Skatepark images', class: "block text-neutral-600 dark:text-neutral-300  mb-1" %>
       <%= form.file_field :images,
                           multiple: true,
@@ -85,7 +95,7 @@
                           class: "p-1 text-neutral-600 dark:text-neutral-300" %>
     </div>
 
-    <div class="grid gap-4 col-span-2 grid-cols-4 place-items-center">
+    <div class="flex gap-4 col-span-2 flex-wrap place-items-center">
       <% if skatepark&.id %>
         <% skatepark.images.each do |image| %>
           <div
@@ -95,9 +105,9 @@
             <%= form.hidden_field :images,
                                   multiple: true,
                                   value: image.signed_id %>
-            <%= image_tag skatepark.cover_image,
-                                    size: "200x150",
-                                    class: "rounded" %>
+            <%= image_tag image,
+                          size: "200x150",
+                          class: "rounded" %>
           </div>
         <% end %>
       <% end %>
