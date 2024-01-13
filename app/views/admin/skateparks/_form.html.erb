@@ -1,6 +1,9 @@
 <%= form_with(url: skatepark&.id ? admin_skatepark_path(skatepark.id) : admin_skateparks_path,
               model: skatepark,
-              class: "my-8") do |form| %>
+              class: "my-8",
+              data: {
+                controller: 'admin--skateparks--form'
+              }) do |form| %>
 
   <% if skatepark.errors.any? %>
     <div class="mb-4">
@@ -82,8 +85,32 @@
                           class: "p-1 text-neutral-600 dark:text-neutral-300" %>
     </div>
 
+    <div class="grid gap-4 col-span-2 grid-cols-4 place-items-center">
+      <% if skatepark&.id %>
+        <% skatepark.images.each do |image| %>
+          <div
+            data-action="click->admin--skateparks--form#onImageClick"
+            class="cursor-pointer hover:outline hover:outline-4 hover:outline-offset-2 hover:outline-red-500 rounded"
+          >
+            <%= form.hidden_field :images,
+                                  multiple: true,
+                                  value: image.signed_id %>
+            <%= image_tag skatepark.cover_image,
+                                    size: "200x150",
+                                    class: "rounded" %>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+
     <div class="col-span-2 justify-self-end">
-      <%= render(ButtonComponent.new(title: "Create", form: form, type: 'submit')) %>
+      <%= render(
+        ButtonComponent.new(
+          title: skatepark&.id ? t('edit') : t('create'),
+          form: form,
+          type: 'submit'
+        )
+      ) %>
     </div>
   </div>
 <% end %>

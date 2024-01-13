@@ -41,3 +41,10 @@ en:
   previous: "Previous"
   next: "Next"
   discover_skateparks_in_greece: "Discover skateparks all over Greece!"
+  delete_confirm: "Are you sure?"
+  skatepark:
+    name: "Name"
+    images: "Images"
+    google_id: "Google ID"
+  edit: "Edit"
+  create: "Create"

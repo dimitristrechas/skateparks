@@ -4,26 +4,6 @@
 </div>
 
 <div class="mb-2">
-  <strong>Cover:</strong>
-  <%= link_to skatepark.cover_image.filename, skatepark.cover_image %>
-</div>
-
-
-<div class="mb-2">
   <strong>Images:</strong>
-  <div class="grid grid-cols-4">
-    <% skatepark.images.each do |image| %>
-      <%= link_to image.filename, image %>
-    <% end %>
-  </div>
-</div>
-
-<div class="mb-2">
-  <strong>Lat:</strong>
-  <%= skatepark.lat %>
-</div>
-
-<div class="mb-2">
-  <strong>Lng:</strong>
-  <%= skatepark.lng %>
+  <%= skatepark.images.size %>
 </div>
