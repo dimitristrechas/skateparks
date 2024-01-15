@@ -17,6 +17,7 @@ en:
     name: "Name"
     images: "Images"
     google_id: "Google ID"
+    status: "status"
   edit: "Edit"
   create: "Create"
   name_el: "Name in greek"

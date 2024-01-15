@@ -17,6 +17,7 @@ el:
     name: "Όνομα"
     images: "Φωτογραφίες"
     google_id: "Google ID"
+    status: "Κατάσταση"
   edit: "Επεξεργασία"
   create: "Δημιουργία"
   name_el: "Όνομα στα ελληνικά"
