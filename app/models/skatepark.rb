@@ -33,10 +33,13 @@ class Skatepark < ApplicationRecord
   #                     )
   # end
 
+  enum status: { draft: 0, published: 1, archived: 2 }
+
   validates :name, presence: true
   validates :cover_image, presence: true 
   validates :lat, presence: true
   validates :lng, presence: true
   validates :description, presence: true
   validates :images, length: { minimum: 2,  too_short: "%{count} is the minimum allowed" }
+  validates :status, presence: true, inclusion: { in: statuses.keys }
 end
