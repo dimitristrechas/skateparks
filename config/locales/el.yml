@@ -22,3 +22,5 @@ el:
   name_el: "Όνομα στα ελληνικά"
   name_en: "Όνομα στα αγγλικά"
   description: "Περιγραφή"
+  about: "Σχετικά με το skateparks.gr"
+  contact: "Επικοινωνία"
