@@ -11,7 +11,6 @@ en:
   open_in_google_maps: "Open skatepark in google maps"
   previous: "Previous"
   next: "Next"
-  discover_skateparks_in_greece: "Discover skateparks all over Greece!"
   delete_confirm: "Are you sure?"
   skatepark:
     name: "Name"
@@ -25,3 +24,6 @@ en:
   description: "Description"
   about: "About"
   contact: "Contact"
+  application:
+    title: "Greece skatepark directory - Find all skateparks in Greece"
+    meta_description: "Discover the ultimate guide to Greece's skateparks, featuring detailed listings, interactive maps, videos and more. Elevate your next skate tour with our comprehensive skatepark directory."

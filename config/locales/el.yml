@@ -11,7 +11,6 @@ el:
   open_in_google_maps: "Δες το πάρκο στο google maps"
   previous: "Προηγούμενο"
   next: "Επόμενο"
-  discover_skateparks_in_greece: "Ανακάλυψε skateparks σε όλη την Ελλάδα!"
   delete_confirm: "Είσαι σίγουρος;"
   skatepark:
     name: "Όνομα"
@@ -25,3 +24,6 @@ el:
   description: "Περιγραφή"
   about: "Σχετικά με το skateparks.gr"
   contact: "Επικοινωνία"
+  application:
+    title: "Βρες skateparks σε όλη την Ελλάδα"
+    meta_description: "Η απόλυτη πηγή πληροφόρησης για skateparks σε όλη την Ελλάδα, με λεπτομερείς χάρτες, φωτογραφίες, βίντεο και πολλά άλλα. Σχεδίασε το επόμενό σου tour εδώ."

@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <%= render partial: "/application/title" %>
-    <meta id="head-description-meta" name="description" itemprop="description" content="<%= @meta_description.blank? ? 'Όλα τα skateparks της Ελλάδας μαζεμένα εδώ!': @meta_description %>">
+    <%= render partial: "/application/description" %>
 
     <% if content_for?(:meta_robot) %>
       <%= yield :meta_robot %>
