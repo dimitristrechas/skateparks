@@ -1,4 +1,4 @@
-<%= form_with(url: skatepark&.id ? admin_skatepark_path(skatepark.id) : admin_skateparks_path,
+<%= form_with(url: skatepark&.id ? admin_skatepark_path(skatepark) : admin_skateparks_path,
               model: skatepark,
               class: "my-8",
               data: {

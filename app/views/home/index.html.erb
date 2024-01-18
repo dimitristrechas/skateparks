@@ -1,6 +1,6 @@
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 place-items-center">
   <% @skateparks.each do |skatepark| %>
-    <%= link_to skatepark_path(skatepark.id),
+    <%= link_to skatepark_path(skatepark),
                 class: "flex flex-col items-stretch bg-neutral-50 border border-gray-200 rounded-lg hover:drop-shadow-md md:flex-row dark:border-gray-700 dark:bg-gray-800" do %>
       <%= image_tag skatepark.cover_image,
                     size: "600x450",
