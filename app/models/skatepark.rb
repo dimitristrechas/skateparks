@@ -42,4 +42,16 @@ class Skatepark < ApplicationRecord
   validates :description, presence: true
   validates :images, length: { minimum: 2,  too_short: "%{count} is the minimum allowed" }
   validates :status, presence: true, inclusion: { in: statuses.keys }
+
+  after_validation :set_slug, only: [:create, :update]
+
+  def to_param
+    "#{id}-#{slug}"
+  end
+
+  private
+
+  def set_slug
+    self.slug = name_en.to_s.parameterize
+  end 
 end
