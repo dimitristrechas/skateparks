@@ -27,11 +27,13 @@ FROM base as build
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y build-essential curl git libpq-dev libvips node-gyp pkg-config python-is-python3
 
-# Install Node.js
+# Install JavaScript dependencies
 ARG NODE_VERSION=20.8.1
+ARG YARN_VERSION=1.22.19
 ENV PATH=/usr/local/node/bin:$PATH
 RUN curl -sL https://github.com/nodenv/node-build/archive/master.tar.gz | tar xz -C /tmp/ && \
     /tmp/node-build-master/bin/node-build "${NODE_VERSION}" /usr/local/node && \
+    npm install -g yarn@$YARN_VERSION && \
     rm -rf /tmp/node-build-master
 
 # Install application gems
@@ -41,8 +43,9 @@ RUN bundle install && \
     rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git
 
 # Install node modules
-COPY --link package.json package-lock.json ./
-RUN npm install
+COPY --link .yarnrc package.json package-lock.json yarn.lock ./
+COPY --link .yarn/releases/* .yarn/releases/
+RUN yarn install --frozen-lockfile
 
 # Copy application code
 COPY --link . .
@@ -50,8 +53,9 @@ COPY --link . .
 # Precompile bootsnap code for faster boot times
 RUN bundle exec bootsnap precompile app/ lib/
 
-# Adjust binfiles to be executable on Linux
-RUN chmod +x bin/*
+# Adjust binfiles to be executable on Linux and set current working directory
+RUN chmod +x bin/* && \
+    grep -l '#!/usr/bin/env ruby' /rails/bin/* | xargs sed -i '/^#!/aDir.chdir File.expand_path("..", __dir__)'
 
 # Precompiling assets for production without requiring secret RAILS_MASTER_KEY
 RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
@@ -80,3 +84,4 @@ ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 
 # Start the server by default, this can be overwritten at runtime
 EXPOSE 3000
+CMD ["./bin/rails", "server"]

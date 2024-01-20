@@ -3,5 +3,6 @@
     "@rails/actiontext": "^7.1.2",
     "flowbite": "^2.2.0",
     "trix": "^2.0.8"
-  }
+  },
+  "packageManager": "yarn@1.22.19"
 }
