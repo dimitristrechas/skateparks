@@ -79,3 +79,5 @@ gem 'mobility', '~> 1.3.0.rc1'
 gem "mobility-actiontext", "~> 1.1"
 
 gem 'sitemap_generator'
+
+gem 'whenever', require: false
