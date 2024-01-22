@@ -8,6 +8,8 @@ class SkateparksController < ApplicationController
 
   # GET /skateparks/1 or /skateparks/1.json
   def show
+    @title = "#{@skatepark.name} | Skateparks.gr"
+    @meta_description = @skatepark.description
   end
 
   private

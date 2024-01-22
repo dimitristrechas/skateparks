@@ -24,6 +24,7 @@ el:
   description: "Περιγραφή"
   about: "Σχετικά με το skateparks.gr"
   contact: "Επικοινωνία"
+  skatepark_details: "Δες όλες τις πληροφορίες γι'αυτό το skatepark!"
   application:
     title: "Βρες skateparks σε όλη την Ελλάδα!"
     meta_description: "Η απόλυτη πηγή πληροφόρησης για skateparks σε όλη την Ελλάδα, με λεπτομερείς χάρτες, φωτογραφίες, βίντεο και πολλά άλλα. Σχεδίασε το επόμενό σου tour εδώ."
