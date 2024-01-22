@@ -5,7 +5,7 @@ SitemapGenerator::Sitemap.default_host = "https://www.skateparks.gr"
 
 SitemapGenerator::Sitemap.public_path = 'tmp/'
 
-SitemapGenerator::Sitemap.adapter = SitemapGenerator::AwsSdkAdapter.new('skateparks.gr',
+SitemapGenerator::Sitemap.adapter = SitemapGenerator::AwsSdkAdapter.new('skateparks.gr/sitemap',
   acl: 'public-read', # Optional. This is the default.
   cache_control: 'private, max-age=0, no-cache', # Optional. This is the default.
   access_key_id: Rails.application.credentials.dig(:aws, :access_key_id),
