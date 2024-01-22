@@ -5,7 +5,7 @@ SitemapGenerator::Sitemap.default_host = "https://www.skateparks.gr"
 
 SitemapGenerator::Sitemap.public_path = 'tmp/'
 
-SitemapGenerator::Sitemap.sitemaps_path = 'sitemap/'
+SitemapGenerator::Sitemap.sitemaps_path = 'sitemap'
 
 SitemapGenerator::Sitemap.adapter = SitemapGenerator::AwsSdkAdapter.new('skateparks.gr',
   acl: 'public-read', # Optional. This is the default.
