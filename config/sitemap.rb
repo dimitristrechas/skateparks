@@ -3,7 +3,7 @@ require 'aws-sdk-s3'
 # Set the host name for URL creation
 SitemapGenerator::Sitemap.default_host = "https://www.skateparks.gr"
 
-# SitemapGenerator::Sitemap.public_path = 'tmp/'
+SitemapGenerator::Sitemap.public_path = 'public/'
 
 # SitemapGenerator::Sitemap.adapter = SitemapGenerator::AwsSdkAdapter.new('skateparks.gr',
 #   acl: 'public-read', # Optional. This is the default.
