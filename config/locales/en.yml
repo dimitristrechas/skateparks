@@ -24,6 +24,7 @@ en:
   description: "Description"
   about: "About"
   contact: "Contact"
+  skatepark_details: "See all the details of this skatepark!"
   application:
     title: "Greece skatepark directory - Find all skateparks in Greece"
     meta_description: "Discover the ultimate guide to Greece's skateparks, featuring detailed listings, interactive maps, videos and more. Elevate your next skate tour with our comprehensive skatepark directory."
