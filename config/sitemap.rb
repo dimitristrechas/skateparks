@@ -15,7 +15,6 @@ SitemapGenerator::Sitemap.adapter = SitemapGenerator::AwsSdkAdapter.new('skatepa
 
 SitemapGenerator::Sitemap.create do
 
-  add '/'
   add '/about'
   add '/contact'
 
