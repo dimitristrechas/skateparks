@@ -44,5 +44,5 @@ console_command = "/rails/bin/rails console"
 [processes]
   app = "./bin/rails server"
 [deploy]
-  release_command = "./bin/rails db:prepare"
+  release_command = "./bin/release"
 
