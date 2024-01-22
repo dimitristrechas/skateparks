@@ -1,2 +1,2 @@
 ./bin/rails db:prepare
-bundle exec rake sitemap:refresh
+rake sitemap:refresh
