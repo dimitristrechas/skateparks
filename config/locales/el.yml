@@ -23,8 +23,10 @@ el:
   name_en: "Όνομα στα αγγλικά"
   description: "Περιγραφή"
   about: "Σχετικά με το skateparks.gr"
+  about_details: "Το skateparks.gr δημιουργήθηκε με σκοπό να συγκεντρώσει όλα τα skateparks της Ελλάδας κάτω από μια στέγη!"
   contact: "Επικοινωνία"
-  skatepark_details: "Δες όλες τις πληροφορίες γι'αυτό το skatepark!"
+  contact_details: "Contact"
+  skatepark_details: "Αν θέλεις να προστεθεί και το skatepark της περιοχής σου μπορείς να μας στείλεις φωτογραφίες, πληροφορίες και ότι άλλο θεωρείς χρήσιμο!"
   application:
-    title: "Βρες skateparks σε όλη την Ελλάδα!"
+    title: "🛹 Βρες skateparks σε όλη την Ελλάδα!"
     meta_description: "Η απόλυτη πηγή πληροφόρησης για skateparks σε όλη την Ελλάδα, με λεπτομερείς χάρτες, φωτογραφίες, βίντεο και πολλά άλλα. Σχεδίασε το επόμενό σου tour εδώ."
