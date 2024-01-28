@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<%= I18n.locale %>" itemscope itemtype="https://schema.org/WebPage">
   <head>
     <%= render partial: "/application/title" %>
     <%= render partial: "/application/description" %>
@@ -9,6 +9,9 @@
     <% else %>
       <meta name="robots" content="index, follow">
     <% end %>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
     <meta property="og:title" itemprop="name"
           content="<%= @title.blank? ? t("application.title") : @title %>">
