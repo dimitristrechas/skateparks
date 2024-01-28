@@ -1,9 +1,9 @@
 version: "3"
-name: skateparks
+name: skateparks-test
 services:
-  skateparks-db:
+  skateparks-db-test:
     image: postgres:14.2-alpine
-    container_name: postgres-14.2
+    container_name: postgres-14.2-test
     volumes:
       - postgres_data:/var/lib/postgresql/data
     command: "postgres -c 'max_connections=500'"
@@ -12,13 +12,13 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     ports:
-      - "5432:5432"
-  skateparks-web:
-    container_name: rails-app
+      - "5433:5433"
+  skateparks-web-test:
+    container_name: rails-app-test
     build:
       context: .
-      dockerfile: Dockerfile.development
-    command: "./bin/rails server -b 0.0.0.0 -p 3000"
+      dockerfile: Dockerfile.test
+    command: "./bin/rails server -b 0.0.0.0 -p 3003 --pid tmp/pids/server_test.pid"
     environment:
       - RAILS_ENV=${RAILS_ENV}
       - POSTGRES_HOST=${POSTGRES_HOST}
@@ -30,9 +30,9 @@ services:
       - app-storage:/rails/storage
       - ${CODEBASE_VOLUME}:/rails
     depends_on:
-      - skateparks-db
+      - skateparks-db-test
     ports:
-      - "3000:3000"
+      - "3003:3003"
 
 volumes:
   postgres_data: {}
