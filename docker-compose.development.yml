@@ -18,6 +18,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.development
+    tty: true
+    stdin_open: true
     command: "./bin/rails server -b 0.0.0.0 -p 3000"
     environment:
       - RAILS_ENV=${RAILS_ENV}
