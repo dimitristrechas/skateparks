@@ -85,3 +85,6 @@ gem "mobility-actiontext", "~> 1.1"
 gem 'sitemap_generator'
 
 gem 'whenever', require: false
+
+gem 'cloudinary'
+gem 'activestorage-cloudinary-service'

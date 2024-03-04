@@ -6,16 +6,15 @@
     <div class="relative overflow-hidden rounded-lg h-96 md:h-128">
       <% skatepark.images.each_with_index do |image, index| %>
         <div class="hidden duration-1000 ease-in-out" data-carousel-item>
-            <%= image_tag image,
-                          class: "absolute block w-full -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 rounded-lg",
-                          loading: index < 5 ? 'eager' : 'lazy'
-                          # srcset: [
-                            # [url_for(image.variant(:sm)), ""],
-                            # [url_for(image.variant(:md)), "1.5x"],
-                            # [url_for(image.variant(:lg)), "2x"]
-                          # ],
-                          # sizes: "100vw"
-            %>
+          <%= cl_image_tag image.key,
+                           width: 1600,
+                           height: 1200,
+                           class: "absolute block w-full -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 rounded-lg",
+                           loading: index < 5 ? 'eager' : 'lazy',
+                           srcset: "#{cloudinary_url(image.key, width: 600, height: 450, **CLOUDINARY_DEFAULT_SETTINGS)} 320w, " \
+                                   "#{cloudinary_url(image.key, width: 1200, height: 900, **CLOUDINARY_DEFAULT_SETTINGS)} 640w, " \
+                                   "#{cloudinary_url(image.key, width: 1600, height: 1200, **CLOUDINARY_DEFAULT_SETTINGS)} 1600w",
+                           sizes: "(max-width: 640px) 320px, 100vw" %>
         </div>
       <% end %>
     </div>
