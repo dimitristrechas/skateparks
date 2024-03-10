@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus";
 import L from "leaflet";
 
 export default class extends Controller {
-  static targets = ["container"];
+  static targets = ["container", "previewImage", "gallery", "galleryImage"];
 
   static values = {
     lat: String,
@@ -25,7 +25,47 @@ export default class extends Controller {
     });
   }
 
+  galleryTargetConnected() {
+    console.log("galleryTargetConnected");
+    document.addEventListener("keydown", this.modalCloseEscHandler);
+  }
+
+  galleryTargetDisonnected() {
+    console.log("galleryTargetDisonnected");
+    document.removeEventListener("keydown", this.modalCloseEscHandler);
+  }
+
+  onImageClick(event) {
+    let imageIndexOpened = 0;
+
+    this.previewImageTargets.forEach((img, idx) => {
+      if (img.id === event.target.id) {
+        imageIndexOpened = idx;
+      }
+    });
+
+    this.galleryTarget.classList.remove("hidden");
+    this.galleryImageTargets[imageIndexOpened].classList.remove("hidden");
+    window.document.body.classList.add("overflow-hidden");
+  }
+
+  onModalClose() {
+    this.galleryTarget.classList.add("hidden");
+    this.galleryImageTargets.forEach((img) => img.classList.add("hidden"));
+    window.document.body.classList.remove("overflow-hidden");
+  }
+
+  modalCloseEscHandler = (event) => {
+    if (event.keyCode == 27) {
+      this.onModalClose();
+    }
+  };
+
   disconnect() {
     this.map.remove();
+    document.removeEventListener("keydown", this.modalCloseEscHandler);
+    this.galleryTarget.classList.add("hidden");
+    this.galleryImageTargets.forEach((img) => img.classList.add("hidden"));
+    window.document.body.classList.remove("overflow-hidden");
   }
 }
