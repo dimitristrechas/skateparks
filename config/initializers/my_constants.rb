@@ -4,7 +4,7 @@ LOCALES = {
 }.freeze
 
 CLOUDINARY_DEFAULT_SETTINGS = {
-  crop: :fill,
+  crop: :contain,
   quality: :auto,
   fetch_format: :auto
 }.freeze
