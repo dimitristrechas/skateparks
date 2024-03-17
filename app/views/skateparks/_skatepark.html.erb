@@ -48,9 +48,10 @@
     <% end %>
   </div>
 
-  <div class="hidden fixed inset-0 py-14 px-4 z-10 bg-neutral-700/80"
+  <div class="hidden fixed inset-0 py-14 px-4 md:py-16 lg:py-24 md:px-16 lg:px-24 z-10 bg-neutral-700/80"
        data-skatepark-target="gallery">
-    <svg class="w-8 h-8 absolute top-2 right-2 text-white font-bold cursor-pointer"
+
+    <svg class="w-8 h-8 lg:w-12 lg:h-12 absolute top-2 right-2 md:top-8 md:right-8 lg:top-12 lg:right-12 text-white font-bold cursor-pointer"
          aria-hidden="true"
          xmlns="http://www.w3.org/2000/svg"
          fill="none"
@@ -62,6 +63,24 @@
             stroke-width="2"
             d="M6 18 18 6m0 12L6 6"/>
     </svg>
+
+    <svg class="hidden sm:block w-14 h-14 absolute top-1/2 left-2 lg:left-6 text-white font-bold cursor-pointer"
+         aria-hidden="true"
+         xmlns="http://www.w3.org/2000/svg"
+         width="24"
+         height="24"
+         fill="none"
+         viewBox="0 0 24 24"
+         data-action="click->skatepark#onPreviousGalleryImage">
+      <path stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="m15 19-7-7 7-7"/>
+    </svg>
+
+
+
     <div class="relative bg-white rounded-lg overflow-hidden pt-8 pb-14 px-4 h-full w-full box-border">
     
         <% skatepark.images.each_with_index do |image, index| %>
@@ -77,6 +96,21 @@
         <% end %>
       
     </div>
+
+    <svg class="hidden sm:block w-14 h-14 absolute top-1/2 right-2 lg:right-6 text-white font-bold cursor-pointer"
+         aria-hidden="true"
+         xmlns="http://www.w3.org/2000/svg"
+         width="24"
+         height="24"
+         fill="none"
+         viewBox="0 0 24 24"
+         data-action="click->skatepark#onNextGalleryImage">
+      <path stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2" d="m9 5 7 7-7 7"/>
+    </svg>
+
   </div>
 
   <div class="hidden sm:block">
