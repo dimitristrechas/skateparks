@@ -51,6 +51,7 @@
   <div class="hidden fixed inset-0 py-14 px-4 md:py-16 lg:py-24 md:px-16 lg:px-24 z-10 bg-neutral-700/80"
        data-skatepark-target="gallery">
 
+    <!-- Close modal icon -->
     <svg class="w-8 h-8 lg:w-12 lg:h-12 absolute top-2 right-2 md:top-8 md:right-8 lg:top-12 lg:right-12 text-white font-bold cursor-pointer"
          aria-hidden="true"
          xmlns="http://www.w3.org/2000/svg"
@@ -63,7 +64,9 @@
             stroke-width="2"
             d="M6 18 18 6m0 12L6 6"/>
     </svg>
+    <!-- Close modal icon -->
 
+    <!-- Previous gallery image icon -->
     <svg class="hidden sm:block w-14 h-14 absolute top-1/2 left-2 lg:left-6 text-white font-bold cursor-pointer"
          aria-hidden="true"
          xmlns="http://www.w3.org/2000/svg"
@@ -78,25 +81,36 @@
             stroke-width="2"
             d="m15 19-7-7 7-7"/>
     </svg>
+    <!-- Previous gallery image icon -->
 
+    <div class="relative flex flex-col items-center justify-between gap-2 bg-white rounded-lg overflow-hidden py-8 px-4 h-full w-full">
+      <!-- Gallery images icon -->
+      <% skatepark.images.each_with_index do |image, index| %>
+          <%= cl_image_tag image.key,
+                            id: "galleryImage-#{index}",
+                            quality: :auto,
+                            fetch_format: :auto,
+                            class: "hidden object-contain w-full h-[92%]",
+                            loading: 'lazy',
+                            data: {
+                              "skatepark-target": "galleryImage"
+                            } %>
+      <% end %>
+      <!-- Gallery images icon -->
 
-
-    <div class="relative bg-white rounded-lg overflow-hidden pt-8 pb-14 px-4 h-full w-full box-border">
-    
+      <!-- Slider indicators -->
+      <div class="flex gap-2 items-center">
         <% skatepark.images.each_with_index do |image, index| %>
-            <%= cl_image_tag image.key,
-                             id: "galleryImage-#{index}",
-                             quality: :auto,
-                             fetch_format: :auto,
-                             class: "hidden object-contain w-full h-full",
-                             loading: 'lazy',
-                             data: {
-                               "skatepark-target": "galleryImage"
-                             } %>
+          <div class="w-4 h-4 lg:w-5 lg:h-5 bg-gray-400 rounded-full opacity-25 cursor-pointer"
+               id="<%= "indicatorImage-#{index}" %>",
+               data-action="click->skatepark#onGalleryImageIndicatorClick"
+               data-skatepark-target="galleryImageIndicator"></div>
         <% end %>
-      
+      </div>
+      <!-- Slider controls -->
     </div>
 
+    <!-- Next gallery image icon -->
     <svg class="hidden sm:block w-14 h-14 absolute top-1/2 right-2 lg:right-6 text-white font-bold cursor-pointer"
          aria-hidden="true"
          xmlns="http://www.w3.org/2000/svg"
@@ -110,6 +124,7 @@
             stroke-linejoin="round"
             stroke-width="2" d="m9 5 7 7-7 7"/>
     </svg>
+    <!-- Next gallery image icon -->
 
   </div>
 
