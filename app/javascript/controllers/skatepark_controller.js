@@ -35,9 +35,20 @@ export default class extends Controller {
 
       L.marker([this.latValue, this.lngValue]).addTo(this.map);
     });
+
+    document.addEventListener("click", (event) => {
+      // Check if click target is the modal element itself
+      const isModal = event.target === this.galleryTarget;
+
+      // If clicked outside or on padding, call the callback function
+      if (!isModal && !this.galleryTarget.contains(event.target)) {
+        console.log("outside");
+      }
+    });
   }
 
-  galleryTargetConnected() {
+  galleryTargetConnected(element) {
+    console.log("element", element);
     document.addEventListener("keydown", this.modalKeysHandler);
     document.addEventListener("touchstart", this.galleryTouchStartHandler);
     document.addEventListener("touchend", this.galleryTouchEndHandler);
@@ -182,10 +193,10 @@ export default class extends Controller {
     this.galleryTarget.classList.remove("flex");
     this.galleryImageTargets.forEach((img) => img.classList.add("hidden"));
     this.galleryImageIndicatorTargets.forEach((img) =>
-      img.classList.add("opacity-25")
+      img.classList.add("opacity-25", "w-4", "h-4", "lg:w-5", "lg:h-5")
     );
     this.galleryImageIndicatorTargets.forEach((img) =>
-      img.classList.remove("opacity-100")
+      img.classList.remove("opacity-100", "w-5", "h-5", "lg:w-6", "lg:h-6")
     );
     window.document.body.classList.remove("overflow-hidden");
   }
