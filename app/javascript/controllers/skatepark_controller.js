@@ -4,7 +4,13 @@ import L from "leaflet";
 const swipeThreshold = 50;
 
 export default class extends Controller {
-  static targets = ["container", "previewImage", "gallery", "galleryImage"];
+  static targets = [
+    "container",
+    "previewImage",
+    "gallery",
+    "galleryImage",
+    "galleryImageIndicator",
+  ];
 
   static values = {
     lat: String,
@@ -39,6 +45,18 @@ export default class extends Controller {
 
   galleryTargetDisonnected() {
     document.removeEventListener("keydown", this.modalKeysHandler);
+    document.removeEventListener("touchstart", this.galleryTouchStartHandler);
+    document.removeEventListener("touchend", this.galleryTouchEndHandler);
+  }
+
+  onGalleryImageIndicatorClick(event) {
+    this.hideGalleryImage(this.imageIndexOpened);
+    this.galleryImageIndicatorTargets.forEach((img, idx) => {
+      if (img.id === event.target.id) {
+        this.imageIndexOpened = idx;
+      }
+    });
+    this.showGalleryImage(this.imageIndexOpened);
   }
 
   onImageClick(event) {
@@ -49,34 +67,70 @@ export default class extends Controller {
     });
 
     this.galleryTarget.classList.remove("hidden");
-    this.galleryImageTargets[this.imageIndexOpened].classList.remove("hidden");
+    this.galleryTarget.classList.add("flex");
+
+    this.showGalleryImage(this.imageIndexOpened);
     window.document.body.classList.add("overflow-hidden");
   }
 
   onPreviousGalleryImage(event) {
-    this.galleryImageTargets[this.imageIndexOpened].classList.add("hidden");
+    this.hideGalleryImage(this.imageIndexOpened);
     if (this.imageIndexOpened == 0) {
       this.imageIndexOpened = this.galleryImageTargets.length - 1;
     } else {
       this.imageIndexOpened--;
     }
-    this.galleryImageTargets[this.imageIndexOpened].classList.remove("hidden");
+    this.showGalleryImage(this.imageIndexOpened);
   }
 
   onNextGalleryImage(event) {
-    this.galleryImageTargets[this.imageIndexOpened].classList.add("hidden");
+    this.hideGalleryImage(this.imageIndexOpened);
     if (this.imageIndexOpened == this.galleryImageTargets.length - 1) {
       this.imageIndexOpened = 0;
     } else {
       this.imageIndexOpened++;
     }
-    this.galleryImageTargets[this.imageIndexOpened].classList.remove("hidden");
+    this.showGalleryImage(this.imageIndexOpened);
+  }
+
+  showGalleryImage(idx) {
+    this.galleryImageTargets[idx].classList.remove("hidden");
+    this.galleryImageIndicatorTargets[idx].classList.remove(
+      "opacity-25",
+      "w-4",
+      "h-4",
+      "lg:w-5",
+      "lg:h-5"
+    );
+    this.galleryImageIndicatorTargets[idx].classList.add(
+      "opacity-100",
+      "w-5",
+      "h-5",
+      "lg:w-6",
+      "lg:h-6"
+    );
+  }
+
+  hideGalleryImage(idx) {
+    this.galleryImageTargets[idx].classList.add("hidden");
+    this.galleryImageIndicatorTargets[idx].classList.add(
+      "opacity-25",
+      "w-4",
+      "h-4",
+      "lg:w-5",
+      "lg:h-5"
+    );
+    this.galleryImageIndicatorTargets[idx].classList.remove(
+      "opacity-100",
+      "w-5",
+      "h-5",
+      "lg:w-6",
+      "lg:h-6"
+    );
   }
 
   onModalClose() {
-    this.galleryTarget.classList.add("hidden");
-    this.galleryImageTargets.forEach((img) => img.classList.add("hidden"));
-    window.document.body.classList.remove("overflow-hidden");
+    this.hideModalElements();
   }
 
   modalKeysHandler = (event) => {
@@ -120,8 +174,19 @@ export default class extends Controller {
     document.removeEventListener("keydown", this.modalKeysHandler);
     document.removeEventListener("touchstart", this.galleryTouchStartHandler);
     document.removeEventListener("touchend", this.galleryTouchEndHandler);
+    this.hideModalElements();
+  }
+
+  hideModalElements() {
     this.galleryTarget.classList.add("hidden");
+    this.galleryTarget.classList.remove("flex");
     this.galleryImageTargets.forEach((img) => img.classList.add("hidden"));
+    this.galleryImageIndicatorTargets.forEach((img) =>
+      img.classList.add("opacity-25")
+    );
+    this.galleryImageIndicatorTargets.forEach((img) =>
+      img.classList.remove("opacity-100")
+    );
     window.document.body.classList.remove("overflow-hidden");
   }
 }
