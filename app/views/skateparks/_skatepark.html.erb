@@ -99,7 +99,7 @@
       <!-- Gallery images icon -->
 
       <!-- Slider indicators -->
-      <div class="flex gap-2 items-center">
+      <div class="flex flex-wrap justify-center gap-2 items-center">
         <% skatepark.images.each_with_index do |image, index| %>
           <div class="w-4 h-4 lg:w-5 lg:h-5 bg-gray-400 rounded-full opacity-25 cursor-pointer"
                id="<%= "indicatorImage-#{index}" %>",
