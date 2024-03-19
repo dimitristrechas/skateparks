@@ -26,14 +26,14 @@
     <% end %>
   </div>
 
-  <div class="grid grid-cols-3 lg:grid-cols-4 gap-1 mb-6 sm:mb-8">
+  <div class="grid grid-cols-3 auto-rows-[8rem] md:auto-rows-[14rem] xl:auto-rows-[20rem] lg:grid-cols-4 gap-1 mb-6 sm:mb-8">
     <% skatepark.images.each_with_index do |image, index| %>
       <div class="hover:opacity-50 hover:cursor-pointer">
         <%= cl_image_tag image.key,
                           width: 400,
                           height: 400,
                           id: "previewImage-#{index}",
-                          class: "",
+                          class: "h-full w-full object-cover",
                           loading: index < 5 ? 'eager' : 'lazy',
                           srcset: "#{cloudinary_url(image.key, width: 245, height: 245, **CLOUDINARY_DEFAULT_SETTINGS)} 320w, " \
                                   "#{cloudinary_url(image.key, width: 400, height: 400, **CLOUDINARY_DEFAULT_SETTINGS)} 640w, " \
