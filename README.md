@@ -1,4 +1,4 @@
-# Development
+## Development
 
 1. `git clone https://github.com/dimitristrechas/skateparks.git`
 2. `cd skateparks`
