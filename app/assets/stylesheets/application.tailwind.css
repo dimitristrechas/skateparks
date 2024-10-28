@@ -4,3 +4,7 @@
 
 @import url("https://fonts.googleapis.com/css2?family=Montserrat&display=swap");
 @import "actiontext.css";
+
+html {
+  scrollbar-gutter: stable;
+}
