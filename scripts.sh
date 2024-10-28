@@ -1,15 +1,16 @@
 #!/bin/bash
 
 clear
-echo -e "--- DEVELOPMENT SERVER -- \n"
-echo -e " (1) to start the development server with a fresh build (detached)"
-echo -e " (2) to start the development server"
-echo -e " (3) to attach in docker development server"
-echo -e " (4) to start the tailwindcss:watch service"
-echo -e " (5) to delete server pid"
+echo -e "--- DEVELOPMENT SERVER --"
+echo -e " (1) to start the development server"
+echo -e " (2) to start the tailwindcss:watch service"
+echo -e " (3) to delete server pid"
+echo -e " (4) to start the development server with a fresh build (detached)"
+echo -e " (5) to attach in docker development server"
 echo -e " (6) rails console"
 echo -e " (7) rails  cli"
-echo -e "--- TEST SERVER -- \n"
+echo -e " \n"
+echo -e "--- TEST SERVER --"
 echo -e " (8) to start the test server (detached)"
 echo -e " (9) test rails  cli"
 echo -e " (10) to delete test server pid"
@@ -18,23 +19,23 @@ read OPTION
 case $OPTION in
 
     1)
-    docker compose -f ./docker-compose.development.yml up --remove-orphans --build --force-recreate -d
-    ;;
-
-    2)
     docker compose -f ./docker-compose.development.yml up
     ;;
 
-    3)
-    docker attach rails-app
-    ;;
-
-    4)
+    2)
     rails tailwindcss:watch
     ;;
 
-    5)
+    3)
     rm tmp/pids/server.pid
+    ;;
+
+    4)
+    docker compose -f ./docker-compose.development.yml up --remove-orphans --build --force-recreate -d
+    ;;
+
+    5)
+    docker attach rails-app
     ;;
 
     6)
