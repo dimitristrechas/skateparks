@@ -1,4 +1,3 @@
-version: "3"
 name: skateparks-test
 services:
   skateparks-db-test:
