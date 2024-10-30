@@ -11,9 +11,10 @@ echo -e " (6) rails console"
 echo -e " (7) rails  cli"
 echo -e " \n"
 echo -e "--- TEST SERVER --"
-echo -e " (8) to start the test server (detached)"
-echo -e " (9) test rails  cli"
-echo -e " (10) to delete test server pid"
+echo -e " (8) to start the test server"
+echo -e " (9) to start the test server with a fresh build (detached)"
+echo -e " (10) test rails cli"
+echo -e " (11) to delete test server pid"
 read OPTION
 
 case $OPTION in
@@ -47,14 +48,18 @@ case $OPTION in
     ;;
 
     8)
-    docker compose -f ./docker-compose.test.yml --env-file ./.env.test up --remove-orphans --build --force-recreate -d
+    docker compose -f ./docker-compose.test.yml up
     ;;
 
     9)
-    docker compose -f ./docker-compose.test.yml exec skateparks-web-test bash
+    docker compose -f ./docker-compose.test.yml --env-file ./.env.test up --remove-orphans --build --force-recreate -d
     ;;
 
     10)
+    docker compose -f ./docker-compose.test.yml exec skateparks-web-test bash
+    ;;
+
+    11)
     rm tmp/pids/server_test.pid
     ;;
 
