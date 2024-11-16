@@ -20,7 +20,7 @@ read OPTION
 case $OPTION in
 
     1)
-    docker compose -f ./docker-compose.development.yml up
+    docker compose -f ./docker-compose.development.yml start
     ;;
 
     2)
@@ -48,7 +48,7 @@ case $OPTION in
     ;;
 
     8)
-    docker compose -f ./docker-compose.test.yml up
+    docker compose -f ./docker-compose.test.yml start
     ;;
 
     9)

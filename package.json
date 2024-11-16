@@ -1,8 +1,8 @@
 {
   "dependencies": {
-    "@rails/actiontext": "^7.1.2",
-    "flowbite": "^2.2.0",
-    "trix": "^2.0.8"
+    "@rails/actiontext": "^8.0.0",
+    "flowbite": "^2.5.2",
+    "trix": "^2.1.8"
   },
-  "packageManager": "yarn@1.22.19"
+  "packageManager": "yarn@1.22.22"
 }
