@@ -33,7 +33,7 @@ class Skatepark < ApplicationRecord
   #                     )
   # end
 
-  enum status: { draft: 0, published: 1, archived: 2 }
+  enum :status, { draft: 0, published: 1, archived: 2 }
 
   validates :name, presence: true
   validates :cover_image, presence: true 

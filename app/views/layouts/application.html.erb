@@ -19,7 +19,7 @@
     <meta property="og:description"
           content="<%= @meta_description.blank? ? t('application.meta_description') : @meta_description %>">
     <meta property="og:type" content="website">
-    <meta property="og:image" content="<%= image_url("og_image.png") %>">
+    <meta property="og:image" content="<%= @meta_image.blank? ? image_url("og_image.png") : @meta_image %>">
     <meta property="og:url" content="<%= url_for(:only_path => false, :protocol => 'https') %>" />
 
     <meta name="viewport" content="width=device-width,initial-scale=1">

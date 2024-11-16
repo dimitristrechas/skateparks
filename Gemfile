@@ -1,9 +1,9 @@
 source "https://rubygems.org"
 
-ruby "3.2.2"
+ruby "3.3.6"
 
 # Use main development branch of Rails
-gem "rails", github: "rails/rails", branch: "main"
+gem 'rails', '~> 8.0'
 
 # The original asset pipeline for Rails [https://github.com/rails/sprockets-rails]
 gem "sprockets-rails"
@@ -76,7 +76,7 @@ gem "tailwindcss-rails", "~> 2.0"
 
 gem "view_component"
 
-gem "dockerfile-rails", ">= 1.6", :group => :development
+gem 'dockerfile-rails', '~> 1.6', '>= 1.6.24'
 
 gem 'mobility', '~> 1.3.0.rc1'
 
