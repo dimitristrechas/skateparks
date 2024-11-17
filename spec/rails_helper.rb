@@ -62,4 +62,10 @@ RSpec.configure do |config|
   config.filter_rails_from_backtrace!
   # arbitrary gems may also be filtered via:
   # config.filter_gems_from_backtrace("gem name")
+  # 
+  config.before(:each, type: :controller) do
+    allow_any_instance_of(ApplicationController).to receive(:default_url_options).and_return({})
+  end
 end
+
+Rails.application.routes.default_url_options[:host] = 'http://test.host'
