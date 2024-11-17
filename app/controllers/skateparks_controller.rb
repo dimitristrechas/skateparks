@@ -1,6 +1,4 @@
 class SkateparksController < ApplicationController
-  include ActionView::Helpers::SanitizeHelper
-
   before_action :set_skatepark, only: %i[ show ]
 
   # GET /skateparks or /skateparks.json
@@ -11,7 +9,7 @@ class SkateparksController < ApplicationController
   # GET /skateparks/1 or /skateparks/1.json
   def show
     @title = "#{@skatepark.name} | Skateparks.gr"
-    @meta_description = strip_tags(@skatepark.description)
+    @meta_description = @skatepark.description.to_plain_text
     @meta_image = url_for(@skatepark.cover_image)
   end
 
