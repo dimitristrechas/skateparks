@@ -4,7 +4,7 @@ RSpec.describe SkateparksController, type: :controller do
   include ActionView::Helpers::SanitizeHelper
   include Rails.application.routes.url_helpers
 
-  let(:valid_attributes) do
+  let(:valid_skatepark_attributes) do
     {
       name: "Test Skatepark",
       lat: 12.345,
@@ -19,19 +19,7 @@ RSpec.describe SkateparksController, type: :controller do
     }
   end
 
-  let(:invalid_attributes) do
-    {
-      name: nil,
-      lat: nil,
-      lng: nil,
-      description: nil,
-      cover_image: nil,
-      images: [],
-      status: nil
-    }
-  end
-
-  let!(:skatepark) { Skatepark.create!(valid_attributes) }
+  let!(:skatepark) { Skatepark.create!(valid_skatepark_attributes) }
 
   describe "GET #index" do
     it "returns a success response and assigns all skateparks" do
