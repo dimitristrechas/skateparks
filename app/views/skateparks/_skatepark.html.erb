@@ -100,9 +100,9 @@
 
       <!-- Slider indicators -->
       <div class="flex flex-wrap justify-center gap-2 items-center">
-        <% skatepark.images.each_with_index do |image, index| %>
+        <% skatepark.images.each_with_index do |_, index| %>
           <div class="w-3 h-3 bg-gray-400 rounded-full opacity-25 cursor-pointer"
-               id="<%= "indicatorImage-#{index}" %>",
+               id="<%= "indicatorImage-#{index}" %>"
                data-action="click->skatepark#onGalleryImageIndicatorClick"
                data-skatepark-target="galleryImageIndicator"></div>
         <% end %>

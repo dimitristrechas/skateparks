@@ -1,6 +1,6 @@
 # skateparks.gr
 
-### How to setup the development environment
+### How to set up the development environment
 
 1. `git clone https://github.com/dimitristrechas/skateparks.git`
 2. `cd skateparks`
