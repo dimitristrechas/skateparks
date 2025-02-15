@@ -49,3 +49,5 @@ config/credentials/development.yml.enc
 
 /config/credentials/test.key
 config/credentials/test.yml.enc
+
+.idea
