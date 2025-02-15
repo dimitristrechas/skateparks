@@ -107,36 +107,20 @@ export default class extends Controller {
   showGalleryImage(idx) {
     this.galleryImageTargets[idx].classList.remove("hidden");
     this.galleryImageIndicatorTargets[idx].classList.remove(
-      "opacity-25",
-      "w-4",
-      "h-4",
-      "lg:w-5",
-      "lg:h-5"
+      "opacity-25"
     );
     this.galleryImageIndicatorTargets[idx].classList.add(
-      "opacity-100",
-      "w-5",
-      "h-5",
-      "lg:w-6",
-      "lg:h-6"
+      "opacity-100"
     );
   }
 
   hideGalleryImage(idx) {
     this.galleryImageTargets[idx].classList.add("hidden");
     this.galleryImageIndicatorTargets[idx].classList.add(
-      "opacity-25",
-      "w-4",
-      "h-4",
-      "lg:w-5",
-      "lg:h-5"
+      "opacity-25"
     );
     this.galleryImageIndicatorTargets[idx].classList.remove(
-      "opacity-100",
-      "w-5",
-      "h-5",
-      "lg:w-6",
-      "lg:h-6"
+      "opacity-100"
     );
   }
 
