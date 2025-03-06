@@ -4,6 +4,11 @@ Rails.application.routes.draw do
     resources :skateparks
   end
 
+  if Rails.env.production?
+    # 301 permanent redirects
+    get "/skateparks/16-xanthi" => redirect("/skateparks/21-xanthi", status: 301)
+  end
+
   resources :skateparks
 
   get "healthcheck" => "rails/health#show", as: :rails_health_check
