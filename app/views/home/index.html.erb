@@ -1,10 +1,10 @@
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 place-items-center">
   <% @skateparks.each do |skatepark| %>
     <%= link_to skatepark_path(skatepark),
-                class: "flex flex-col items-stretch bg-neutral-50 border border-gray-200 rounded-lg hover:drop-shadow-md md:flex-row dark:border-gray-700 dark:bg-gray-800" do %>
+                class: "flex flex-col items-stretch bg-neutral-50 border border-gray-200 w-full rounded-lg hover:drop-shadow-md md:flex-row dark:border-gray-700 dark:bg-gray-800" do %>
       <%= cl_image_tag skatepark.cover_image.key,
                        size: "600x450",
-                       class: "object-cover w-full md:h-auto md:w-3/5 -skew-y-1 origin-bottom-left rounded-lg shadow-lg",
+                       class: "object-cover w-full h-80 md:w-3/5 -skew-y-1 origin-bottom-left rounded-lg shadow-lg",
                        alt: "#{skatepark.name} cover image",
                        **CLOUDINARY_DEFAULT_SETTINGS
                        %>
