@@ -20,4 +20,3 @@
 3. Select `test rails cli` option
 
 4. `bundle exec rake spec`
-
