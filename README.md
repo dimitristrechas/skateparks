@@ -21,4 +21,3 @@
 
 4. `bundle exec rake spec`
 
-
