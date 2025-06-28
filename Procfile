@@ -1,2 +1,2 @@
-web: rake db:migrate && bundle exec rails server -b 0.0.0.0 -p ${PORT:-3000}
+web: rm -f tmp/pids/server.pid && rake db:migrate && bin/rails server -b 0.0.0.0 -p ${PORT:-3000}
 worker: bundle exec sidekiq -e $RAILS_ENV
