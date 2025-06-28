@@ -3,10 +3,11 @@ require 'sidekiq/cron/web'
 
 Rails.application.routes.draw do
 
-  mount Sidekiq::Web => '/sidekiq'
+
 
   namespace :admin do
     resources :skateparks
+    mount Sidekiq::Web => '/sidekiq'
   end
 
   if Rails.env.production?
