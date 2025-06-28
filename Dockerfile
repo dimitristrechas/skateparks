@@ -48,6 +48,11 @@ RUN yarn install --frozen-lockfile
 # Copy application code
 COPY --link . .
 
+# Update crontab file using whenever command
+RUN if [ -f config/schedule.rb ]; then \
+      bundle exec whenever --update-crontab; \
+    fi
+
 # Precompile bootsnap code for faster boot times
 RUN bundle exec bootsnap precompile app/ lib/
 
