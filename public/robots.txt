@@ -1,4 +1,4 @@
 # See https://www.robotstxt.org/robotstxt.html for documentation on how to use the robots.txt file
 User-agent: *
 Disallow: /admin/
-Sitemap: https://d2uyo8zt4wnyy7.cloudfront.net/sitemap/sitemap.xml.gz
+Sitemap: https://www.skateparks.gr/sitemap.xml.gz
