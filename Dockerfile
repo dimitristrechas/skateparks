@@ -23,7 +23,7 @@ FROM base as build
 
 # Install packages needed to build gems and node modules
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y build-essential curl git libpq-dev libvips node-gyp pkg-config python-is-python3 cron \
+    apt-get install --no-install-recommends -y build-essential curl git libpq-dev libvips node-gyp pkg-config python-is-python3
 
 # Install JavaScript dependencies
 ARG NODE_VERSION=20.8.1
@@ -39,6 +39,9 @@ COPY --link Gemfile Gemfile.lock ./
 RUN bundle install && \
     bundle exec bootsnap precompile --gemfile && \
     rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git
+
+# Update crontab file using whenever command
+RUN bundle exec whenever --update-crontab
 
 # Install node modules
 COPY --link .yarnrc package.json yarn.lock ./
