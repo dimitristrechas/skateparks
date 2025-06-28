@@ -40,9 +40,6 @@ RUN bundle install && \
     bundle exec bootsnap precompile --gemfile && \
     rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git
 
-# Update crontab file using whenever command
-RUN bundle exec whenever --update-crontab
-
 # Install node modules
 COPY --link .yarnrc package.json yarn.lock ./
 COPY --link .yarn/releases/* .yarn/releases/
@@ -50,6 +47,9 @@ RUN yarn install --frozen-lockfile
 
 # Copy application code
 COPY --link . .
+
+# Update crontab file using whenever command
+RUN bundle exec whenever --update-crontab
 
 # Precompile bootsnap code for faster boot times
 RUN bundle exec bootsnap precompile app/ lib/
