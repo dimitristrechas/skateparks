@@ -13,7 +13,7 @@ services:
       - "5432:5432"
   skateparks:
     build: .
-    command: "./bin/rails server"
+#    command: "./bin/rails server"
     environment:
       - RAILS_ENV=${RAILS_ENV}
       - POSTGRES_HOST=${POSTGRES_HOST}

@@ -28,7 +28,7 @@ services:
       dockerfile: Dockerfile.development
     tty: true
     stdin_open: true
-    command: "./bin/rails server -b 0.0.0.0 -p 3000"
+#    command: "./bin/rails server -b 0.0.0.0 -p 3000"
     environment:
       - RAILS_ENV=${RAILS_ENV}
       - POSTGRES_HOST=${POSTGRES_HOST}
@@ -37,6 +37,7 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - RAILS_MASTER_KEY=${RAILS_MASTER_KEY}
       - REDIS_URL=${REDIS_URL}
+      - PORT=${PORT:-3000}
     volumes:
       - app-storage:/rails/storage
       - ${CODEBASE_VOLUME}:/rails
