@@ -86,3 +86,5 @@ gem 'activestorage-cloudinary-service'
 gem 'sidekiq'
 gem 'sidekiq-cron'
 gem 'redis', '~> 5.0'
+
+gem "foreman", "~> 0.88.1"
