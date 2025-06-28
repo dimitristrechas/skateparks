@@ -48,6 +48,9 @@ RUN yarn install --frozen-lockfile
 # Copy application code
 COPY --link . .
 
+# Create empty crontab file
+RUN crontab -l | { cat; echo ""; } | crontab -
+
 # Update crontab file using whenever command
 RUN bundle exec whenever --update-crontab
 
