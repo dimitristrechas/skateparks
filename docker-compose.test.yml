@@ -1,8 +1,8 @@
 name: skateparks-test
 services:
   skateparks-db-test:
-    image: postgres:14.2-alpine
-    container_name: postgres-14.2-test
+    image: postgres:17-alpine
+    container_name: postgres-17-test
     volumes:
       - postgres_data:/var/lib/postgresql/data
     command: "postgres -c 'max_connections=500'"
@@ -12,6 +12,14 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     ports:
       - "5433:5433"
+  skateparks-redis-test:
+    image: redis:7-alpine
+    container_name: skateparks-redis-test
+    command: redis-server
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
   skateparks-web-test:
     container_name: rails-app-test
     build:
@@ -25,14 +33,17 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - RAILS_MASTER_KEY=${RAILS_MASTER_KEY}
+      - REDIS_URL=${REDIS_URL}
     volumes:
       - app-storage:/rails/storage
       - ${CODEBASE_VOLUME}:/rails
     depends_on:
       - skateparks-db-test
+      - skateparks-redis-test
     ports:
       - "3003:3003"
 
 volumes:
   postgres_data: {}
   app-storage: {}
+  redis_data: {}
