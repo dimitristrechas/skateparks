@@ -1,6 +1,5 @@
 # Set the host name for URL creation
 SitemapGenerator::Sitemap.default_host = "https://www.skateparks.gr"
-SitemapGenerator::Sitemap.ping_search_engines = false
 
 SitemapGenerator::Sitemap.create do
 
