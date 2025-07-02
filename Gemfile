@@ -2,7 +2,7 @@ source "https://rubygems.org"
 
 ruby "3.3.6"
 
-# Use main development branch of Rails
+# Use the main development branch of Rails
 gem 'rails', '~> 8.0'
 
 # The original asset pipeline for Rails [https://github.com/rails/sprockets-rails]
