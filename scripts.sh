@@ -3,18 +3,17 @@
 clear
 echo -e "--- DEVELOPMENT SERVER --"
 echo -e " (1) to start the development server"
-echo -e " (2) to start the tailwindcss:watch service"
-echo -e " (3) to delete server pid"
-echo -e " (4) to start the development server with a fresh build (detached)"
-echo -e " (5) to attach in docker development server"
-echo -e " (6) rails console (for querying the database)"
-echo -e " (7) docker console"
+echo -e " (2) to delete server pid"
+echo -e " (3) to start the development server with a fresh build (detached)"
+echo -e " (4) to attach in docker development server"
+echo -e " (5) rails console (for querying the database)"
+echo -e " (6) docker console"
 echo -e " \n"
 echo -e "--- TEST SERVER --"
-echo -e " (8) to start the test server"
+echo -e " (7) to start the test server"
 echo -e " (9) to start the test server with a fresh build (detached)"
-echo -e " (10) test docker console"
-echo -e " (11) to delete test server pid"
+echo -e " (9) test docker console"
+echo -e " (10) to delete test server pid"
 read OPTION
 
 case $OPTION in
