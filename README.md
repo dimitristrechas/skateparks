@@ -8,13 +8,12 @@
 4. `npm install`
 5. Copy .env.example to .env and fill variables
 6. `sh scripts.sh`, option 4 builds the docker image from scratch, option 1 runs existing image
-7. Open another terminal and type `sh scripts.sh`, select option 4 to build tailwind css
-8. Open browser on `localhost:3000`
+7. Open browser on `localhost:3000`
 
 ### How to run tests
 
 1. Copy .env.example to .env.test and fill the env variables
 2. `sh scripts.sh`
-3. Select option 10 ` test docker console` option
+3. Select option 9 ` test docker console` option
 4. Run `bundle exec rake spec`
 
