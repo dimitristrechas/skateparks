@@ -42,13 +42,12 @@ export default class extends Controller {
 
       // If clicked outside or on padding, call the callback function
       if (!isModal && !this.galleryTarget.contains(event.target)) {
-        console.log("outside");
+        // console.log("outside");
       }
     });
   }
 
   galleryTargetConnected(element) {
-    console.log("element", element);
     document.addEventListener("keydown", this.modalKeysHandler);
     document.addEventListener("touchstart", this.galleryTouchStartHandler);
     document.addEventListener("touchend", this.galleryTouchEndHandler);
