@@ -2,17 +2,17 @@
 
 clear
 echo -e "--- DEVELOPMENT SERVER --"
-echo -e " (1) to start the development server"
+echo -e " (1) to start the development server (detached)"
 echo -e " (2) to delete server pid"
 echo -e " (3) to start the development server with a fresh build (detached)"
 echo -e " (4) to attach in docker development server"
 echo -e " (5) rails console (for querying the database)"
-echo -e " (6) docker console"
+echo -e " (6) connect to docker console"
 echo -e " \n"
 echo -e "--- TEST SERVER --"
-echo -e " (7) to start the test server"
-echo -e " (9) to start the test server with a fresh build (detached)"
-echo -e " (9) test docker console"
+echo -e " (7) to start the test server (detached)"
+echo -e " (8) to start the test server with a fresh build (detached)"
+echo -e " (9) connect to test docker console"
 echo -e " (10) to delete test server pid"
 read OPTION
 
@@ -23,42 +23,38 @@ case $OPTION in
     ;;
 
     2)
-    rails tailwindcss:watch
-    ;;
-
-    3)
     rm tmp/pids/server.pid
     ;;
 
-    4)
+    3)
     docker compose -f ./docker-compose.development.yml up --remove-orphans --build --force-recreate -d
     ;;
 
-    5)
+    4)
     docker attach rails-app
     ;;
 
-    6)
+    5)
     docker compose -f ./docker-compose.development.yml exec skateparks-web bundle exec rails console
     ;;
 
-    7)
+    6)
     docker compose -f ./docker-compose.development.yml exec skateparks-web bash
     ;;
 
-    8)
+    7)
     docker compose -f ./docker-compose.test.yml start
     ;;
 
-    9)
+    8)
     docker compose -f ./docker-compose.test.yml --env-file ./.env.test up --remove-orphans --build --force-recreate -d
     ;;
 
-    10)
+    9)
     docker compose -f ./docker-compose.test.yml exec skateparks-web-test bash
     ;;
 
-    11)
+    10)
     rm tmp/pids/server_test.pid
     ;;
 
