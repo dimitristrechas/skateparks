@@ -3,10 +3,13 @@ require 'sidekiq/cron/web'
 
 Rails.application.routes.draw do
 
-
-
   namespace :admin do
     resources :skateparks
+
+    Sidekiq::Web.use Rack::Auth::Basic do |username, password|
+      ActiveSupport::SecurityUtils.secure_compare(username, Rails.application.credentials.dig(:admin, :username)) &&
+      ActiveSupport::SecurityUtils.secure_compare(password, Rails.application.credentials.dig(:admin, :password))
+    end
     mount Sidekiq::Web => '/sidekiq'
   end
 
