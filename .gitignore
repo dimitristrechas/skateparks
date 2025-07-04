@@ -46,3 +46,4 @@ node_modules
 
 .idea
 /skateparks.iml
+/yarn-error.log
