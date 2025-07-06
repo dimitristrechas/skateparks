@@ -1,14 +1,12 @@
 <%= render(TitleComponent.new(title: "Create a skatepark")) %>
 
-
 <%= render "form", skatepark: @skatepark %>
-
 
 <div class="flex">
   <%= render(
     LinkComponent.new(
       title: "Back to all skateparks",
-      url: admin_skateparks_path
-    )
+      url: admin_skateparks_path,
+    ),
   ) %>
 </div>
