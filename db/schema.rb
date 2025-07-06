@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_01_27_164920) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_06_163957) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -114,6 +114,10 @@ ActiveRecord::Schema[8.0].define(version: 2024_01_27_164920) do
     t.string "google_id"
     t.integer "status", null: false
     t.string "slug"
+    t.string "country_code"
+    t.string "state"
+    t.index ["country_code"], name: "index_skateparks_on_country_code"
+    t.index ["state"], name: "index_skateparks_on_state"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
