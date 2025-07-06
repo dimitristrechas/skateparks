@@ -17,6 +17,7 @@ Rails.application.routes.draw do
   if Rails.env.production?
     # 301 permanent redirects
     get '/skateparks/16-xanthi' => redirect('/skateparks/21-xanthi', status: 301)
+    get '/skateparks/32-elefsina' => redirect('/skateparks/35-elefsina', status: 301)
   end
 
   resources :skateparks
