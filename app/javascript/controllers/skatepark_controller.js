@@ -29,8 +29,7 @@ export default class extends Controller {
       }).setView([this.latValue, this.lngValue], 20);
 
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
       }).addTo(this.map);
 
       L.marker([this.latValue, this.lngValue]).addTo(this.map);
@@ -105,22 +104,14 @@ export default class extends Controller {
 
   showGalleryImage(idx) {
     this.galleryImageTargets[idx].classList.remove("hidden");
-    this.galleryImageIndicatorTargets[idx].classList.remove(
-      "opacity-25"
-    );
-    this.galleryImageIndicatorTargets[idx].classList.add(
-      "opacity-100"
-    );
+    this.galleryImageIndicatorTargets[idx].classList.remove("opacity-25");
+    this.galleryImageIndicatorTargets[idx].classList.add("opacity-100");
   }
 
   hideGalleryImage(idx) {
     this.galleryImageTargets[idx].classList.add("hidden");
-    this.galleryImageIndicatorTargets[idx].classList.add(
-      "opacity-25"
-    );
-    this.galleryImageIndicatorTargets[idx].classList.remove(
-      "opacity-100"
-    );
+    this.galleryImageIndicatorTargets[idx].classList.add("opacity-25");
+    this.galleryImageIndicatorTargets[idx].classList.remove("opacity-100");
   }
 
   onModalClose() {
@@ -151,10 +142,7 @@ export default class extends Controller {
     const swipeX = touchendX - this.touchstartX;
     const swipeY = touchendY - this.touchstartY;
 
-    if (
-      Math.abs(swipeX) > Math.abs(swipeY) &&
-      Math.abs(swipeX) > swipeThreshold
-    ) {
+    if (Math.abs(swipeX) > Math.abs(swipeY) && Math.abs(swipeX) > swipeThreshold) {
       if (swipeX > 0) {
         this.onPreviousGalleryImage();
       } else {

@@ -8,8 +8,7 @@ export default class extends Controller {
   connect() {
     if (
       localStorage.theme === "dark" ||
-      (!("theme" in localStorage) &&
-        window.matchMedia("(prefers-color-scheme: dark)").matches)
+      (!("theme" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches)
     ) {
       this.lightIconTarget.classList.remove("hidden");
     } else {
