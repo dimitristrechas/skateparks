@@ -5,7 +5,7 @@ export default class extends Controller {
 
   connect() {
     if (this.countrySelectTarget.value) {
-      this.fetchStates(countryCode);
+      this.fetchStates(this.countrySelectTarget.value);
     }
   }
 
