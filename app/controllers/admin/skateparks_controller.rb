@@ -1,5 +1,5 @@
 class Admin::SkateparksController < ApplicationController
-  before_action :set_skatepark, only: %i[ show edit update destroy ]
+  before_action :set_skatepark, only: %i[show edit update destroy]
   http_basic_authenticate_with name: Rails.application.credentials.dig(:admin, :username),
                                password: Rails.application.credentials.dig(:admin, :password)
 
@@ -9,8 +9,7 @@ class Admin::SkateparksController < ApplicationController
   end
 
   # GET /skateparks/1 or /skateparks/1.json
-  def show
-  end
+  def show; end
 
   # GET /skateparks/new
   def new
@@ -18,8 +17,7 @@ class Admin::SkateparksController < ApplicationController
   end
 
   # GET /skateparks/1/edit
-  def edit
-  end
+  def edit; end
 
   # POST /skateparks or /skateparks.json
   def create
@@ -27,7 +25,7 @@ class Admin::SkateparksController < ApplicationController
 
     respond_to do |format|
       if @skatepark.save
-        format.html { redirect_to admin_skatepark_url(@skatepark), notice: "Skatepark was successfully created." }
+        format.html { redirect_to admin_skatepark_url(@skatepark), notice: 'Skatepark was successfully created.' }
         format.json { render :show, status: :created, location: @skatepark }
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -40,7 +38,7 @@ class Admin::SkateparksController < ApplicationController
   def update
     respond_to do |format|
       if @skatepark.update(skatepark_params)
-        format.html { redirect_to admin_skatepark_url(@skatepark), notice: "Skatepark was successfully updated." }
+        format.html { redirect_to admin_skatepark_url(@skatepark), notice: 'Skatepark was successfully updated.' }
         format.json { render :show, status: :ok, location: @skatepark }
       else
         format.html { render :edit, status: :unprocessable_entity }
@@ -54,20 +52,26 @@ class Admin::SkateparksController < ApplicationController
     @skatepark.destroy!
 
     respond_to do |format|
-      format.html { redirect_to admin_skateparks_url, notice: "Skatepark was successfully destroyed." }
+      format.html { redirect_to admin_skateparks_url, notice: 'Skatepark was successfully destroyed.' }
       format.json { head :no_content }
     end
   end
 
-  private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_skatepark
-      @skatepark = Skatepark.find(params[:id])
-    end
+  def states
+    country = ISO3166::Country[params[:country_code]]
+    render json: country.subdivisions
+  end
 
-    # Only allow a list of trusted parameters through.
-    def skatepark_params
-      params.require(:skatepark).permit(:name_el, :name_en, :lat, :lng, :cover_image, :description_el, :description_en, :google_id, :status, images: [])
-    end
+  private
+
+  # Use callbacks to share common setup or constraints between actions.
+  def set_skatepark
+    @skatepark = Skatepark.find(params[:id])
+  end
+
+  # Only allow a list of trusted parameters through.
+  def skatepark_params
+    params.expect(skatepark: [:name_el, :name_en, :lat, :lng, :cover_image, :description_el, :description_en,
+                              :google_id, :status, :country_code, :state, { images: [] }])
+  end
 end
-  

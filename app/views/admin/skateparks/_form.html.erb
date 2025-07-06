@@ -18,90 +18,108 @@
 
   <div class="grid grid-cols-2 gap-8">
     <div class="flex flex-col gap-2">
-      <%= render(
-        TextFieldComponent.new(
-          name: 'name_el',
-          title: t('name_el'),
-          form: form
-        )
-      ) %>
-      <%= render(
-        TextFieldComponent.new(
-          name: 'name_en',
-          title: t('name_en'),
-          form: form
-        )
-      ) %>
+      <%= render(TextFieldComponent.new(name: "name_el", title: t("name_el"), form: form)) %>
+      <%= render(TextFieldComponent.new(name: "name_en", title: t("name_en"), form: form)) %>
     </div>
 
     <div class="flex flex-col gap-2">
       <%= render(
         TextFieldComponent.new(
-          name: 'lat',
-          title: t('latitude'),
+          name: "lat",
+          title: t("latitude"),
           form: form,
-          classnames: 'col-start-1'
-        )
+          classnames: "col-start-1",
+        ),
       ) %>
-      <%= render(
-        TextFieldComponent.new(
-          name: 'lng',
-          title: t('longitude'),
-          form: form
-        )
-      ) %>
+      <%= render(TextFieldComponent.new(name: "lng", title: t("longitude"), form: form)) %>
     </div>
 
     <%= render(
       TextFieldComponent.new(
-        name: 'google_id',
-        title: 'Google maps id',
-        form: form
-      )
+        name: "google_id",
+        title: "Google maps id",
+        form: form,
+      ),
     ) %>
 
     <div class="flex flex-col gap-2">
       <%= form.label :status %>
       <%= form.select :status,
-                      Skatepark.statuses.keys.map{ |key| [key.humanize, key] },
-                      selected: skatepark.status || :draft %>
+                  Skatepark.statuses.keys.map { |key| [key.humanize, key] },
+                  { selected: skatepark.status || :draft },
+                  { class: "p-1 text-neutral-600 dark:text-neutral-700" } %>
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <%= form.label :country_code,
+                 class: "block text-neutral-600 dark:text-neutral-300  mb-1" %>
+      <%= form.select :country_code,
+                  ISO3166::Country.all.map { |c| [c.common_name, c.alpha2] },
+                  { selected: skatepark.country_code || "GR" },
+                  {
+                    class: "p-1 text-neutral-600 dark:text-neutral-700",
+                    data: {
+                      admin__skateparks__form_target: "countrySelect",
+                      action: "change->admin--skateparks--form#onCountryChange",
+                    },
+                  } %>
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <%= form.label :state, class: "block text-neutral-600 dark:text-neutral-300 mb-1" %>
+      <%= form.select :state,
+                  skatepark.country&.subdivisions&.map { |code, subdivision|
+                    [subdivision.name, code]
+                  } || [],
+                  { selected: skatepark.state },
+                  {
+                    disabled: skatepark.country_code.blank?,
+                    class: "p-1 text-neutral-600 dark:text-neutral-700",
+                    data: {
+                      admin__skateparks__form_target: "stateSelect",
+                    },
+                  } %>
     </div>
 
     <div class="col-start-1">
-      <%= form.label :description_el, 'Description el', class: "block text-neutral-600 dark:text-neutral-300 mb-1" %>
-      <%= form.rich_text_area(:description_el, class: 'bg-white text-neutral-600') %>
+      <%= form.label :description_el,
+                 "Description el",
+                 class: "block text-neutral-600 dark:text-neutral-300 mb-1" %>
+      <%= form.rich_text_area(:description_el, class: "bg-white text-neutral-600") %>
     </div>
 
     <div>
-      <%= form.label :description_en, 'Description en', class: "block text-neutral-600 dark:text-neutral-300 mb-1" %>
-      <%= form.rich_text_area(:description_en, class: 'bg-white text-neutral-600') %>
+      <%= form.label :description_en,
+                 "Description en",
+                 class: "block text-neutral-600 dark:text-neutral-300 mb-1" %>
+      <%= form.rich_text_area(:description_en, class: "bg-white text-neutral-600") %>
     </div>
 
     <div class="col-start-1">
-      <%= form.label :cover_image, 'Cover image', class: "block text-neutral-600 dark:text-neutral-300  mb-1" %>
+      <%= form.label :cover_image,
+                 "Cover image",
+                 class: "block text-neutral-600 dark:text-neutral-300  mb-1" %>
 
       <%= form.file_field :cover_image,
-                          multiple: false,
-                          accept:'image/*',
-                          class: "p-1 text-neutral-600 dark:text-neutral-300" %>
+                      multiple: false,
+                      accept: "image/*",
+                      class: "p-1 text-neutral-600 dark:text-neutral-300" %>
     </div>
 
     <div class="flex gap-4 col-span-2 flex-wrap place-items-center">
       <% if skatepark&.id %>
-        <%= image_tag skatepark.cover_image,
-                      size: "600x450",
-                      class: "rounded" %>
+        <%= image_tag skatepark.cover_image, size: "600x450", class: "rounded" %>
       <% end %>
     </div>
 
     <div class="col-start-1">
       <%= form.label :images,
-                     'Images',
-                     class: "block text-neutral-600 dark:text-neutral-300  mb-1" %>
+                 "Images",
+                 class: "block text-neutral-600 dark:text-neutral-300  mb-1" %>
       <%= form.file_field :images,
-                          multiple: true,
-                          accept:'image/*',
-                          class: "p-1 text-neutral-600 dark:text-neutral-300" %>
+                      multiple: true,
+                      accept: "image/*",
+                      class: "p-1 text-neutral-600 dark:text-neutral-300" %>
     </div>
 
     <div class="flex gap-4 col-span-2 flex-wrap place-items-center">
@@ -109,14 +127,13 @@
         <% skatepark.images.each do |image| %>
           <div
             data-action="click->admin--skateparks--form#onImageClick"
-            class="cursor-pointer hover:outline hover:outline-4 hover:outline-offset-2 hover:outline-red-500 rounded"
+            class="
+              cursor-pointer hover:outline hover:outline-4 hover:outline-offset-2
+              hover:outline-red-500 rounded
+            "
           >
-            <%= form.hidden_field :images,
-                                  multiple: true,
-                                  value: image.signed_id %>
-            <%= image_tag image,
-                          size: "200x150",
-                          class: "rounded" %>
+            <%= form.hidden_field :images, multiple: true, value: image.signed_id %>
+            <%= image_tag image, size: "200x150", class: "rounded" %>
           </div>
         <% end %>
       <% end %>
@@ -125,10 +142,10 @@
     <div class="col-span-2 justify-self-end">
       <%= render(
         ButtonComponent.new(
-          title: skatepark&.id ? t('edit') : t('create'),
+          title: skatepark&.id ? t("edit") : t("create"),
           form: form,
-          type: 'submit'
-        )
+          type: "submit",
+        ),
       ) %>
     </div>
   </div>

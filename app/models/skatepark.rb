@@ -36,22 +36,32 @@ class Skatepark < ApplicationRecord
   enum :status, { draft: 0, published: 1, archived: 2 }
 
   validates :name, presence: true
-  validates :cover_image, presence: true 
+  validates :cover_image, presence: true
   validates :lat, presence: true
   validates :lng, presence: true
   validates :description, presence: true
-  validates :images, length: { minimum: 2,  too_short: "%{count} is the minimum allowed" }
+  validates :images, length: { minimum: 2, too_short: '%<count>s is the minimum allowed' }
   validates :status, presence: true, inclusion: { in: statuses.keys }
+  validates :country_code, presence: true, inclusion: { in: ISO3166::Country.codes }
+  validates :state, presence: true
 
-  after_validation :set_slug, only: [:create, :update]
+  after_validation :set_slug, only: %i[create update]
 
   def to_param
     "#{id}-#{slug}"
+  end
+
+  def country
+    ISO3166::Country[country_code]
+  end
+
+  def state_name
+    country.subdivisions[state]&.name if state.present?
   end
 
   private
 
   def set_slug
     self.slug = name_en.to_s.parameterize
-  end 
+  end
 end
