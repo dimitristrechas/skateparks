@@ -48,7 +48,9 @@
 
     </script>
 
-    <%= javascript_include_tag "https://analytics.dimitristrechas.com/script.js", defer: true, "data-website-id": "8069aac7-fcfc-4784-bd61-6616285973fd" if Rails.env.production? %>
+    <%= javascript_include_tag "https://analytics.dimitristrechas.com/script.js",
+                               defer: true,
+                               "data-website-id": "8069aac7-fcfc-4784-bd61-6616285973fd" if Rails.env.production? && !request.path.start_with?('/admin') %>
   </head>
 
   <body class="grid grid-rows-layout min-h-screen container mx-auto py-4 md:py-6 px-2 md:px-4 2xl:px-0 dark:bg-neutral-800 bg-neutral-100 text-neutral-600 dark:text-neutral-300">
