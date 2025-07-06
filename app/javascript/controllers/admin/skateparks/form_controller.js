@@ -22,6 +22,8 @@ export default class extends Controller {
     fetch(`/admin/states/${countryCode}`)
       .then((response) => response.json())
       .then((states) => {
+        console.log("states", states);
+        console.log("stateSelect", this.stateSelectTarget.value);
         this.stateSelectTarget.innerHTML = this.buildStateOptions(states);
         this.stateSelectTarget.disabled = false;
       });
@@ -29,7 +31,11 @@ export default class extends Controller {
 
   buildStateOptions(states) {
     return Object.entries(states)
-      .map(([code, state]) => `<option value="${code}">${state.name}</option>`)
+      .map(([code, state]) => {
+        const selected = code === this.stateSelectTarget.value ? "selected" : "";
+
+        return `<option ${selected} value="${code}">${state.name}</option>`;
+      })
       .join("");
   }
 
