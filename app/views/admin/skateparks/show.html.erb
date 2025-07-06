@@ -6,16 +6,18 @@
   <%= render(
     LinkComponent.new(
       title: "Edit this skatepark",
-      url: edit_admin_skatepark_path(@skatepark)
-    )
+      url: edit_admin_skatepark_path(@skatepark),
+    ),
   ) %>
 
   <%= render(
     LinkComponent.new(
       title: "Back to all skateparks",
-      url: admin_skateparks_path
-    )
+      url: admin_skateparks_path,
+    ),
   ) %>
 
-  <%= button_to "Destroy this skatepark", admin_skatepark_path(@skatepark), method: :delete %>
+  <%= button_to "Destroy this skatepark",
+  admin_skatepark_path(@skatepark),
+  method: :delete %>
 </div>

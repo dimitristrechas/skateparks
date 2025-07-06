@@ -1,12 +1,10 @@
-<%= link_to 'homepage', root_path, class: 'text-blue-500 underline' %>
-
+<%= link_to "homepage", root_path, class: "text-blue-500 underline" %>
 
 <div id="skateparks">
   <% @skateparks.each do |skatepark| %>
     <%= render skatepark %>
     <p>
-      <%= link_to "Show this skatepark", skatepark, class: 'text-blue-500 underline' %>
+      <%= link_to "Show this skatepark", skatepark, class: "text-blue-500 underline" %>
     </p>
   <% end %>
 </div>
-
