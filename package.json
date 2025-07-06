@@ -4,5 +4,8 @@
     "flowbite": "^2.5.2",
     "trix": "^2.1.8"
   },
+  "devDependencies": {
+    "prettier": "^3.6.2"
+  },
   "packageManager": "yarn@1.22.22"
 }
