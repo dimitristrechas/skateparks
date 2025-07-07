@@ -7,6 +7,8 @@ en:
   photos: "photos"
   latitude: "latitude"
   longitude: "longitude"
+  country: 'Ψοθντρυ'
+  country_state: 'State/Region'
   back_to_homepage: "Back to homepage"
   open_in_google_maps: "Open skatepark in google maps"
   previous: "Previous"
