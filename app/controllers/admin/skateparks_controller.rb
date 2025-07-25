@@ -1,7 +1,8 @@
 class Admin::SkateparksController < ApplicationController
   before_action :set_skatepark, only: %i[show edit update destroy]
   http_basic_authenticate_with name: Rails.application.credentials.dig(:admin, :username),
-                               password: Rails.application.credentials.dig(:admin, :password)
+                               password: Rails.application.credentials.dig(:admin, :password),
+                               unless: -> { Rails.env.development? }
 
   # GET /skateparks or /skateparks.json
   def index
@@ -25,7 +26,10 @@ class Admin::SkateparksController < ApplicationController
 
     respond_to do |format|
       if @skatepark.save
-        format.html { redirect_to admin_skatepark_url(@skatepark), notice: 'Skatepark was successfully created.' }
+        format.html do
+          redirect_to admin_skateparks_url,
+                      notice: "Skatepark: #{@skatepark.name} was successfully created."
+        end
         format.json { render :show, status: :created, location: @skatepark }
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -38,7 +42,10 @@ class Admin::SkateparksController < ApplicationController
   def update
     respond_to do |format|
       if @skatepark.update(skatepark_params)
-        format.html { redirect_to admin_skatepark_url(@skatepark), notice: 'Skatepark was successfully updated.' }
+        format.html do
+          redirect_to admin_skateparks_url,
+                      notice: "Skatepark: #{@skatepark.name} was successfully updated."
+        end
         format.json { render :show, status: :ok, location: @skatepark }
       else
         format.html { render :edit, status: :unprocessable_entity }
@@ -52,7 +59,9 @@ class Admin::SkateparksController < ApplicationController
     @skatepark.destroy!
 
     respond_to do |format|
-      format.html { redirect_to admin_skateparks_url, notice: 'Skatepark was successfully destroyed.' }
+      format.html do
+        redirect_to admin_skateparks_url, notice: "Skatepark: #{@skatepark.name} was successfully destroyed."
+      end
       format.json { head :no_content }
     end
   end

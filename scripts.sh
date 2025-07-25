@@ -14,6 +14,9 @@ echo -e " (7) to start the test server (detached)"
 echo -e " (8) to start the test server with a fresh build (detached)"
 echo -e " (9) connect to test docker console"
 echo -e " (10) to delete test server pid"
+echo -e " \n"
+echo -e "--- UTILITY --"
+echo -e " (11) to format all the erb files with erb-format"
 read OPTION
 
 case $OPTION in
@@ -56,6 +59,10 @@ case $OPTION in
 
     10)
     rm tmp/pids/server_test.pid
+    ;;
+
+    11)
+    bundle exec erb-format -w app/views/**/*.erb
     ;;
 
     *)

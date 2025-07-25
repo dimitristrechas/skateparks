@@ -1,0 +1,47 @@
+<%= form_with url: skateparks_path, method: :get, class: 'flex flex-wrap items-end gap-4 mb-12', data: {
+  controller: 'skateparks--filters',
+} do |form| %>
+  <div class="flex flex-col gap-1 items-start">
+    <%= form.label :country_code, "Country", class: "block text-sm font-medium" %>
+    <%= form.select :country_code,
+                options_for_select(
+                  [[t("all_countries"), ""]] +
+                    @countries.map { |c| [c.common_name, c.alpha2] },
+                  params[:country_code],
+                ),
+                {},
+                {
+                  class:
+                    "w-56 bg-gray-50 border border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500",
+                  data: {
+                    "skateparks--filters-target": "countrySelect",
+                  },
+                } %>
+  </div>
+
+  <div class="flex flex-col gap-1 items-start">
+    <%= form.label :state, "State/Province", class: "block text-sm font-medium" %>
+    <%= form.select :state,
+                options_for_select(
+                  [[t("all_states"), ""]] + @states.map { |s| [s.name, s.code] },
+                  params[:state],
+                ),
+                {},
+                {
+                  disabled: @states.empty?,
+                  class:
+                    "w-56 bg-gray-50 border border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500",
+                  data: {
+                    "skateparks--filters-target": "stateSelect",
+                  },
+                } %>
+  </div>
+
+  <div class="flex gap-4 xl:gap-6 items-center ms-0 lg:ms-auto xl:ms-8">
+    <%= link_to t("reset_filters"), skateparks_path %>
+    <%= form.button t("search"),
+                type: "submit",
+                class:
+                  "py-2.5 px-5 text-sm font-medium focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" %>
+  </div>
+<% end %>

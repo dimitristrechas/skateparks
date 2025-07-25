@@ -95,3 +95,5 @@ gem 'sidekiq-cron'
 gem 'foreman', '~> 0.88.1'
 
 gem 'countries', '~> 8.0'
+
+gem 'kaminari'

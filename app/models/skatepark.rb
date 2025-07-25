@@ -46,6 +46,8 @@ class Skatepark < ApplicationRecord
   validates :state, presence: true
 
   after_validation :set_slug, only: %i[create update]
+  after_destroy :clear_countries_cache, :clear_location_caches
+  after_save :clear_countries_cache, :clear_location_caches
 
   def to_param
     "#{id}-#{slug}"
@@ -63,5 +65,17 @@ class Skatepark < ApplicationRecord
 
   def set_slug
     self.slug = name_en.to_s.parameterize
+  end
+
+  def clear_countries_cache
+    Rails.cache.delete('skateparks_countries') if saved_change_to_country_code? || saved_change_to_status?
+  end
+
+  def clear_location_caches
+    return unless saved_change_to_country_code? || saved_change_to_state? || saved_change_to_status?
+
+    Rails.cache.delete('skateparks_countries')
+    Rails.cache.delete("skateparks_states_#{country_code}") if country_code.present?
+    Rails.cache.delete("skateparks_states_#{country_code_before_last_save}") if country_code_before_last_save.present?
   end
 end

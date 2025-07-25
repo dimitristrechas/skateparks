@@ -22,6 +22,8 @@ Rails.application.routes.draw do
 
   resources :skateparks
 
+  get 'available_states/:country_code', to: 'skateparks#available_states'
+
   get 'healthcheck' => 'rails/health#show', as: :rails_health_check
 
   root to: 'home#index'
