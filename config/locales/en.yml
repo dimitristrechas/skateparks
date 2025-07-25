@@ -7,9 +7,9 @@ en:
   photos: "photos"
   latitude: "latitude"
   longitude: "longitude"
-  country: 'Ψοθντρυ'
+  country: 'Country'
   country_state: 'State/Region'
-  back_to_homepage: "Back to homepage"
+  back_to_skateparks: "Back to all skateparks"
   open_in_google_maps: "Open skatepark in google maps"
   previous: "Previous"
   next: "Next"
@@ -29,6 +29,10 @@ en:
   contact: "Contact"
   contact_details: "Contact"
   skatepark_details: "If you want the skatepark in your area to be added, you can send us photos, information, and anything else you find useful!"
+  search: "Search"
+  reset_filters: "Reset"
+  all_countries: "All"
+  all_states: "All"
   application:
     title: "Skateparks in Greece - Find all skateparks in Greece"
     meta_description: "Discover the ultimate guide to Greece's skateparks, featuring detailed listings, interactive maps, videos and more. Elevate your next skate tour with our comprehensive skatepark directory."

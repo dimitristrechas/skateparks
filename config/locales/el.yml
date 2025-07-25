@@ -9,7 +9,7 @@ el:
   longitude: "γεωγραφικό μήκος"
   country: 'Χώρα'
   country_state: 'Νομός/Περιφέρεια'
-  back_to_homepage: "Πίσω στην αρχική"
+  back_to_skateparks: "Πίσω σε όλα τα skateparks"
   open_in_google_maps: "Δες το πάρκο στο google maps"
   previous: "Προηγούμενο"
   next: "Επόμενο"
@@ -29,6 +29,10 @@ el:
   contact: "Επικοινωνία"
   contact_details: "Contact"
   skatepark_details: "Αν θέλεις να προστεθεί και το skatepark της περιοχής σου μπορείς να μας στείλεις φωτογραφίες, πληροφορίες και ότι άλλο θεωρείς χρήσιμο!"
+  search: "Αναζήτηση"
+  reset_filters: "Επαναφορά"
+  all_countries: "Όλες"
+  all_states: "Όλες"
   application:
     title: "Βρες skateparks σε όλη την Ελλάδα!"
     meta_description: "Η απόλυτη πηγή πληροφόρησης για skateparks σε όλη την Ελλάδα, με λεπτομερείς χάρτες, φωτογραφίες, βίντεο και πολλά άλλα. Σχεδίασε το επόμενό σου tour εδώ."
