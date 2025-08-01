@@ -5,8 +5,8 @@ ruby '3.3.6'
 # Use the main development branch of Rails
 gem 'rails', '~> 8.0'
 
-# The original asset pipeline for Rails [https://github.com/rails/sprockets-rails]
-gem 'sprockets-rails'
+# Use Propshaft, the new asset pipeline for Rails 8 [https://github.com/rails/propshaft]
+gem 'propshaft'
 
 # Use postgresql as the database for Active Record
 gem 'pg', '~> 1.1'
