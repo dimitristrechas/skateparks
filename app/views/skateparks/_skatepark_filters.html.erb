@@ -1,6 +1,7 @@
 <%= form_with url: skateparks_path, method: :get, class: 'flex flex-wrap items-end gap-4 mb-12', data: {
   controller: 'skateparks--filters',
 } do |form| %>
+  <%= form.hidden_field :locale, value: I18n.locale %>
   <div class="flex flex-col gap-1 items-start">
     <%= form.label :country_code, "Country", class: "block text-sm font-medium" %>
     <%= form.select :country_code,
