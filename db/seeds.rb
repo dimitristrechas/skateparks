@@ -1,7 +1,7 @@
 require 'open-uri'
 
 # Create sample skateparks
-35.times do |i|
+10.times do |i|
   country = ISO3166::Country.all.select { |c| c.subdivisions.any? }.sample
   skatepark = Skatepark.new(
     name_en: "Sample Skatepark #{i + rand(1000)}",
