@@ -47,3 +47,5 @@ node_modules
 .idea
 /skateparks.iml
 /yarn-error.log
+/.claude/settings.local.json
+/CLAUDE.md
