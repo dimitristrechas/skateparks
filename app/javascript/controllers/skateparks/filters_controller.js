@@ -1,9 +1,8 @@
 import { Controller } from "@hotwired/stimulus";
 
 export default class extends Controller {
+  static values = { locale: String };
   static targets = ["countrySelect", "stateSelect"];
-
-  static values = {};
 
   connect() {
     if (this.hasCountrySelectTarget) {
@@ -38,8 +37,8 @@ export default class extends Controller {
     return (
       defaultOption +
       states
-        .map(({ code, name }) => {
-          return `<option  value="${code}">${name}</option>`;
+        .map(({ code, name, translations }) => {
+          return `<option  value="${code}">${translations[this.localeValue] ?? name}</option>`;
         })
         .join("")
     );
