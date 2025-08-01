@@ -17,6 +17,7 @@ echo -e " (10) to delete test server pid"
 echo -e " \n"
 echo -e "--- UTILITY --"
 echo -e " (11) to format all the erb files with erb-format"
+echo -e " (12) to seed the database"
 read OPTION
 
 case $OPTION in
@@ -63,6 +64,10 @@ case $OPTION in
 
     11)
     bundle exec erb-format -w app/views/**/*.erb
+    ;;
+
+    12)
+    docker compose -f ./docker-compose.development.yml exec skateparks-web bash -c "bundle exec rails db:seed"
     ;;
 
     *)
