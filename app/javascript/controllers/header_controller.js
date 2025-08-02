@@ -1,9 +1,7 @@
 import { Controller } from "@hotwired/stimulus";
 
 export default class extends Controller {
-  static targets = ["image", "toggleButton", "lightIcon", "darkIcon"];
-
-  static values = {};
+  static targets = ["image", "toggleButton", "lightIcon", "darkIcon", "lightLogo", "darkLogo"];
 
   connect() {
     if (
@@ -11,14 +9,20 @@ export default class extends Controller {
       (!("theme" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches)
     ) {
       this.lightIconTarget.classList.remove("hidden");
+      this.lightLogoTarget.classList.add("hidden");
+      this.darkLogoTarget.classList.remove("hidden");
     } else {
       this.darkIconTarget.classList.remove("hidden");
+      this.lightLogoTarget.classList.remove("hidden");
+      this.darkLogoTarget.classList.add("hidden");
     }
   }
 
   toggleThemeMode = (event) => {
     this.darkIconTarget.classList.toggle("hidden");
     this.lightIconTarget.classList.toggle("hidden");
+    this.lightLogoTarget.classList.toggle("hidden");
+    this.darkLogoTarget.classList.toggle("hidden");
 
     if (localStorage.getItem("theme")) {
       if (localStorage.getItem("theme") === "light") {
@@ -38,6 +42,4 @@ export default class extends Controller {
       }
     }
   };
-
-  disconnect() {}
 }
