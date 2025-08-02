@@ -1,13 +1,15 @@
 <header
   data-controller="header"
-  class="flex items-center mb-8 md:mb-16 gap-4 md:gap-8"
+  class="flex items-start mb-6 md:mb-12 "
 >
   <%= link_to root_path, class: ''  do %>
-    <%= image_tag("skateparks-logo-transparent.png", alt: "skateparks.gr logo", class: "h-36 w-auto", data: { header_target: "lightLogo" }) %>
-    <%= image_tag("skateparks-logo-transparent-dark-mode.png", alt: "skateparks.gr logo", class: "h-36 w-auto hidden", data: { header_target: "darkLogo" }) %>
+    <%= image_tag("skateparks-logo-transparent.png", alt: "skateparks.gr logo", class: "h-24 md:h-32 w-auto", data: { header_target: "lightLogo" }) %>
+    <%= image_tag("skateparks-logo-transparent-dark-mode.png", alt: "skateparks.gr logo", class: "h-24 md:h-32 w-auto hidden", data: { header_target: "darkLogo" }) %>
   <% end %>
 
+  <div class="flex item ms-auto gap-4 md:gap-8">
   <%= render "home/locale_selector" %>
 
   <%= render "home/dark_mode_switch" %>
+  </div>
 </header>
