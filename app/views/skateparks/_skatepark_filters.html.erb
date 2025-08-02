@@ -4,7 +4,7 @@
 } do |form| %>
   <%= form.hidden_field :locale, value: I18n.locale %>
   <div class="flex flex-col gap-1 items-start">
-    <%= form.label :country_code, t('country'), class: "block text-sm font-medium" %>
+    <%= form.label :country_code, t("country"), class: "block text-sm font-medium" %>
     <%= form.select :country_code,
                 options_for_select(
                   [[t("all_countries"), ""]] +
@@ -22,12 +22,11 @@
   </div>
 
   <div class="flex flex-col gap-1 items-start">
-    <%= form.label :state, t('country_state'), class: "block text-sm font-medium" %>
+    <%= form.label :state, t("country_state"), class: "block text-sm font-medium" %>
     <%= form.select :state,
                 options_for_select(
-                  [[t("all_states"), ""]] + @states.map do |s|
-                    [s.translations[I18n.locale], s.code]
-                  end,
+                  [[t("all_states"), ""]] +
+                    @states.map { |s| [s.translations[I18n.locale], s.code] },
                   params[:state],
                 ),
                 {},
