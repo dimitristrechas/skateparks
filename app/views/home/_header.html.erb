@@ -1,20 +1,9 @@
-<header data-controller="header" class="flex items-start mb-6 md:mb-12">
+<header data-controller="header" class="flex items-start mb-4 md:mb-6">
   <%= link_to root_path, class: ''  do %>
     <%= image_tag(
-      "skateparks-logo-transparent.png",
+      "skateparks-logo.png",
       alt: "skateparks.gr logo",
-      class: "h-24 md:h-32 w-auto",
-      data: {
-        header_target: "lightLogo",
-      },
-    ) %>
-    <%= image_tag(
-      "skateparks-logo-transparent-dark-mode.png",
-      alt: "skateparks.gr logo",
-      class: "h-24 md:h-32 w-auto hidden",
-      data: {
-        header_target: "darkLogo",
-      },
+        class: "h-24 md:h-32 w-auto dark:drop-shadow-[0_0_3px_rgba(255,255,255,1)]",
     ) %>
   <% end %>
 
