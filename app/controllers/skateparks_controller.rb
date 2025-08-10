@@ -15,7 +15,14 @@ class SkateparksController < ApplicationController
   end
 
   def available_states
-    render json: states_for_country
+    @states = states_for_country
+
+    respond_to do |format|
+      format.json { render json: @states }
+      format.turbo_stream do
+        render turbo_stream: turbo_stream.replace('state_select', partial: 'state_select', locals: { states: @states })
+      end
+    end
   end
 
   private

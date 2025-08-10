@@ -1,7 +1,6 @@
 import { Controller } from "@hotwired/stimulus";
 
 export default class extends Controller {
-  static values = { locale: String };
   static targets = ["countrySelect", "stateSelect"];
 
   connect() {
@@ -11,11 +10,14 @@ export default class extends Controller {
   }
 
   handleCountryChange = (event) => {
+    const countryCode = event.target.value;
+    
     if (this.hasStateSelectTarget) {
       this.stateSelectTarget.value = "";
     }
-    if (event.target.value) {
-      this.fetchAvailableStates(event.target.value);
+    
+    if (countryCode) {
+      this.fetchAvailableStates(countryCode);
     } else {
       this.stateSelectTarget.value = "";
       this.stateSelectTarget.disabled = true;
@@ -23,24 +25,13 @@ export default class extends Controller {
   };
 
   fetchAvailableStates(countryCode) {
-    fetch(`/available_states/${countryCode}`)
-      .then((response) => response.json())
-      .then((states) => {
-        this.stateSelectTarget.innerHTML = this.buildStateOptions(states);
-        this.stateSelectTarget.disabled = false;
-      });
-  }
-
-  buildStateOptions(states) {
-    const defaultOption = `<option selected value="">All States</option>`;
-
-    return (
-      defaultOption +
-      states
-        .map(({ code, name, translations }) => {
-          return `<option  value="${code}">${translations[this.localeValue] ?? name}</option>`;
-        })
-        .join("")
-    );
+    fetch(`/available_states/${countryCode}`, {
+      method: 'GET',
+      headers: {
+        'Accept': 'text/vnd.turbo-stream.html'
+      }
+    })
+    .then(response => response.text())
+    .then(html => Turbo.renderStreamMessage(html));
   }
 }

@@ -1,6 +1,5 @@
 <%= form_with url: skateparks_path, method: :get, class: 'flex flex-wrap items-end gap-4 mb-12', data: {
-  controller: 'skateparks--filters',
-  'skateparks--filters-locale-value': I18n.locale,
+  controller: 'skateparks--filters'
 } do |form| %>
   <%= form.hidden_field :locale, value: I18n.locale %>
   <div class="flex flex-col gap-1 items-start">
@@ -16,29 +15,12 @@
                   class:
                     "w-56 bg-gray-50 border border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500",
                   data: {
-                    "skateparks--filters-target": "countrySelect",
-                  },
+                    "skateparks--filters-target": "countrySelect"
+                  }
                 } %>
   </div>
 
-  <div class="flex flex-col gap-1 items-start">
-    <%= form.label :state, t("country_state"), class: "block text-sm font-medium" %>
-    <%= form.select :state,
-                options_for_select(
-                  [[t("all_states"), ""]] +
-                    @states.map { |s| [s.translations[I18n.locale], s.code] },
-                  params[:state],
-                ),
-                {},
-                {
-                  disabled: @states.empty?,
-                  class:
-                    "w-56 bg-gray-50 border border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500",
-                  data: {
-                    "skateparks--filters-target": "stateSelect",
-                  },
-                } %>
-  </div>
+  <%= render "state_select", states: @states %>
 
   <div class="flex gap-4 xl:gap-6 items-center ms-0 lg:ms-auto xl:ms-8">
     <%= link_to t("reset_filters"), skateparks_path %>
