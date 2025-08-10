@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus";
 
 export default class extends Controller {
-  static targets = ["countrySelect", "stateSelect"];
+  static targets = ["countrySelect"];
 
   connect() {
     if (this.hasCountrySelectTarget) {
@@ -11,27 +11,18 @@ export default class extends Controller {
 
   handleCountryChange = (event) => {
     const countryCode = event.target.value;
-    
-    if (this.hasStateSelectTarget) {
-      this.stateSelectTarget.value = "";
-    }
-    
-    if (countryCode) {
-      this.fetchAvailableStates(countryCode);
-    } else {
-      this.stateSelectTarget.value = "";
-      this.stateSelectTarget.disabled = true;
-    }
+
+    this.fetchAvailableStates(countryCode);
   };
 
   fetchAvailableStates(countryCode) {
     fetch(`/available_states/${countryCode}`, {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Accept': 'text/vnd.turbo-stream.html'
-      }
+        Accept: "text/vnd.turbo-stream.html",
+      },
     })
-    .then(response => response.text())
-    .then(html => Turbo.renderStreamMessage(html));
+      .then((response) => response.text())
+      .then((html) => Turbo.renderStreamMessage(html));
   }
 }
