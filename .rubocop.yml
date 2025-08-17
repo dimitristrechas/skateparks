@@ -1,9 +1,14 @@
 require:
   - rubocop-rails
 
+plugins:
+  - rubocop-capybara
+  - rubocop-rspec
+  - rubocop-rspec_rails
+
 AllCops:
   NewCops: enable
-  TargetRubyVersion: 3.0
+  TargetRubyVersion: 3.3
 
 Style/Documentation:
   Enabled: false
