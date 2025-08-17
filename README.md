@@ -10,12 +10,12 @@
 5. `npm install`
 6. `sh scripts.sh`, option 3 builds the docker image from scratch, option 1 runs existing image
 7. Open browser on `localhost:3000`
-8. Optionally seed the database, use option 6 to connect to the docker console and run `rake db:seed`
+8. Optionally seed the database using option 19, or use option 6 to connect to the docker console and run `rake db:seed`
 
 ### How to run tests
 
 1. Copy .env.example to .env.test and fill the env variables
 2. `sh scripts.sh`
-3. Select option 9 `test docker console` option
-4. Run `bundle exec rake spec`
+3. Select option 10 to build test server, or option 11 to connect to test docker console
+4. Run `bundle exec rake spec`, or use option 13 to run tests directly
 
