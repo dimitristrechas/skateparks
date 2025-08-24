@@ -25,7 +25,7 @@ check_docker() {
 
 # Function to show Docker container status
 show_docker_status() {
-    echo -e "${CYAN}--- DOCKER STATUS ---${NC}"
+    echo -e "${CYAN}--- Docker Status ---${NC}"
     if docker ps --format "table {{.Names}}\t{{.Status}}" | grep -E "(skateparks|rails)" > /dev/null 2>&1; then
         docker ps --format "table {{.Names}}\t{{.Status}}" | grep -E "(skateparks|rails)" | head -10
     else
@@ -47,14 +47,14 @@ confirm_action() {
 }
 
 clear
-echo -e "${PURPLE}🛹 SKATEPARKS DEVELOPMENT TOOLKIT 🛹${NC}"
+echo -e "${PURPLE}🛹 Skateparks.gr Development Toolkit 🛹${NC}"
 echo ""
 
 # Check Docker status first
 check_docker
 show_docker_status
 
-echo -e "${GREEN}--- DEVELOPMENT SERVER ---${NC}"
+echo -e "${GREEN}--- Development Server ---${NC}"
 echo -e " ${BLUE}(1)${NC}  Start development server (detached)"
 echo -e " ${BLUE}(2)${NC}  Delete server PID file"
 echo -e " ${BLUE}(3)${NC}  Fresh build & start development server (detached)"
@@ -64,7 +64,7 @@ echo -e " ${BLUE}(6)${NC}  Connect to Docker console"
 echo -e " ${BLUE}(7)${NC}  View development server logs"
 echo -e " ${BLUE}(8)${NC}  Stop development server"
 echo ""
-echo -e "${GREEN}--- TEST SERVER ---${NC}"
+echo -e "${GREEN}--- Test Server ---${NC}"
 echo -e " ${BLUE}(9)${NC}  Start test server (detached)"
 echo -e " ${BLUE}(10)${NC} Fresh build & start test server (detached)"
 echo -e " ${BLUE}(11)${NC} Connect to test Docker console"
@@ -72,13 +72,13 @@ echo -e " ${BLUE}(12)${NC} Delete test server PID file"
 echo -e " ${BLUE}(13)${NC} Run RSpec tests"
 echo -e " ${BLUE}(14)${NC} View test server logs"
 echo ""
-echo -e "${GREEN}--- CODE QUALITY & FORMATTING ---${NC}"
+echo -e "${GREEN}--- Code Quality & Formatting ---${NC}"
 echo -e " ${BLUE}(15)${NC} Format ERB files with erb-format"
 echo -e " ${BLUE}(16)${NC} Run Ruby linter (RuboCop)"
 echo -e " ${BLUE}(17)${NC} Auto-fix Ruby linter issues"
 echo -e " ${BLUE}(18)${NC} Format JavaScript/CSS files (Prettier)"
 echo ""
-echo -e "${GREEN}--- DATABASE & UTILITIES ---${NC}"
+echo -e "${GREEN}--- Database & Utilities ---${NC}"
 echo -e " ${BLUE}(19)${NC} Seed the database"
 echo -e " ${BLUE}(20)${NC} Reset database & migrate"
 echo -e " ${BLUE}(21)${NC} Stop skateparks Docker containers"
