@@ -21,7 +21,7 @@
       sm:justify-center mb-6 sm:mb-8
     "
   >
-    <%= link_to @skatepark.google_id.nil? ?
+    <%= link_to @skatepark.google_id.blank? ?
                   "https://www.google.com/maps/search/?api=1&query=#{@skatepark.lat},#{@skatepark.lng}" :
                   "https://maps.app.goo.gl/#{@skatepark.google_id}",
                 target: "_blank",
