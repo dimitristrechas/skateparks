@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="<%= I18n.locale %>" itemscope itemtype="https://schema.org/WebPage">
+<html lang="<%= I18n.locale %>">
   <head>
     <%= render partial: "/application/title" %>
     <%= render partial: "/application/description" %>
@@ -15,7 +15,6 @@
 
     <meta
       property="og:title"
-      itemprop="name"
       content="<%= @title.blank? ? t("application.title") : @title %>"
     >
     <meta property="og:site_name" content="Skateparks.gr">
@@ -37,6 +36,15 @@
     <link rel="canonical" href="<%= request.base_url + request.path %>"/>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
+
+    <%= json_ld_schema(
+      skatepark: defined?(@skatepark) ? @skatepark : nil,
+      skateparks: defined?(@skateparks) ? @skateparks : nil,
+      title: @title,
+      meta_description: @meta_description,
+      meta_image: @meta_image
+    ) %>
+
     <%= stylesheet_link_tag "tailwind", "trix", "actiontext", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css",
     integrity: "sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=",

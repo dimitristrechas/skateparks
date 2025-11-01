@@ -1,8 +1,8 @@
 {
   "dependencies": {
-    "@rails/actiontext": "^8.0.0",
-    "flowbite": "^2.5.2",
-    "trix": "^2.1.8"
+    "@rails/actiontext": "8.0.0",
+    "flowbite": "2.5.2",
+    "trix": "2.1.15"
   },
   "devDependencies": {
     "prettier": "^3.6.2"
