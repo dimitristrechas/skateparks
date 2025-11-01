@@ -24,6 +24,6 @@ module Skateparks
     # config.eager_load_paths << Rails.root.join("extras")
 
     config.i18n.available_locales = %i[en el]
-    config.i18n.default_locale = :el
+    config.i18n.default_locale = :en
   end
 end
