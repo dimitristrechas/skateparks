@@ -46,9 +46,7 @@
     ) %>
 
     <%= stylesheet_link_tag "tailwind", "trix", "actiontext", "data-turbo-track": "reload" %>
-    <%= stylesheet_link_tag "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css",
-    integrity: "sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=",
-    crossorigin: "" %>
+    <%= stylesheet_link_tag "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css", integrity: "sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=", crossorigin: "" %>
     <%= javascript_importmap_tags %>
     <%= favicon_link_tag asset_path("favicon/favicon.ico") %>
 
@@ -64,11 +62,13 @@
       }
     </script>
 
-    <%= if Rails.env.production? && !request.path.start_with?("/admin")
-      javascript_include_tag "https://analytics.dimitristrechas.com/script.js",
-      defer: true,
-      "data-website-id": "8069aac7-fcfc-4784-bd61-6616285973fd"
-    end %>
+    <% if Rails.env.production? && !request.path.start_with?("/admin") %>
+      <script
+        src="https://analytics.dimitristrechas.com/script.js"
+        defer
+        data-website-id="8069aac7-fcfc-4784-bd61-6616285973fd">
+      </script>
+    <% end %>
   </head>
 
   <body
