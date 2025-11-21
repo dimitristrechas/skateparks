@@ -15,7 +15,7 @@ module LocaleHelper
       elements << content_tag(:ul, class: "absolute inset-x-0 bottom-0 bg-white") do
         links = []
         I18n.available_locales.each do |locale|
-          link = link_to LOCALES[locale], params.permit(:locale).merge(:locale => locale)
+          link = link_to LOCALES[locale], { locale: locale, country_code: params[:country_code], state: params[:state], page: params[:page] }.compact
           links << content_tag(:li, link)
         end
         links.join.html_safe
