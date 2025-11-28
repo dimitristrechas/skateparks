@@ -2,7 +2,7 @@
   <%= t("explore_all_skateparks") %>
 </h1>
 
-<section class="grid justify-items-center grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8 lg:gap-16 mb-12 lg:mb-20">
+<section class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8 lg:gap-16 mb-12 lg:mb-20">
   <% @skateparks_latest.each do |skatepark| %>
     <%= render(SkateparkCardComponent.new(skatepark: skatepark, badge_type: :new)) %>
   <% end %>
