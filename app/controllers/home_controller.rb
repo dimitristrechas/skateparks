@@ -1,17 +1,23 @@
-
 class HomeController < ApplicationController
   def index
     @skateparks = Skatepark.published.order(created_at: :desc)
-    @locale = params["locale"]
+    @skateparks_latest = Rails.cache.fetch('skateparks_latest', expires_in: 1.year) do
+      Skatepark.latest.to_a
+    end
+    @skateparks_most_images = Rails.cache.fetch('skateparks_most_images', expires_in: 1.year) do
+      Skatepark.most_images.to_a
+    end
+
+    @locale = params['locale']
   end
 
   def about
     @title = t('about')
-    @meta_description =  t('about_details')
+    @meta_description = t('about_details')
   end
 
   def contact
     @title = t('contact')
-    @meta_description =  t('contact_details')
+    @meta_description = t('contact_details')
   end
 end

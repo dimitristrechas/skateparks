@@ -1,5 +1,6 @@
 class Skatepark < ApplicationRecord
   extend Mobility
+
   translates :name, type: :string
   translates :description, backend: :action_text
   has_many_attached :images
@@ -35,6 +36,16 @@ class Skatepark < ApplicationRecord
 
   enum :status, { draft: 0, published: 1, archived: 2 }
 
+  scope :latest, -> { published.order(created_at: :desc).limit(3) }
+  scope :most_images, lambda {
+    published
+      .left_joins(:images_attachments)
+      .group(:id)
+      .order('COUNT(active_storage_attachments.id) DESC')
+      .order(updated_at: :desc)
+      .limit(2)
+  }
+
   validates :name, presence: true
   validates :cover_image, presence: true
   validates :lat, presence: true
@@ -46,8 +57,10 @@ class Skatepark < ApplicationRecord
   validates :state, presence: true
 
   after_validation :set_slug, only: %i[create update]
-  after_destroy :clear_countries_cache, :clear_location_caches
-  after_save :clear_countries_cache, :clear_location_caches
+  after_destroy :clear_countries_cache, :clear_location_caches, :clear_skateparks_latest_cache,
+                :clear_skateparks_most_images_cache
+  after_save :clear_countries_cache, :clear_location_caches, :clear_skateparks_latest_cache,
+             :clear_skateparks_most_images_cache
 
   def to_param
     "#{id}-#{slug}"
@@ -77,5 +90,17 @@ class Skatepark < ApplicationRecord
     Rails.cache.delete('skateparks_countries')
     Rails.cache.delete("skateparks_states_#{country_code}") if country_code.present?
     Rails.cache.delete("skateparks_states_#{country_code_before_last_save}") if country_code_before_last_save.present?
+  end
+
+  def clear_skateparks_latest_cache
+    return unless saved_change_to_country_code? || saved_change_to_status?
+
+    Rails.cache.delete('skateparks_latest')
+  end
+
+  def clear_skateparks_most_images_cache
+    return unless saved_change_to_status?
+
+    Rails.cache.delete('skateparks_most_images')
   end
 end

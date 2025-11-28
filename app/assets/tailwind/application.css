@@ -1,0 +1,20 @@
+@import 'tailwindcss';
+
+@plugin '@tailwindcss/forms';
+@plugin '@tailwindcss/typography';
+@plugin 'flowbite/plugin';
+
+@source '../../../public/*.html';
+@source '../../helpers/**/*.rb';
+@source '../../javascript/**/*.js';
+@source '../../views/**/*.{erb,haml,html,slim}';
+@source '../../components/**/*.{erb,html,rb}';
+@source '../../../node_modules/flowbite/**/*.js';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --grid-template-rows-layout: auto 1fr auto;
+  --font-sans: Rubik, system-ui, sans-serif;
+}
+
