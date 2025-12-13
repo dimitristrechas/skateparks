@@ -1,0 +1,76 @@
+<p style="color: green"><%= notice %></p>
+
+<%= render(TitleComponent.new(title: t('admin.popular_skateparks.title'))) %>
+
+<div class="my-8 p-6 bg-gray-50 dark:bg-gray-800 rounded-lg">
+  <h2 class="text-xl font-semibold mb-4"><%= t('admin.popular_skateparks.add_section_title') %></h2>
+
+  <%= form_with model: PopularSkatepark.new,
+                url: admin_popular_skateparks_path,
+                class: "flex gap-4 items-end" do |form| %>
+
+    <div class="flex flex-col gap-2 flex-1">
+      <%= form.label :skatepark_id, 'Skatepark', class: "block text-neutral-600 dark:text-neutral-300" %>
+      <%= form.select :skatepark_id,
+                      @available_skateparks.map { |s| [s.name, s.id] },
+                      { prompt: t('admin.popular_skateparks.select_prompt') },
+                      { class: "p-2 text-neutral-600 dark:text-neutral-700 rounded" } %>
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <%= form.label :position, t('skatepark.position'), class: "block text-neutral-600 dark:text-neutral-300" %>
+      <%= form.number_field :position,
+                            class: "p-2 text-neutral-600 dark:text-neutral-700 rounded",
+                            placeholder: t('admin.popular_skateparks.position_placeholder') %>
+    </div>
+
+    <div>
+      <%= render(ButtonComponent.new(title: t('admin.popular_skateparks.add_button'), form: form, type: "submit")) %>
+    </div>
+  <% end %>
+</div>
+
+<div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+  <table class="w-full text-md text-left rtl:text-right text-gray-500 dark:text-gray-400">
+    <thead class="text-sm text-gray-700 bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+      <tr>
+        <th scope="col" class="px-6 py-3"><%= t('skatepark.position') %></th>
+        <th scope="col" class="px-6 py-3"><%= t('skatepark.name') %></th>
+        <th scope="col" class="px-6 py-3"></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if @popular_skateparks.empty? %>
+        <tr class="bg-white dark:bg-gray-900 border-b dark:border-gray-700">
+          <td colspan="3" class="px-6 py-4 text-center"><%= t('admin.popular_skateparks.empty_state') %></td>
+        </tr>
+      <% else %>
+        <% @popular_skateparks.each do |popular_skatepark| %>
+          <tr class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
+            <td class="px-6 py-4">
+              <%= form_with model: popular_skatepark,
+                            url: admin_popular_skatepark_path(popular_skatepark),
+                            method: :patch,
+                            class: "flex gap-2 items-center" do |f| %>
+                <%= f.number_field :position,
+                                   value: popular_skatepark.position,
+                                   class: "p-1 w-20 text-neutral-600 dark:text-neutral-700 rounded" %>
+                <%= f.submit t('admin.popular_skateparks.update_button'), class: "px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 cursor-pointer" %>
+              <% end %>
+            </td>
+            <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">
+              <%= popular_skatepark.skatepark.name %>
+            </td>
+            <td class="px-6 py-4">
+              <%= button_to t('admin.popular_skateparks.remove_button'),
+                            admin_popular_skatepark_path(popular_skatepark),
+                            method: :delete,
+                            form: { data: { turbo_confirm: t('admin.popular_skateparks.remove_confirm') } },
+                            class: "text-red-500 hover:underline" %>
+            </td>
+          </tr>
+        <% end %>
+      <% end %>
+    </tbody>
+  </table>
+</div>

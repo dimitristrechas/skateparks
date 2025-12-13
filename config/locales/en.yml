@@ -14,6 +14,7 @@ en:
     images: "Images"
     google_id: "Google ID"
     status: "status"
+    position: "Position"
   edit: "Edit"
   create: "Create"
   name_el: "Name in greek"
@@ -33,3 +34,18 @@ en:
   application:
     title: "Skateparks in Greece - Find all skateparks in Greece"
     meta_description: "Discover the ultimate guide to Greece's skateparks, featuring detailed listings, interactive maps, videos and more. Elevate your next skate tour with our comprehensive skatepark directory."
+  admin:
+    popular_skateparks:
+      title: "Popular Skateparks"
+      add_section_title: "Add Popular Skatepark"
+      select_prompt: "Select a skatepark"
+      position_placeholder: "e.g. 1"
+      add_button: "Add"
+      name_header: "Skatepark Name"
+      empty_state: "No popular skateparks yet"
+      update_button: "Update"
+      remove_button: "Remove"
+      remove_confirm: "Remove this skatepark from popular list?"
+      added_notice: "Skatepark added to popular list."
+      updated_notice: "Position updated successfully."
+      removed_notice: "Skatepark removed from popular list."

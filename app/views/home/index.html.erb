@@ -7,7 +7,7 @@
     <%= render(SkateparkCardComponent.new(skatepark: skatepark, badge_type: :new)) %>
   <% end %>
 
-  <% @skateparks_most_images.each do |skatepark| %>
+  <% @skateparks_popular.each do |skatepark| %>
     <%= render(SkateparkCardComponent.new(skatepark: skatepark, badge_type: :popular)) %>
   <% end %>
 </section>

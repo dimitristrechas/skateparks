@@ -83,6 +83,7 @@ echo -e " ${BLUE}(19)${NC} Seed the database"
 echo -e " ${BLUE}(20)${NC} Reset database & migrate"
 echo -e " ${BLUE}(21)${NC} Stop skateparks Docker containers"
 echo -e " ${BLUE}(22)${NC} Show Docker container status"
+echo -e " ${BLUE}(23)${NC} Clear all Rails cache"
 echo ""
 echo -e "${YELLOW}Choose an option:${NC} "
 read OPTION
@@ -270,9 +271,18 @@ case $OPTION in
     show_docker_status
     ;;
 
+    23)
+    echo -e "${GREEN}Clearing Rails cache...${NC}"
+    if docker compose -f $DEV_COMPOSE_FILE exec $SERVICE_NAME bash -c "bundle exec rails runner 'Rails.cache.clear'"; then
+        echo -e "${GREEN}✅ Cache cleared successfully${NC}"
+    else
+        echo -e "${RED}❌ Failed to clear cache${NC}"
+    fi
+    ;;
+
     *)
     echo -e "${RED}❌ Unknown option: $OPTION${NC}"
-    echo -e "${YELLOW}Please choose a valid option (1-22)${NC}"
+    echo -e "${YELLOW}Please choose a valid option (1-23)${NC}"
     exit 1
     ;;
 esac

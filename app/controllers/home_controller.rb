@@ -4,8 +4,8 @@ class HomeController < ApplicationController
     @skateparks_latest = Rails.cache.fetch('skateparks_latest', expires_in: 1.year) do
       Skatepark.latest.to_a
     end
-    @skateparks_most_images = Rails.cache.fetch('skateparks_most_images', expires_in: 1.year) do
-      Skatepark.most_images.to_a
+    @skateparks_popular = Rails.cache.fetch('skateparks_popular', expires_in: 1.year) do
+      Skatepark.popular.to_a
     end
 
     @locale = params['locale']

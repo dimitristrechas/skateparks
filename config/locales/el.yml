@@ -14,6 +14,7 @@ el:
     images: "Φωτογραφίες"
     google_id: "Google ID"
     status: "Κατάσταση"
+    position: "Θέση"
   edit: "Επεξεργασία"
   create: "Δημιουργία"
   name_el: "Όνομα στα ελληνικά"
@@ -33,3 +34,18 @@ el:
   application:
     title: "Βρες skateparks σε όλη την Ελλάδα!"
     meta_description: "Η απόλυτη πηγή πληροφόρησης για skateparks σε όλη την Ελλάδα, με λεπτομερείς χάρτες, φωτογραφίες, βίντεο και πολλά άλλα. Σχεδίασε το επόμενό σου tour εδώ."
+  admin:
+    popular_skateparks:
+      title: "Δημοφιλή Skateparks"
+      add_section_title: "Προσθήκη Δημοφιλούς Skatepark"
+      select_prompt: "Επίλεξε skatepark"
+      position_placeholder: "π.χ. 1"
+      add_button: "Προσθήκη"
+      name_header: "Όνομα Skatepark"
+      empty_state: "Δεν υπάρχουν δημοφιλή skateparks ακόμα"
+      update_button: "Ενημέρωση"
+      remove_button: "Αφαίρεση"
+      remove_confirm: "Αφαίρεση του skatepark από τη λίστα δημοφιλών;"
+      added_notice: "Το skatepark προστέθηκε στη λίστα δημοφιλών."
+      updated_notice: "Η θέση ενημερώθηκε επιτυχώς."
+      removed_notice: "Το skatepark αφαιρέθηκε από τη λίστα δημοφιλών."

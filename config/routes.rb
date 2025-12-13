@@ -4,6 +4,7 @@ require 'sidekiq/cron/web'
 Rails.application.routes.draw do
   namespace :admin do
     resources :skateparks
+    resources :popular_skateparks, only: %i[index create update destroy]
 
     Sidekiq::Web.use Rack::Auth::Basic do |username, password|
       ActiveSupport::SecurityUtils.secure_compare(username, Rails.application.credentials.dig(:admin, :username)) &&
