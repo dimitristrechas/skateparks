@@ -2,8 +2,6 @@ en:
   made_with: "Made with"
   city_of_origin: "Kavala, Greece"
   photos: "photos"
-  latitude: "latitude"
-  longitude: "longitude"
   country: 'Country'
   country_state: 'State/Region'
   back_to_skateparks: "Back to all skateparks"
@@ -15,10 +13,12 @@ en:
     google_id: "Google ID"
     status: "status"
     position: "Position"
+    name_el: "Name in Greek"
+    name_en: "Name in English"
+    latitude: "latitude"
+    longitude: "longitude"
   edit: "Edit"
   create: "Create"
-  name_el: "Name in greek"
-  name_en: "Name in english"
   about: "About skateparks.gr"
   about_details: "Skateparks.gr was created with the aim of gathering all the skateparks in Greece under one roof!"
   contact: "Contact"

@@ -2,8 +2,6 @@ el:
   made_with: "Φτιαγμένο με"
   city_of_origin: "Καβάλα, Ελλάδα"
   photos: "φωτογραφίες"
-  latitude: "γεωγραφικό πλάτος"
-  longitude: "γεωγραφικό μήκος"
   country: 'Χώρα'
   country_state: 'Νομός/Περιφέρεια'
   back_to_skateparks: "Πίσω σε όλα τα skateparks"
@@ -15,10 +13,12 @@ el:
     google_id: "Google ID"
     status: "Κατάσταση"
     position: "Θέση"
+    name_el: "Όνομα στα Ελληνικά"
+    name_en: "Όνομα στα Αγγλικά"
+    latitude: "γεωγραφικό πλάτος"
+    longitude: "γεωγραφικό μήκος"
   edit: "Επεξεργασία"
   create: "Δημιουργία"
-  name_el: "Όνομα στα ελληνικά"
-  name_en: "Όνομα στα αγγλικά"
   about: "Σχετικά με το skateparks.gr"
   about_details: "Το skateparks.gr δημιουργήθηκε με σκοπό να συγκεντρώσει όλα τα skateparks της Ελλάδας κάτω από μια στέγη!"
   contact: "Επικοινωνία"

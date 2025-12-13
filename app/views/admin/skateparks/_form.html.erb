@@ -18,20 +18,20 @@
 
   <div class="grid grid-cols-2 gap-8">
     <div class="flex flex-col gap-2">
-      <%= render(TextFieldComponent.new(name: "name_el", title: t("name_el"), form: form)) %>
-      <%= render(TextFieldComponent.new(name: "name_en", title: t("name_en"), form: form)) %>
+      <%= render(TextFieldComponent.new(name: "name_el", title: t("skatepark.name_el"), form: form)) %>
+      <%= render(TextFieldComponent.new(name: "name_en", title: t("skatepark.name_en"), form: form)) %>
     </div>
 
     <div class="flex flex-col gap-2">
       <%= render(
         TextFieldComponent.new(
           name: "lat",
-          title: t("latitude"),
+          title: t("skatepark.latitude"),
           form: form,
           classnames: "col-start-1",
         ),
       ) %>
-      <%= render(TextFieldComponent.new(name: "lng", title: t("longitude"), form: form)) %>
+      <%= render(TextFieldComponent.new(name: "lng", title: t("skatepark.longitude"), form: form)) %>
     </div>
 
     <%= render(
