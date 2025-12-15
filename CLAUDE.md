@@ -2,6 +2,12 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Code Quality Standards
+
+- All generated code must include RSpec tests
+- Code must not produce RuboCop errors
+- Run `bundle exec rubocop` to verify compliance before completing tasks
+
 ## Development Commands
 
 ### Development Server
