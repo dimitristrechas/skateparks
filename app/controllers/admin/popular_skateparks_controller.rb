@@ -22,7 +22,7 @@ class Admin::PopularSkateparksController < ApplicationController
       @available_skateparks = Skatepark.published
                                        .where.not(id: PopularSkatepark.pluck(:skatepark_id))
                                        .order(:name)
-      render :index, status: :unprocessable_entity
+      render :index, status: :unprocessable_content
     end
   end
 
@@ -35,7 +35,7 @@ class Admin::PopularSkateparksController < ApplicationController
       @available_skateparks = Skatepark.published
                                        .where.not(id: PopularSkatepark.pluck(:skatepark_id))
                                        .order(:name)
-      render :index, status: :unprocessable_entity
+      render :index, status: :unprocessable_content
     end
   end
 

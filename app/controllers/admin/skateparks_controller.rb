@@ -32,8 +32,8 @@ class Admin::SkateparksController < ApplicationController
         end
         format.json { render :show, status: :created, location: @skatepark }
       else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @skatepark.errors, status: :unprocessable_entity }
+        format.html { render :new, status: :unprocessable_content }
+        format.json { render json: @skatepark.errors, status: :unprocessable_content }
       end
     end
   end
@@ -48,8 +48,8 @@ class Admin::SkateparksController < ApplicationController
         end
         format.json { render :show, status: :ok, location: @skatepark }
       else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @skatepark.errors, status: :unprocessable_entity }
+        format.html { render :edit, status: :unprocessable_content }
+        format.json { render json: @skatepark.errors, status: :unprocessable_content }
       end
     end
   end
