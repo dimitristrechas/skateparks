@@ -11,13 +11,13 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     ports:
-      - "5433:5433"
+      - "5433:5432"
   skateparks-redis-test:
     image: redis:7-alpine
     container_name: skateparks-redis-test
     command: redis-server
     ports:
-      - "6379:6379"
+      - "6380:6379"
     volumes:
       - redis_data:/data
   skateparks-web-test:

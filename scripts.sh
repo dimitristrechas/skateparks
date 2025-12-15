@@ -190,8 +190,10 @@ case $OPTION in
     ;;
 
     13)
-    echo -e "${GREEN}Running RSpec tests...${NC}"
-    docker compose -f $TEST_COMPOSE_FILE exec $TEST_SERVICE_NAME bundle exec rake spec
+    echo -e "${GREEN}Running RSpec tests with coverage...${NC}"
+    docker compose -f $TEST_COMPOSE_FILE exec $TEST_SERVICE_NAME bash -c "COVERAGE=true bundle exec rspec --format progress"
+    echo ""
+    echo -e "${CYAN}Coverage report: ${NC}file://$(pwd)/coverage/index.html"
     ;;
 
     14)
