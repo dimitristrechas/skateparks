@@ -47,7 +47,7 @@ group :development, :test do
 
   gem 'pry-rails'
 
-  gem 'rspec-rails', '~> 6.1.0'
+  gem 'rspec-rails', '~> 8.0'
 end
 
 group :development do
@@ -61,8 +61,8 @@ group :development do
   # gem "spring"
 
   gem 'rubocop', require: false
-  gem 'rubocop-rails', require: false
   gem 'rubocop-capybara', require: false
+  gem 'rubocop-rails', require: false
   gem 'rubocop-rspec', require: false
   gem 'rubocop-rspec_rails', require: false
 
@@ -72,8 +72,10 @@ end
 group :test do
   # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
   gem 'capybara'
+  gem 'factory_bot_rails'
+  gem 'faker'
   gem 'rails-controller-testing'
-  gem 'selenium-webdriver'
+  gem 'simplecov', require: false
 end
 
 gem 'tailwindcss-rails', '~> 4.0'
