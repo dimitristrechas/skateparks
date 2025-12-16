@@ -93,6 +93,7 @@ gem 'sitemap_generator'
 gem 'activestorage-cloudinary-service'
 gem 'cloudinary'
 
+gem 'connection_pool', '~> 2.5'
 gem 'redis', '~> 5.0'
 gem 'sidekiq'
 gem 'sidekiq-cron'
