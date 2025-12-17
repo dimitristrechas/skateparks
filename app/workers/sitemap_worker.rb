@@ -1,4 +1,4 @@
-require "rake"
+require 'rake'
 
 class SitemapWorker
   include Sidekiq::Worker
@@ -11,6 +11,6 @@ class SitemapWorker
 
   def ensure_public_directory
     FileUtils.mkdir_p(Rails.public_path)
-    FileUtils.chmod(0755, Rails.public_path)
+    FileUtils.chmod(0o755, Rails.public_path)
   end
 end

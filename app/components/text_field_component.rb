@@ -6,5 +6,4 @@ class TextFieldComponent < ViewComponent::Base
     @title = title
     @classnames = classnames
   end
-
 end

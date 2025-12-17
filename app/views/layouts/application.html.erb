@@ -31,7 +31,7 @@
       property="og:url"
       content="<%= url_for(:only_path => false, :protocol => 'https') %>"
     />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <link rel="canonical" href="<%= request.base_url + request.path %>"/>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
@@ -41,14 +41,22 @@
       skateparks: defined?(@skateparks) ? @skateparks : nil,
       title: @title,
       meta_description: @meta_description,
-      meta_image: @meta_image
+      meta_image: @meta_image,
     ) %>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <%= stylesheet_link_tag "tailwind", "trix", "actiontext", "data-turbo-track": "reload" %>
-    <%= stylesheet_link_tag "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css", integrity: "sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=", crossorigin: "" %>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    >
+    <%= stylesheet_link_tag "tailwind",
+    "trix",
+    "actiontext",
+    "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css",
+    integrity: "sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=",
+    crossorigin: "" %>
     <%= javascript_importmap_tags %>
     <%= favicon_link_tag asset_path("favicon/favicon.ico") %>
 
@@ -68,11 +76,12 @@
       <script
         src="https://analytics.dimitristrechas.com/script.js"
         defer
-        data-website-id="8069aac7-fcfc-4784-bd61-6616285973fd">
+        data-website-id="8069aac7-fcfc-4784-bd61-6616285973fd"
+      >
       </script>
     <% end %>
 
-    <meta name="view-transition" content="same-origin" />
+    <meta name="view-transition" content="same-origin"/>
   </head>
 
   <body

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe HomeController, type: :controller do
+RSpec.describe HomeController do
   let!(:published_skatepark) { create(:skatepark) }
   let!(:draft_skatepark) { create(:skatepark, :draft) }
 

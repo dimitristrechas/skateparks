@@ -42,5 +42,5 @@ require 'open-uri'
   end
 
   skatepark.save!
-  puts "Created skatepark: #{skatepark.name_en}"
+  Rails.logger.debug { "Created skatepark: #{skatepark.name_en}" }
 end

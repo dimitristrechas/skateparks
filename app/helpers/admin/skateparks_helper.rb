@@ -1,2 +1,4 @@
-module Admin::SkateparksHelper
+module Admin
+  module SkateparksHelper
+  end
 end

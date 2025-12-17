@@ -4,7 +4,6 @@ module Admin
                                  password: Rails.application.credentials.dig(:admin, :password),
                                  unless: -> { Rails.env.development? }
 
-    def index
-    end
+    def index; end
   end
 end

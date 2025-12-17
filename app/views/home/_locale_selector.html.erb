@@ -36,7 +36,12 @@
     <% I18n.available_locales.each do |locale| %>
       <li>
         <%= link_to LOCALES[locale],
-        { locale: locale, country_code: params[:country_code], state: params[:state], page: params[:page] }.compact,
+        {
+          locale: locale,
+          country_code: params[:country_code],
+          state: params[:state],
+          page: params[:page],
+        }.compact,
         class:
           "block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white" %>
       </li>

@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :popular_skatepark do
-    association :skatepark
+    skatepark
     sequence(:position) { |n| n }
   end
 end

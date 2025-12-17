@@ -1,3 +1,4 @@
 indent_size: 2
+line_length: 120
 quotes: double
 break_attributes: false

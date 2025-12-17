@@ -27,7 +27,7 @@ module SchemaHelper
       description: t('application.meta_description', locale: :en),
       sameAs: [
         # Add social media URLs here if available
-      ]
+      ],
     }
   end
 
@@ -44,10 +44,10 @@ module SchemaHelper
         '@type': 'SearchAction',
         target: {
           '@type': 'EntryPoint',
-          urlTemplate: "#{skateparks_url(protocol: 'https')}?search={search_term_string}"
+          urlTemplate: "#{skateparks_url(protocol: 'https')}?search={search_term_string}",
         },
-        'query-input': 'required name=search_term_string'
-      }
+        'query-input': 'required name=search_term_string',
+      },
     }
   end
 
@@ -61,8 +61,8 @@ module SchemaHelper
       image: meta_image.presence || image_url('og_image.png'),
       url: url_for(only_path: false, protocol: 'https'),
       isPartOf: {
-        '@id': "#{root_url(protocol: 'https')}#website"
-      }
+        '@id': "#{root_url(protocol: 'https')}#website",
+      },
     }
   end
 
@@ -77,7 +77,7 @@ module SchemaHelper
       name: skatepark.name,
       description: skatepark.description&.to_plain_text,
       url: skatepark_url(skatepark, protocol: 'https'),
-      image: images.first(5) # Limit to first 5 images
+      image: images.first(5), # Limit to first 5 images
     }
 
     # Add geo coordinates if available
@@ -85,7 +85,7 @@ module SchemaHelper
       schema[:geo] = {
         '@type': 'GeoCoordinates',
         latitude: skatepark.lat,
-        longitude: skatepark.lng
+        longitude: skatepark.lng,
       }
     end
 
@@ -93,7 +93,7 @@ module SchemaHelper
     if skatepark.country_code.present?
       address = {
         '@type': 'PostalAddress',
-        addressCountry: skatepark.country_code
+        addressCountry: skatepark.country_code,
       }
 
       if skatepark.state.present?
@@ -117,12 +117,12 @@ module SchemaHelper
       description: t('application.meta_description', locale: :en),
       url: skateparks_url(protocol: 'https'),
       isPartOf: {
-        '@id': "#{root_url(protocol: 'https')}#website"
+        '@id': "#{root_url(protocol: 'https')}#website",
       },
       mainEntity: {
         '@type': 'ItemList',
-        numberOfItems: skateparks.respond_to?(:total_count) ? skateparks.total_count : skateparks&.size
-      }
+        numberOfItems: skateparks.respond_to?(:total_count) ? skateparks.total_count : skateparks&.size,
+      },
     }
   end
 end

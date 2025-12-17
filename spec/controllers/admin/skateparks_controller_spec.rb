@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Admin::SkateparksController, type: :controller do
+RSpec.describe Admin::SkateparksController do
   include ActionView::Helpers::SanitizeHelper
   include Rails.application.routes.url_helpers
 
@@ -14,7 +14,7 @@ RSpec.describe Admin::SkateparksController, type: :controller do
       description: nil,
       cover_image: nil,
       images: [],
-      status: nil
+      status: nil,
     }
   end
 
@@ -92,7 +92,7 @@ RSpec.describe Admin::SkateparksController, type: :controller do
           name_el: 'Updated Skatepark',
           lat: 23.456,
           lng: 78.901,
-          description_el: '<strong>An updated description</strong>'
+          description_el: '<strong>An updated description</strong>',
         }
       end
 
