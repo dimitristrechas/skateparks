@@ -7,9 +7,7 @@ module Admin
 
     def index
       @popular_skateparks = PopularSkatepark.includes(:skatepark)
-      @available_skateparks = Skatepark.published
-                                       .where.not(id: PopularSkatepark.select(:skatepark_id))
-                                       .order(:name)
+      @available_skateparks = available_skateparks
     end
 
     def create
@@ -20,9 +18,8 @@ module Admin
                     notice: t('admin.popular_skateparks.added_notice')
       else
         @popular_skateparks = PopularSkatepark.includes(:skatepark)
-        @available_skateparks = Skatepark.published
-                                         .where.not(id: PopularSkatepark.select(:skatepark_id))
-                                         .order(:name)
+        @available_skateparks = available_skateparks
+
         render :index, status: :unprocessable_content
       end
     end
@@ -33,9 +30,8 @@ module Admin
                     notice: t('admin.popular_skateparks.updated_notice')
       else
         @popular_skateparks = PopularSkatepark.includes(:skatepark)
-        @available_skateparks = Skatepark.published
-                                         .where.not(id: PopularSkatepark.select(:skatepark_id))
-                                         .order(:name)
+        @available_skateparks = available_skateparks
+
         render :index, status: :unprocessable_content
       end
     end
@@ -54,6 +50,12 @@ module Admin
 
     def popular_skatepark_params
       params.expect(popular_skatepark: %i[skatepark_id position])
+    end
+
+    def available_skateparks
+      Skatepark.published
+               .where.not(id: PopularSkatepark.select(:skatepark_id))
+               .order(:name)
     end
   end
 end
