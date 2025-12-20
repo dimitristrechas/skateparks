@@ -15,6 +15,6 @@
 
 @theme {
   --grid-template-rows-layout: auto 1fr auto;
-  --font-sans: Rubik, system-ui, sans-serif;
+  --font-sans: Nunito, system-ui, sans-serif;
 }
 
