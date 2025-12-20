@@ -79,8 +79,6 @@ echo ""
 echo -e "${GREEN}--- Other ---${NC}"
 echo -e " ${BLUE}(19)${NC} Stop skateparks Docker containers"
 echo -e " ${BLUE}(20)${NC} Show Docker container status"
-echo -e " ${BLUE}(22)${NC} Delete server PID file"
-echo -e " ${BLUE}(23)${NC} Delete test server PID file"
 echo ""
 echo -e "${YELLOW}Choose an option:${NC} "
 read OPTION
@@ -139,7 +137,6 @@ case $OPTION in
     fi
     ;;
 
-    # TEST SERVER OPTIONS
     8)
     echo -e "${GREEN}Starting test server...${NC}"
     if docker compose -f $TEST_COMPOSE_FILE start; then
@@ -171,7 +168,6 @@ case $OPTION in
     docker compose -f $TEST_COMPOSE_FILE logs -f $TEST_SERVICE_NAME
     ;;
 
-    # CODE QUALITY & FORMATTING OPTIONS
     12)
     echo -e "${GREEN}Running RSpec tests with coverage...${NC}"
     docker compose -f $TEST_COMPOSE_FILE exec $TEST_SERVICE_NAME bash -c "COVERAGE=true bundle exec rspec --format progress"
@@ -215,7 +211,6 @@ case $OPTION in
     fi
     ;;
 
-    # DATABASE & UTILITIES OPTIONS
     17)
     echo -e "${GREEN}Seeding the database...${NC}"
     if docker compose -f $DEV_COMPOSE_FILE exec $SERVICE_NAME bash -c "bundle exec rails db:seed"; then
@@ -258,27 +253,6 @@ case $OPTION in
         echo -e "${GREEN}✅ Cache cleared successfully${NC}"
     else
         echo -e "${RED}❌ Failed to clear cache${NC}"
-    fi
-    ;;
-
-    # OTHER OPTIONS
-    22)
-    echo -e "${YELLOW}Deleting server PID file...${NC}"
-    if [ -f tmp/pids/server.pid ]; then
-        rm tmp/pids/server.pid
-        echo -e "${GREEN}✅ Server PID file deleted${NC}"
-    else
-        echo -e "${YELLOW}⚠️  Server PID file not found${NC}"
-    fi
-    ;;
-
-    23)
-    echo -e "${YELLOW}Deleting test server PID file...${NC}"
-    if [ -f tmp/pids/server_test.pid ]; then
-        rm tmp/pids/server_test.pid
-        echo -e "${GREEN}✅ Test server PID file deleted${NC}"
-    else
-        echo -e "${YELLOW}⚠️  Test server PID file not found${NC}"
     fi
     ;;
 
