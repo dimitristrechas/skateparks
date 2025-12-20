@@ -59,5 +59,8 @@ RSpec/ExampleLength:
 RSpec/NestedGroups:
   Max: 5
 
+RSpec/MultipleMemoizedHelpers:
+  Max: 12 # An arbitrary high number until better understanding is achieved
+
 RSpec/ContextWording:
   Enabled: false
