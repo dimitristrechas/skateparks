@@ -8,13 +8,12 @@
 4. Copy .env.example to .env and .env.test and fill variables, for RAILS_MASTER_KEY use `config/credentials/development.key` and `config/credentials/test.key` respectively
 5. `bundle install`
 6. `yarn`
-7. `sh scripts.sh`, option 3 builds the docker image from scratch, option 1 runs existing image
+7. `./scripts.sh`, select option "Fresh build & start development server" to build the docker containers from scratch
 8. Open browser on `localhost:3000`
-9. Optionally seed the database using option 19, or use option 6 to connect to the docker console and run `rake db:seed`
+9. Optionally seed the database with "Seed the database" option in `./scripts.sh`
 
 ### How to run tests
 
-1. Copy .env.example to .env.test and fill the env variables
-2. `sh scripts.sh`
-3. Select option 10 to build test server, or option 11 to connect to test docker console
-4. Run `bundle exec rake spec`, or use option 13 to run tests directly
+1. `./scripts.sh`
+2. Select option "Fresh build & start test server" to build the docker containers from scratch
+3. Select option "Run RSpec tests" to run the specs
