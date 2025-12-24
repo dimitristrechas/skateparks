@@ -1,76 +1,128 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Guidance for Claude Code working with this Rails 8 skateparks application.
 
 ## Code Quality Standards
 
-- All generated code must include RSpec tests
-- Code must not produce RuboCop errors
-- Run `bundle exec rubocop` to verify compliance before completing tasks
+- **All code must include RSpec tests** (use rspec-test-writer agent)
+- **Zero RuboCop violations** (use rubocop-enforcer agent)
+- Verify compliance: `sh scripts.sh` option 14 or 15
 
-## Development Commands
+## Specialized Claude Agents
 
-### Development Server
-- `sh scripts.sh` then select option (3): Builds and starts the development server with fresh docker build, it uses the docker-compose.development.yml and Dockerfile.dev files
-- `sh scripts.sh` then select option (1): Start an existing development server via docker, it uses the docker-compose.development.yml and Dockerfile.dev files
-- `sh scripts.sh` then select option (6): Connect to Docker console for debugging
+Available in `.claude/agents/`:
+- **rspec-test-writer**: Writing/debugging RSpec tests, FactoryBot factories
+- **rubocop-enforcer**: RuboCop compliance checking and auto-fixing
+- **frontend-expert**: Stimulus controllers, Tailwind CSS, ViewComponents
+- **rails-backend-architect**: Models, controllers, services, database design
+- **gem-dependency-manager**: Dependency updates, security audits
 
-### Testing
-- `sh scripts.sh` then select option (9): Connect to test Docker console
-- Inside test console: `bundle exec rake spec` to run RSpec tests
+## Development Commands (`sh scripts.sh`)
 
-### Database Operations
-- `sh scripts.sh` then select option (5): Rails console for database queries
-- `sh scripts.sh` then select option (12): Seed the database
+**Server:**
+1. Start dev server
+2. Fresh build & start
+3. Attach to server
+4. Rails console
+5. Docker console
+6. View logs
+7. Stop server
 
-### Code Formatting
-- `sh scripts.sh` then select option (11): Format ERB files with erb-format
-- `bundle exec rubocop`: Run Ruby linter
-- `yarn prettier`: Format JavaScript/CSS files
+**Testing:**
+8. Start test server
+9. Fresh build & start test
+10. Test console
+11. Test logs
+12. RSpec with coverage
 
-## Architecture Overview
+**Code Quality:**
+13. Format ERB
+14. Run RuboCop
+15. RuboCop auto-fix
+16. Prettier (JS/CSS)
 
-This is a Rails 8.0 application for cataloging skateparks with the following key features:
+**Database:**
+17. Seed database
+18. Reset & migrate
+21. Clear Rails cache
 
-### Core Models
-- **Skatepark**: Main entity with multilingual support (Greek/English)
-  - Location data (lat/lng, country_code, state)
-  - Image attachments (cover_image + multiple images)
-  - Rich text descriptions via ActionText
-  - Status enum (draft/published/archived)
-  - Slug-based URLs
+## Architecture
 
-### Internationalization
-- **Mobility gem**: Handles translations for name and description fields
-- Locales: Greek (el) and English (en)
-- Country/state data using ISO3166 gem with subdivisions
+### Models
+- **Skatepark**: Main entity with i18n (Greek/English via Mobility gem)
+  - Location: lat/lng, country_code, state (ISO3166 gem)
+  - Images: Cloudinary (cover_image + multiple attachments)
+  - Rich text: ActionText descriptions
+  - Status: draft/published/archived enum
+  - URLs: Friendly slug-based
 
-### Key Technologies
-- **Rails 8.0** with PostgreSQL database
-- **Docker** for development/test environments
-- **Tailwind CSS** + Flowbite for styling
-- **ViewComponent** for reusable UI components
-- **Stimulus** controllers for JavaScript interactions
-- **Sidekiq** for background jobs with cron scheduling
-- **Cloudinary** for image storage and processing
-- **Kaminari** for pagination
+- **PopularSkatepark**: Featured skateparks with position ordering
+  - belongs_to :skatepark, uniqueness validation
+  - Cache invalidation on save/destroy
+  - Default scope ordered by position
 
-### Controllers Structure
-- `SkateparksController`: Public listing and detail pages with filtering
-- `Admin::SkateparksController` (assumed): Admin interface
-- `HomeController`: Static pages (about, contact)
+### Controllers
+- **SkateparksController**: Public listing/detail, filtering by country/state
+- **HomeController**: Static pages (about, contact)
+- **Admin::SkateparksController**: Admin CRUD
+- **Admin::PopularSkateparksController**: Featured skateparks management
+- **Admin::DashboardController**: Admin dashboard
+
+### Views & Components
+**ViewComponents** (app/components/):
+- ButtonComponent
+- LinkComponent
+- SkateparkCardComponent
+- TextFieldComponent
+
+**Stimulus Controllers** (app/javascript/controllers/):
+- header_controller.js
+- skatepark_controller.js
+- admin/skateparks/form_controller.js
+- skateparks/filters_controller.js
+
+### Helpers
+- **LocaleHelper**: I18n utilities, country/state names with flags
+- **SchemaHelper**: JSON-LD structured data for SEO
+- **SkateparksHelper**: Skatepark-specific view helpers
+
+### Tech Stack
+- **Rails 8.0** + PostgreSQL
+- **Propshaft** (asset pipeline)
+- **Hotwire**: Turbo + Stimulus
+- **Tailwind CSS 4.0** + Flowbite
+- **Sidekiq**: Background jobs + cron
+- **Cloudinary**: Image storage/processing
+- **Kaminari**: Pagination
+- **Mobility**: I18n (Greek/English)
+- **ISO3166**: Country/subdivision data
+
+### Testing Infrastructure
+- **RSpec 8.0**: Test framework
+- **FactoryBot**: Test data factories
+- **Faker**: Realistic fake data
+- **Capybara**: System/feature tests
+- **SimpleCov**: Coverage reports
+- **RuboCop**: Style enforcement (Rails, RSpec, FactoryBot, Capybara)
+
+Factories in `spec/factories/`: skateparks.rb, popular_skateparks.rb
+Shared contexts: `spec/support/shared_contexts/admin_auth.rb`
 
 ### Data Flow
-- Skateparks are filtered by published status
+- Published skateparks only on public pages
 - Country/state filtering with caching
-- Location-friendly names with emoji flags
-- SEO-optimized meta tags per skatepark
+- Redis caching for popular skateparks list
+- SEO meta tags per skatepark with structured data
+- Emoji flags for location-friendly names
 
-### Environment Setup
-1. Clone repository
-2. `bundle install` && `npm install`
-3. Copy `.env.example` to `.env` and configure
-4. Use `scripts.sh` for Docker-based development
-5. Database seeding available via script menu
+## Environment Setup
+1. Clone repo
+2. Get credentials: `config/credentials/{development,production,test}.key`
+3. Copy `.env.example` → `.env` + `.env.test`, set RAILS_MASTER_KEY
+4. `bundle install && yarn`
+5. `sh scripts.sh` option 2 (fresh build)
+6. Open `localhost:3000`
+7. Optional: seed database (option 17)
 
-The application uses a Docker-first development approach with all operations handled through the interactive `scripts.sh` menu system.
+**Docker-first workflow**: All ops via `scripts.sh` interactive menu.
+
