@@ -1,7 +1,3 @@
-# CLAUDE.md
-
-Guidance for Claude Code working with this Rails 8 skateparks application.
-
 ## Code Quality Standards
 
 - **All code must include RSpec tests** (use rspec-test-writer agent)
