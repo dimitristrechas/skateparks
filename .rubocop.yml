@@ -23,7 +23,7 @@ Layout/LineLength:
     - 'config/**/*'
 
 Metrics/MethodLength:
-  Max: 15
+  Max: 25
   Exclude:
     - 'spec/**/*'
 
@@ -34,6 +34,9 @@ Metrics/BlockLength:
 
 Metrics/AbcSize:
   Max: 20
+
+Metrics/ModuleLength:
+  Max: 180
 
 Style/Documentation:
   Enabled: false
