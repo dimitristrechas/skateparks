@@ -41,6 +41,7 @@ jobs:
 
     env:
       RAILS_ENV: test
+      CI: true
       POSTGRES_HOST: localhost
       POSTGRES_DB: skateparks_test
       POSTGRES_USER: skateparks
