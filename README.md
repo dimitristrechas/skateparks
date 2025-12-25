@@ -8,9 +8,10 @@
 4. Copy .env.example to .env and .env.test and fill variables, for RAILS_MASTER_KEY use `config/credentials/development.key` and `config/credentials/test.key` respectively
 5. `bundle install`
 6. `yarn`
-7. `./scripts.sh`, select option "Fresh build & start development server" to build the docker containers from scratch
-8. Open browser on `localhost:3000`
-9. Optionally seed the database with "Seed the database" option in `./scripts.sh`
+7. `lefthook install` (sets up pre-commit hooks)
+8. `./scripts.sh`, select option "Fresh build & start development server" to build the docker containers from scratch
+9. Open browser on `localhost:3000`
+10. Optionally seed the database with "Seed the database" option in `./scripts.sh`
 
 ### How to run tests
 

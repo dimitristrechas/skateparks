@@ -3,10 +3,20 @@
 - **All code must include RSpec tests** (use rspec-test-writer agent)
 - **Zero RuboCop violations** (use rubocop-enforcer agent)
 - Verify compliance: `sh scripts.sh` option 14 or 15
+- **Pre-commit hook** blocks commits with RuboCop/erb-formatter/Prettier errors
+
+## Pre-commit Hook (Lefthook)
+
+Runs automatically on `git commit`:
+
+- **rubocop**: Checks staged `*.rb` files
+- **erb-formatter**: Checks staged `*.erb` files
+- **prettier**: Checks staged `*.{js,css,json,md}` files
 
 ## Specialized Claude Agents
 
 Available in `.claude/agents/`:
+
 - **rspec-test-writer**: Writing/debugging RSpec tests, FactoryBot factories
 - **rubocop-enforcer**: RuboCop compliance checking and auto-fixing
 - **frontend-expert**: Stimulus controllers, Tailwind CSS, ViewComponents
@@ -16,6 +26,7 @@ Available in `.claude/agents/`:
 ## Development Commands (`sh scripts.sh`)
 
 **Server:**
+
 1. Start dev server
 2. Fresh build & start
 3. Attach to server
@@ -24,27 +35,16 @@ Available in `.claude/agents/`:
 6. View logs
 7. Stop server
 
-**Testing:**
-8. Start test server
-9. Fresh build & start test
-10. Test console
-11. Test logs
-12. RSpec with coverage
+**Testing:** 8. Start test server 9. Fresh build & start test 10. Test console 11. Test logs 12. RSpec with coverage
 
-**Code Quality:**
-13. Format ERB
-14. Run RuboCop
-15. RuboCop auto-fix
-16. Prettier (JS/CSS)
+**Code Quality:** 13. Format ERB 14. Run RuboCop 15. RuboCop auto-fix 16. Prettier (JS/CSS)
 
-**Database:**
-17. Seed database
-18. Reset & migrate
-21. Clear Rails cache
+**Database:** 17. Seed database 18. Reset & migrate 21. Clear Rails cache
 
 ## Architecture
 
 ### Models
+
 - **Skatepark**: Main entity with i18n (Greek/English via Mobility gem)
   - Location: lat/lng, country_code, state (ISO3166 gem)
   - Images: Cloudinary (cover_image + multiple attachments)
@@ -58,6 +58,7 @@ Available in `.claude/agents/`:
   - Default scope ordered by position
 
 ### Controllers
+
 - **SkateparksController**: Public listing/detail, filtering by country/state
 - **HomeController**: Static pages (about, contact)
 - **Admin::SkateparksController**: Admin CRUD
@@ -65,24 +66,29 @@ Available in `.claude/agents/`:
 - **Admin::DashboardController**: Admin dashboard
 
 ### Views & Components
+
 **ViewComponents** (app/components/):
+
 - ButtonComponent
 - LinkComponent
 - SkateparkCardComponent
 - TextFieldComponent
 
 **Stimulus Controllers** (app/javascript/controllers/):
+
 - header_controller.js
 - skatepark_controller.js
 - admin/skateparks/form_controller.js
 - skateparks/filters_controller.js
 
 ### Helpers
+
 - **LocaleHelper**: I18n utilities, country/state names with flags
 - **SchemaHelper**: JSON-LD structured data for SEO
 - **SkateparksHelper**: Skatepark-specific view helpers
 
 ### Tech Stack
+
 - **Rails 8.0** + PostgreSQL
 - **Propshaft** (asset pipeline)
 - **Hotwire**: Turbo + Stimulus
@@ -94,6 +100,7 @@ Available in `.claude/agents/`:
 - **ISO3166**: Country/subdivision data
 
 ### Testing Infrastructure
+
 - **RSpec 8.0**: Test framework
 - **FactoryBot**: Test data factories
 - **Faker**: Realistic fake data
@@ -105,6 +112,7 @@ Factories in `spec/factories/`: skateparks.rb, popular_skateparks.rb
 Shared contexts: `spec/support/shared_contexts/admin_auth.rb`
 
 ### Data Flow
+
 - Published skateparks only on public pages
 - Country/state filtering with caching
 - Redis caching for popular skateparks list
@@ -112,6 +120,7 @@ Shared contexts: `spec/support/shared_contexts/admin_auth.rb`
 - Emoji flags for location-friendly names
 
 ## Environment Setup
+
 1. Clone repo
 2. Get credentials: `config/credentials/{development,production,test}.key`
 3. Copy `.env.example` → `.env` + `.env.test`, set RAILS_MASTER_KEY
@@ -121,4 +130,3 @@ Shared contexts: `spec/support/shared_contexts/admin_auth.rb`
 7. Optional: seed database (option 17)
 
 **Docker-first workflow**: All ops via `scripts.sh` interactive menu.
-
