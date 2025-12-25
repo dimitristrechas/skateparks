@@ -13,7 +13,7 @@ module SchemaHelper
       schemas << webpage_schema(title: title, meta_description: meta_description, meta_image: meta_image)
     end
 
-    content_tag :script, schemas.to_json.html_safe, type: 'application/ld+json'
+    content_tag :script, schemas.to_json.html_safe, type: 'application/ld+json' # rubocop:disable Rails/OutputSafety
   end
 
   private
@@ -26,7 +26,7 @@ module SchemaHelper
       url: root_url(protocol: 'https'),
       description: t('application.meta_description', locale: :en),
       sameAs: [
-        # Add social media URLs here if available
+        # Social media URLs here
       ],
     }
   end
@@ -67,9 +67,6 @@ module SchemaHelper
   end
 
   def skatepark_schema(skatepark)
-    images = [skatepark.cover_image&.url].compact
-    images += skatepark.images.map(&:url) if skatepark.images.attached?
-
     schema = {
       '@context': 'https://schema.org',
       '@type': 'SportsActivityLocation',
@@ -77,35 +74,44 @@ module SchemaHelper
       name: skatepark.name,
       description: skatepark.description&.to_plain_text,
       url: skatepark_url(skatepark, protocol: 'https'),
-      image: images.first(5), # Limit to first 5 images
+      image: skatepark_schema_images(skatepark),
     }
 
-    # Add geo coordinates if available
-    if skatepark.lat.present? && skatepark.lng.present?
-      schema[:geo] = {
-        '@type': 'GeoCoordinates',
-        latitude: skatepark.lat,
-        longitude: skatepark.lng,
-      }
-    end
-
-    # Add address info
-    if skatepark.country_code.present?
-      address = {
-        '@type': 'PostalAddress',
-        addressCountry: skatepark.country_code,
-      }
-
-      if skatepark.state.present?
-        country = ISO3166::Country[skatepark.country_code]
-        subdivision = country&.subdivisions&.[](skatepark.state)
-        address[:addressRegion] = subdivision&.name || skatepark.state
-      end
-
-      schema[:address] = address
-    end
+    schema[:geo] = skatepark_schema_geo(skatepark) if skatepark.lat.present? && skatepark.lng.present?
+    schema[:address] = skatepark_schema_address(skatepark) if skatepark.country_code.present?
 
     schema
+  end
+
+  def skatepark_schema_images(skatepark)
+    images = [skatepark.cover_image&.url].compact
+    images += skatepark.images.map(&:url) if skatepark.images.attached?
+    images.first(5)
+  end
+
+  def skatepark_schema_geo(skatepark)
+    {
+      '@type': 'GeoCoordinates',
+      latitude: skatepark.lat,
+      longitude: skatepark.lng,
+    }
+  end
+
+  def skatepark_schema_address(skatepark)
+    address = {
+      '@type': 'PostalAddress',
+      addressCountry: skatepark.country_code,
+    }
+
+    address[:addressRegion] = skatepark_schema_region(skatepark) if skatepark.state.present?
+
+    address
+  end
+
+  def skatepark_schema_region(skatepark)
+    country = ISO3166::Country[skatepark.country_code]
+    subdivision = country&.subdivisions&.[](skatepark.state)
+    subdivision&.name || skatepark.state
   end
 
   def collection_page_schema(skateparks)
