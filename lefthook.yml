@@ -7,7 +7,7 @@ pre-commit:
 
     prettier:
       glob: "*.{js,ts,json,css}"
-      run: yarn prettier --check {staged_files}
+      run: yarn prettier:check {staged_files}
 
     herb-lint:
       glob: "*.erb"

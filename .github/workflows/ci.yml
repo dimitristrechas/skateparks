@@ -103,7 +103,7 @@ jobs:
         run: bundle exec rubocop --force-exclusion
 
       - name: Prettier
-        run: yarn prettier --check "**/*.{js,ts,json,css}"
+        run: yarn prettier:check
 
       - name: Herb Lint
         run: yarn herb:lint

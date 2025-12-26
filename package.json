@@ -16,6 +16,8 @@
     "herb:lint": "herb-lint",
     "herb:lint:fix": "herb-lint --fix",
     "herb:format": "herb-format 'app/views/**/*.erb' 'app/components/**/*.erb'",
-    "herb:format:check": "herb-format --check 'app/views/**/*.erb' 'app/components/**/*.erb'"
+    "herb:format:check": "herb-format --check 'app/views/**/*.erb' 'app/components/**/*.erb'",
+    "prettier:check": "prettier --check '**/*.{js,ts,json,css}'",
+    "prettier:fix": "prettier --write '**/*.{js,ts,json,css}'"
   }
 }

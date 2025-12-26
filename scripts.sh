@@ -241,27 +241,19 @@ case $OPTION in
 
     20)
     echo -e "${GREEN}Checking Prettier errors...${NC}"
-    if command -v yarn >/dev/null 2>&1; then
-        if yarn prettier --check .; then
-            echo -e "${GREEN}✅ No Prettier errors found${NC}"
-        else
-            echo -e "${RED}❌ Prettier errors detected${NC}"
-        fi
+    if yarn prettier:check; then
+        echo -e "${GREEN}✅ No Prettier errors found${NC}"
     else
-        echo -e "${RED}❌ Yarn not found. Please install yarn first.${NC}"
+        echo -e "${RED}❌ Prettier errors detected${NC}"
     fi
     ;;
 
     21)
     echo -e "${GREEN}Running Prettier...${NC}"
-    if command -v yarn >/dev/null 2>&1; then
-        if yarn prettier --write .; then
-            echo -e "${GREEN}✅ Files formatted with Prettier successfully${NC}"
-        else
-            echo -e "${RED}❌ Failed to format files with Prettier${NC}"
-        fi
+    if yarn prettier:fix; then
+        echo -e "${GREEN}✅ Files formatted with Prettier successfully${NC}"
     else
-        echo -e "${RED}❌ Yarn not found. Please install yarn first.${NC}"
+        echo -e "${RED}❌ Failed to format files with Prettier${NC}"
     fi
     ;;
 
