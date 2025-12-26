@@ -15,7 +15,7 @@
   "scripts": {
     "herb:lint": "herb-lint",
     "herb:lint:fix": "herb-lint --fix",
-    "herb:format": "herb-format",
-    "herb:format:check": "herb-format --check"
+    "herb:format": "herb-format 'app/views/**/*.erb' 'app/components/**/*.erb'",
+    "herb:format:check": "herb-format --check 'app/views/**/*.erb' 'app/components/**/*.erb'"
   }
 }
