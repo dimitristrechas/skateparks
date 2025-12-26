@@ -66,20 +66,21 @@ echo -e " ${BLUE}(11)${NC} View test server logs"
 echo ""
 echo -e "${GREEN}--- Tests & Linting & Formatting ---${NC}"
 echo -e " ${BLUE}(12)${NC} Run RSpec tests"
-echo -e " ${BLUE}(13)${NC} Format ERB files with erb-format"
-echo -e " ${BLUE}(14)${NC} Run Ruby linter (RuboCop)"
-echo -e " ${BLUE}(15)${NC} Auto-fix Ruby linter issues"
-echo -e " ${BLUE}(16)${NC} Format JavaScript/CSS files (Prettier)"
-echo -e " ${BLUE}(22)${NC} Run Brakeman security scan"
+echo -e " ${BLUE}(13)${NC} Run erb-format"
+echo -e " ${BLUE}(14)${NC} Check for RuboCop errors"
+echo -e " ${BLUE}(15)${NC} Run RuboCop auto-fix"
+echo -e " ${BLUE}(16)${NC} Check for Prettier errors"
+echo -e " ${BLUE}(17)${NC} Run Prettier"
+echo -e " ${BLUE}(18)${NC} Run Brakeman security scan"
 echo ""
 echo -e "${GREEN}--- Database & Cache ---${NC}"
-echo -e " ${BLUE}(17)${NC} Seed the database"
-echo -e " ${BLUE}(18)${NC} Reset database & migrate"
+echo -e " ${BLUE}(19)${NC} Seed the database"
+echo -e " ${BLUE}(20)${NC} Reset database & migrate"
 echo -e " ${BLUE}(21)${NC} Clear all Rails cache"
 echo ""
 echo -e "${GREEN}--- Other ---${NC}"
-echo -e " ${BLUE}(19)${NC} Stop skateparks Docker containers"
-echo -e " ${BLUE}(20)${NC} Show Docker container status"
+echo -e " ${BLUE}(22)${NC} Stop skateparks Docker containers"
+echo -e " ${BLUE}(23)${NC} Show Docker container status"
 echo ""
 echo -e "${YELLOW}Choose an option:${NC} "
 read OPTION
@@ -191,7 +192,7 @@ case $OPTION in
     ;;
 
     15)
-    echo -e "${GREEN}Auto-fixing Ruby linter issues...${NC}"
+    echo -e "${GREEN}Running RuboCop auto-fix...${NC}"
     if bundle exec rubocop -A; then
         echo -e "${GREEN}✅ RuboCop auto-fixes applied successfully${NC}"
     else
@@ -200,7 +201,20 @@ case $OPTION in
     ;;
 
     16)
-    echo -e "${GREEN}Formatting JavaScript/CSS files with Prettier...${NC}"
+    echo -e "${GREEN}Checking Prettier errors...${NC}"
+    if command -v yarn >/dev/null 2>&1; then
+        if yarn prettier --check .; then
+            echo -e "${GREEN}✅ No Prettier errors found${NC}"
+        else
+            echo -e "${RED}❌ Prettier errors detected${NC}"
+        fi
+    else
+        echo -e "${RED}❌ Yarn not found. Please install yarn first.${NC}"
+    fi
+    ;;
+
+    17)
+    echo -e "${GREEN}Running Prettier...${NC}"
     if command -v yarn >/dev/null 2>&1; then
         if yarn prettier --write .; then
             echo -e "${GREEN}✅ Files formatted with Prettier successfully${NC}"
@@ -212,7 +226,16 @@ case $OPTION in
     fi
     ;;
 
-    17)
+    18)
+    echo -e "${GREEN}Running Brakeman security scan...${NC}"
+    if bundle exec brakeman -q --no-pager; then
+        echo -e "${GREEN}✅ No security issues found${NC}"
+    else
+        echo -e "${RED}❌ Security issues detected${NC}"
+    fi
+    ;;
+
+    19)
     echo -e "${GREEN}Seeding the database...${NC}"
     if docker compose -f $DEV_COMPOSE_FILE exec $SERVICE_NAME bash -c "bundle exec rails db:seed"; then
         echo -e "${GREEN}✅ Database seeded successfully${NC}"
@@ -221,13 +244,22 @@ case $OPTION in
     fi
     ;;
 
-    18)
+    20)
     confirm_action "This will reset and migrate the database. All data will be lost!"
     echo -e "${GREEN}Resetting and migrating database...${NC}"
     docker compose -f $DEV_COMPOSE_FILE exec $SERVICE_NAME bash -c "bundle exec rails db:reset db:migrate"
     ;;
 
-    19)
+    21)
+    echo -e "${GREEN}Clearing Rails cache...${NC}"
+    if docker compose -f $DEV_COMPOSE_FILE exec $SERVICE_NAME bash -c "bundle exec rails runner 'Rails.cache.clear'"; then
+        echo -e "${GREEN}✅ Cache cleared successfully${NC}"
+    else
+        echo -e "${RED}❌ Failed to clear cache${NC}"
+    fi
+    ;;
+
+    22)
     confirm_action "This will stop all skateparks-related Docker containers."
     echo -e "${YELLOW}Stopping skateparks Docker containers...${NC}"
     STOPPED=false
@@ -244,27 +276,10 @@ case $OPTION in
     fi
     ;;
 
-    20)
+    23)
     show_docker_status
     ;;
 
-    21)
-    echo -e "${GREEN}Clearing Rails cache...${NC}"
-    if docker compose -f $DEV_COMPOSE_FILE exec $SERVICE_NAME bash -c "bundle exec rails runner 'Rails.cache.clear'"; then
-        echo -e "${GREEN}✅ Cache cleared successfully${NC}"
-    else
-        echo -e "${RED}❌ Failed to clear cache${NC}"
-    fi
-    ;;
-
-    22)
-    echo -e "${GREEN}Running Brakeman security scan...${NC}"
-    if bundle exec brakeman -q --no-pager; then
-        echo -e "${GREEN}✅ No security issues found${NC}"
-    else
-        echo -e "${RED}❌ Security issues detected${NC}"
-    fi
-    ;;
 
     *)
     echo -e "${RED}❌ Unknown option: $OPTION${NC}"
