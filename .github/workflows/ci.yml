@@ -74,3 +74,31 @@ jobs:
 
       - name: Run RSpec
         run: bundle exec rspec --format progress
+
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.3.6
+          bundler-cache: true
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 20
+          cache: yarn
+
+      - name: Install JS dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Rubocop
+        run: bundle exec rubocop --force-exclusion
+
+      - name: Prettier
+        run: yarn prettier --check "**/*.{js,ts,json,css}"
+
