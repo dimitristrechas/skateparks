@@ -102,3 +102,6 @@ jobs:
       - name: Prettier
         run: yarn prettier --check "**/*.{js,ts,json,css}"
 
+      - name: Brakeman
+        run: bundle exec brakeman -q --no-pager
+

@@ -8,3 +8,9 @@ pre-commit:
     prettier:
       glob: "*.{js,ts,json,css}"
       run: yarn prettier --check {staged_files}
+
+pre-push:
+  commands:
+    brakeman:
+      run: bundle exec brakeman -q --no-pager
+

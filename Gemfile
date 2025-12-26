@@ -70,6 +70,8 @@ group :development do
   gem 'rubocop-rspec_rails', require: false
 
   gem 'erb-formatter'
+
+  gem 'brakeman', require: false
 end
 
 group :test do

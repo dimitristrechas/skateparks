@@ -70,6 +70,7 @@ echo -e " ${BLUE}(13)${NC} Format ERB files with erb-format"
 echo -e " ${BLUE}(14)${NC} Run Ruby linter (RuboCop)"
 echo -e " ${BLUE}(15)${NC} Auto-fix Ruby linter issues"
 echo -e " ${BLUE}(16)${NC} Format JavaScript/CSS files (Prettier)"
+echo -e " ${BLUE}(22)${NC} Run Brakeman security scan"
 echo ""
 echo -e "${GREEN}--- Database & Cache ---${NC}"
 echo -e " ${BLUE}(17)${NC} Seed the database"
@@ -253,6 +254,15 @@ case $OPTION in
         echo -e "${GREEN}✅ Cache cleared successfully${NC}"
     else
         echo -e "${RED}❌ Failed to clear cache${NC}"
+    fi
+    ;;
+
+    22)
+    echo -e "${GREEN}Running Brakeman security scan...${NC}"
+    if bundle exec brakeman -q --no-pager; then
+        echo -e "${GREEN}✅ No security issues found${NC}"
+    else
+        echo -e "${RED}❌ Security issues detected${NC}"
     fi
     ;;
 
