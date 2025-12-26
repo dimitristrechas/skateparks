@@ -2,7 +2,8 @@
 
 - **All code must include RSpec tests** (use rspec-test-writer agent)
 - **Zero RuboCop violations** (use rubocop-enforcer agent)
-- Verify compliance: `sh scripts.sh` option 14 or 15
+- **Zero Herb lint and format violations** (use frontend-expert agent)
+- Verify compliance: `sh scripts.sh` options in "Tests & Linting & Formatting"
 - **Pre-commit hook** blocks commits with RuboCop/Herb/Prettier errors
 
 ## Pre-commit Hook (Lefthook)
@@ -14,9 +15,9 @@ Runs automatically on `git commit`:
 - **herb-format**: Checks formatting of staged `*.erb` files
 - **prettier**: Checks staged `*.{js,css,json,md}` files
 
-## Specialized Claude Agents
+## Specialized Agents
 
-Available in `.claude/agents/`:
+Available in `.claude/agents/` for Claude Code and in `.github/agents` GitHub Copilot:
 
 - **rspec-test-writer**: Writing/debugging RSpec tests, FactoryBot factories
 - **rubocop-enforcer**: RuboCop compliance checking and auto-fixing
@@ -36,11 +37,36 @@ Available in `.claude/agents/`:
 6. View logs
 7. Stop server
 
-**Testing:** 8. Start test server 9. Fresh build & start test 10. Test console 11. Test logs 12. RSpec with coverage
+**Testing:**
 
-**Code Quality:** 13. Format ERB 14. Run RuboCop 15. RuboCop auto-fix 16. Prettier (JS/CSS)
+8. Start test server
+9. Fresh build & start test
+10. Test console
+11. Test logs
+12. RSpec with coverage
 
-**Database:** 17. Seed database 18. Reset & migrate 21. Clear Rails cache
+**Code Quality:**
+
+13. Brakeman security scan
+14. Check Herb format
+15. Run Herb format
+16. Check Herb lint
+17. Run Herb lint auto-fix
+18. Check RuboCop errors
+19. Run RuboCop auto-fix
+20. Check Prettier errors
+21. Run Prettier
+
+**Database:**
+
+22. Seed database
+23. Reset & migrate
+24. Clear Rails cache
+
+**Other:**
+
+25. Stop Docker containers
+26. Show Docker status
 
 ## Architecture
 
@@ -90,15 +116,18 @@ Available in `.claude/agents/`:
 
 ### Tech Stack
 
-- **Rails 8.0** + PostgreSQL
-- **Propshaft** (asset pipeline)
+- **Rails 8.0** + **Ruby 3.3.6** + PostgreSQL
+- **Propshaft** (asset pipeline) + **Importmap**
 - **Hotwire**: Turbo + Stimulus
 - **Tailwind CSS 4.0** + Flowbite
-- **Sidekiq**: Background jobs + cron
-- **Cloudinary**: Image storage/processing
+- **ViewComponent**: Component-based views
+- **Sidekiq** + **Sidekiq-Cron**: Background jobs + scheduling
+- **Redis 5.0**: Caching + Sidekiq backend
+- **Cloudinary**: Image storage/processing (ActiveStorage)
 - **Kaminari**: Pagination
-- **Mobility**: I18n (Greek/English)
-- **ISO3166**: Country/subdivision data
+- **Mobility**: I18n (Greek/English) + ActionText integration
+- **Countries**: Country/subdivision data
+- **Sitemap Generator**: SEO sitemaps
 
 ### Testing Infrastructure
 
@@ -106,8 +135,13 @@ Available in `.claude/agents/`:
 - **FactoryBot**: Test data factories
 - **Faker**: Realistic fake data
 - **Capybara**: System/feature tests
+- **Rails Controller Testing**: Controller specs
 - **SimpleCov**: Coverage reports
-- **RuboCop**: Style enforcement (Rails, RSpec, FactoryBot, Capybara)
+- **RuboCop**: Style enforcement (Rails, RSpec, FactoryBot, Capybara, RSpec Rails)
+- **Brakeman**: Security scanning
+- **Herb Tools**: ERB linting + formatting
+- **Prettier**: JS/CSS/JSON/MD formatting
+- **Lefthook**: Git hooks
 
 Factories in `spec/factories/`: skateparks.rb, popular_skateparks.rb
 Shared contexts: `spec/support/shared_contexts/admin_auth.rb`
