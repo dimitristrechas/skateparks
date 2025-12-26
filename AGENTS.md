@@ -3,14 +3,15 @@
 - **All code must include RSpec tests** (use rspec-test-writer agent)
 - **Zero RuboCop violations** (use rubocop-enforcer agent)
 - Verify compliance: `sh scripts.sh` option 14 or 15
-- **Pre-commit hook** blocks commits with RuboCop/erb-formatter/Prettier errors
+- **Pre-commit hook** blocks commits with RuboCop/Herb/Prettier errors
 
 ## Pre-commit Hook (Lefthook)
 
 Runs automatically on `git commit`:
 
 - **rubocop**: Checks staged `*.rb` files
-- **erb-formatter**: Checks staged `*.erb` files
+- **herb-lint**: Lints staged `*.erb` files
+- **herb-format**: Checks formatting of staged `*.erb` files
 - **prettier**: Checks staged `*.{js,css,json,md}` files
 
 ## Specialized Claude Agents
@@ -124,7 +125,7 @@ Shared contexts: `spec/support/shared_contexts/admin_auth.rb`
 1. Clone repo
 2. Get credentials: `config/credentials/{development,production,test}.key`
 3. Copy `.env.example` → `.env` + `.env.test`, set RAILS_MASTER_KEY
-4. `bundle install && yarn`
+4. `bundle install && yarn install`
 5. `sh scripts.sh` option 2 (fresh build)
 6. Open `localhost:3000`
 7. Optional: seed database (option 17)

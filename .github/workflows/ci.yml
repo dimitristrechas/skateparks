@@ -102,6 +102,12 @@ jobs:
       - name: Prettier
         run: yarn prettier --check "**/*.{js,ts,json,css}"
 
+      - name: Herb Lint
+        run: yarn herb:lint
+
+      - name: Herb Format
+        run: yarn herb:format:check
+
       - name: Brakeman
         run: bundle exec brakeman -q --no-pager
 

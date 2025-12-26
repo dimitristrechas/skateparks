@@ -7,7 +7,15 @@
     "trix": "2.1.15"
   },
   "devDependencies": {
+    "@herb-tools/formatter": "^0.8.6",
+    "@herb-tools/linter": "^0.8.6",
     "prettier": "^3.6.2"
   },
-  "packageManager": "yarn@1.22.22"
+  "packageManager": "yarn@1.22.22",
+  "scripts": {
+    "herb:lint": "herb-lint",
+    "herb:lint:fix": "herb-lint --fix",
+    "herb:format": "herb-format",
+    "herb:format:check": "herb-format --check"
+  }
 }

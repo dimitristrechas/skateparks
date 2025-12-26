@@ -1,4 +1,4 @@
-<div class="max-w-4xl mx-auto p-8">
+<div class="mx-auto max-w-4xl p-8">
   <%= render TitleComponent.new(title: "Dashboard", classnames: "mb-8") %>
 
   <div class="space-y-4">
@@ -7,6 +7,7 @@
       url: admin_skateparks_path,
       classnames: "!text-gray-900 !no-underline block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100"
     ) %>
+
     <%= render LinkComponent.new(
       title: "Manage Popular Skateparks",
       url: admin_popular_skateparks_path,

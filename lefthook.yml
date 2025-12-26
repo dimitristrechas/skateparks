@@ -9,6 +9,14 @@ pre-commit:
       glob: "*.{js,ts,json,css}"
       run: yarn prettier --check {staged_files}
 
+    herb-lint:
+      glob: "*.erb"
+      run: yarn herb:lint {staged_files}
+
+    herb-format:
+      glob: "*.erb"
+      run: yarn herb:format:check {staged_files}
+
 pre-push:
   commands:
     brakeman:

@@ -1,12 +1,6 @@
-<h1 class="text-3xl font-bold mb-12 lg:mb-20 text-center">
-  <%= t("explore_all_skateparks") %>
-</h1>
+<h1 class="mb-12 text-center text-3xl font-bold lg:mb-20"><%= t("explore_all_skateparks") %></h1>
 
-<section
-  class="
-    grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8 lg:gap-16 mb-12 lg:mb-20
-  "
->
+<section class="mb-12 grid grid-cols-1 gap-8 lg:mb-20 lg:grid-cols-2 lg:gap-16 xl:grid-cols-3">
   <% @skateparks_latest.each do |skatepark| %>
     <%= render(SkateparkCardComponent.new(skatepark: skatepark, badge_type: :new)) %>
   <% end %>
@@ -16,11 +10,12 @@
   <% end %>
 </section>
 
-<section class="flex justify-center gap-2 items-center mb-12 lg:mb-20">
+<section class="mb-12 flex items-center justify-center gap-2 lg:mb-20">
   <%= link_to skateparks_path, class: "flex items-center gap-2 py-2 ps-4 pe-3 text-lg border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-600 transition-colors" do %>
     <span class="text-lg"><%= t("view_all_skateparks") %></span>
+
     <svg
-      class="w-5 h-5 text-gray-800 dark:text-white"
+      class="h-5 w-5 text-gray-800 dark:text-white"
       aria-hidden="true"
       xmlns="http://www.w3.org/2000/svg"
       width="24"

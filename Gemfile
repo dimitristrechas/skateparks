@@ -69,8 +69,6 @@ group :development do
   gem 'rubocop-rspec', require: false
   gem 'rubocop-rspec_rails', require: false
 
-  gem 'erb-formatter'
-
   gem 'brakeman', require: false
 end
 

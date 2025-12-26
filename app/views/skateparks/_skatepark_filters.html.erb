@@ -2,8 +2,10 @@
   controller: 'skateparks--filters'
 } do |form| %>
   <%= form.hidden_field :locale, value: I18n.locale %>
-  <div class="flex flex-col gap-1 items-start">
+
+  <div class="flex flex-col items-start gap-1">
     <%= form.label :country_code, t("country"), class: "block text-sm font-medium" %>
+
     <%= form.select :country_code,
                 options_for_select(
                   [[t("all_countries"), ""]] +
@@ -22,8 +24,9 @@
 
   <%= render "state_select", states: @states %>
 
-  <div class="flex gap-4 xl:gap-6 items-center ms-0 lg:ms-auto xl:ms-8">
+  <div class="ms-0 flex items-center gap-4 lg:ms-auto xl:ms-8 xl:gap-6">
     <%= link_to t("reset_filters"), skateparks_path %>
+
     <%= form.button t("search"),
                 type: "submit",
                 class:

@@ -1,0 +1,28 @@
+version: 0.8.6
+
+files:
+  exclude:
+    - 'public/**/*'
+    - 'tmp/**/*'
+    - 'coverage/**/*'
+    - 'vendor/**/*'
+    - 'node_modules/**/*'
+    - 'app/views/active_storage/**/*'
+
+linter:
+  enabled: true
+  rules:
+    erb-no-extra-newline:
+      enabled: true
+    html-no-duplicate-attributes:
+      enabled: true
+    html-no-duplicate-ids:
+      enabled: true
+
+formatter:
+  enabled: true
+  indentWidth: 2
+  maxLineLength: 120
+  rewriter:
+    pre:
+      - tailwind-class-sorter

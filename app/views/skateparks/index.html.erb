@@ -1,7 +1,7 @@
 <div id="skateparks">
   <%= render "skatepark_filters" %>
 
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 place-items-center">
+  <div class="grid grid-cols-1 place-items-center gap-8 lg:grid-cols-2">
     <% @skateparks.each do |skatepark| %>
       <%= render "skatepark_result", skatepark: skatepark %>
     <% end %>

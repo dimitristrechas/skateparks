@@ -1,5 +1,6 @@
-<div class="flex flex-col gap-1 items-start" id="state_select">
+<div class="flex flex-col items-start gap-1" id="state_select">
   <%= label_tag :state, t("country_state"), class: "block text-sm font-medium" %>
+
   <%= select_tag :state,
   options_for_select(
     [[t("all_states"), ""]] +
