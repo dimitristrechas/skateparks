@@ -91,7 +91,7 @@ gem 'view_component'
 
 gem 'dockerfile-rails', '~> 1.6', '>= 1.6.24'
 
-gem 'mobility', '~> 1.3.0.rc1'
+gem 'mobility', '~> 1.3.2'
 
 gem 'mobility-actiontext', '~> 1.1'
 
