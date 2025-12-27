@@ -17,7 +17,7 @@ Runs automatically on `git commit`:
 
 ## Specialized Agents
 
-Available in `.claude/agents/` for Claude Code and in `.github/agents` GitHub Copilot:
+Available in `.claude/agents/` for Claude Code and in `.github/agents` for GitHub Copilot:
 
 - rspec-test-writer: Writing/debugging RSpec tests, FactoryBot factories
 - rubocop-enforcer: RuboCop compliance checking and auto-fixing

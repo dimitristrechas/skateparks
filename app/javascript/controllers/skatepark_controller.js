@@ -4,13 +4,7 @@ import L from "leaflet";
 const swipeThreshold = 50;
 
 export default class extends Controller {
-  static targets = [
-    "container",
-    "previewImage",
-    "gallery",
-    "galleryImage",
-    "galleryImageIndicator",
-  ];
+  static targets = ["container", "previewImage", "gallery", "galleryImage", "galleryImageIndicator"];
 
   static values = {
     lat: String,
