@@ -2,6 +2,8 @@ require 'sidekiq/web'
 require 'sidekiq/cron/web'
 
 Rails.application.routes.draw do
+  mount Lookbook::Engine, at: '/lookbook' if Rails.env.development?
+
   namespace :admin do
     root to: 'dashboard#index'
     resources :skateparks

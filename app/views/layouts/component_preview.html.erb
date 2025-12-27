@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <title>Component Preview</title>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <%= stylesheet_link_tag "tailwind", data_turbo_track: "reload" %>
+    <%= javascript_importmap_tags %>
+
+    <script>
+      if (
+        localStorage.theme === "dark" ||
+        (!("theme" in localStorage) &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches)
+      ) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    </script>
+  </head>
+
+  <body class="container mx-auto bg-neutral-100 px-4 py-4 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300">
+    <div class="flex justify-end" data-controller="header"><%= render "home/dark_mode_switch" %></div>
+    <main class="mt-4"><%= yield %></main>
+  </body>
+</html>

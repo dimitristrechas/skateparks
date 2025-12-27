@@ -65,7 +65,7 @@ RSpec.configure do |config|
   # config.filter_gems_from_backtrace("gem name")
 
   config.before(:each, type: :controller) do
-    allow_any_instance_of(ApplicationController).to receive(:default_url_options).and_return({}) # rubocop:disable RSpec/AnyInstance
+    allow_any_instance_of(ApplicationController).to receive(:default_url_options).and_return({})
   end
 end
 
