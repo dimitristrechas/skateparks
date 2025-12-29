@@ -1,6 +1,11 @@
 ---
 name: rails-backend-architect
-description: Use this agent when: backend architecture decisions needed, database schema design/optimization, Rails model/controller/service implementation, background job setup, caching strategy, API design, performance optimization, SOLID violations, ActiveRecord queries, Redis integration, database migrations, test coverage for backend logic.\n\nExamples:\n- User: "Add geospatial search for skateparks within radius"\n  Assistant: "Using rails-backend-architect to design efficient PostGIS solution"\n- User: "Optimize skatepark listing query performance"\n  Assistant: "Launching rails-backend-architect to analyze N+1 queries and caching strategy"\n- User: "Need background job to sync skatepark data"\n  Assistant: "Using rails-backend-architect to implement Sidekiq job with proper error handling"
+description: >-
+  Use this agent when: backend architecture decisions needed, database schema
+  design/optimization, Rails model/controller/service implementation,
+  background job setup, caching strategy, API design, performance optimization,
+  SOLID violations, ActiveRecord queries, Redis integration, database
+  migrations, test coverage for backend logic.
 model: sonnet
 color: yellow
 ---

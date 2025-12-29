@@ -1,6 +1,10 @@
 ---
 name: frontend-expert
-description: Use this agent when working on frontend tasks including: JavaScript/Stimulus controllers, Hotwire/Turbo functionality, HTML templates, CSS/Tailwind styling, ViewComponents, accessibility improvements, responsive design, or any client-side code. Examples:\n\n<example>\nuser: "Add a dropdown menu to the skatepark filter"\nassistant: "Using frontend-expert agent to implement accessible dropdown with Stimulus and Tailwind"\n</example>\n\n<example>\nuser: "The mobile navigation isn't working properly"\nassistant: "Using frontend-expert agent to debug and fix responsive navigation issues"\n</example>\n\n<example>\nuser: "Create a new ViewComponent for displaying skatepark cards"\nassistant: "Using frontend-expert agent to build component with proper HTML semantics and Tailwind styling"\n</example>
+description: >-
+  Use this agent when working on frontend tasks including: JavaScript/Stimulus
+  controllers, Hotwire/Turbo functionality, HTML templates, CSS/Tailwind
+  styling, ViewComponents, accessibility improvements, responsive design, or
+  any client-side code.
 model: sonnet
 color: purple
 ---
