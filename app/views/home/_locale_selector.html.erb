@@ -1,43 +1,18 @@
-<button
-  id="dropdownDefaultButton"
-  data-dropdown-toggle="dropdown"
-  class="inline-flex items-center px-5 py-1 text-center text-sm font-medium"
-  type="button"
->
-  <%= LOCALES[I18n.locale] %>
-
-  <svg
-    class="ms-3 h-2.5 w-2.5"
-    aria-hidden="true"
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 10 6"
-  >
-    <path
-      stroke="currentColor"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      stroke-width="2"
-      d="m1 1 4 4 4-4"
-    />
-  </svg>
-</button>
-
-<!-- Dropdown menu -->
-<div id="dropdown" class="z-10 hidden w-36 divide-y divide-gray-100 rounded-lg bg-white shadow dark:bg-gray-700">
-  <ul class="py-1 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
+<nav aria-label="Language selector" class="flex place-items-center">
+  <ul class="flex gap-4">
     <% I18n.available_locales.each do |locale| %>
       <li>
+        <% selected = LOCALES[I18n.locale] === LOCALES[locale] %>
+
         <%= link_to LOCALES[locale],
-        {
-          locale: locale,
-          country_code: params[:country_code],
-          state: params[:state],
-          page: params[:page],
-        }.compact,
-        class:
-          "block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white" %>
+                    {
+                      locale: locale,
+                      country_code: params[:country_code],
+                      state: params[:state],
+                      page: params[:page],
+                    }.compact,
+                    class: "#{selected ? 'outline rounded-lg outline-gray-200 bg-gray-200 dark:outline-gray-800 dark:bg-gray-800':'hover:outline rounded-lg dark:hover:outline-gray-800 dark:hover:bg-gray-800 hover:outline-gray-200 hover:bg-gray-200'} py-2 px-4" %>
       </li>
     <% end %>
   </ul>
-</div>
+</nav>
