@@ -165,3 +165,7 @@ Shared contexts: `spec/support/shared_contexts/admin_auth.rb`
 7. Optional: seed database (option 17)
 
 Docker-first workflow: All ops via `scripts.sh` interactive menu.
+
+## Generic rules
+
+Do not commit code unless specifically instructed to do so.
