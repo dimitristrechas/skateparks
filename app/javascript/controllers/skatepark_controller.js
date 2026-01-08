@@ -1,5 +1,4 @@
 import { Controller } from "@hotwired/stimulus";
-import L from "leaflet";
 
 const swipeThreshold = 50;
 
