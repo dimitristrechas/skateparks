@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe SkateparkCardComponent, type: :component do
+RSpec.describe HomepageSkateparkCardComponent, type: :component do
   include ViewComponent::TestHelpers
   include Capybara::RSpecMatchers
   include Rails.application.routes.url_helpers

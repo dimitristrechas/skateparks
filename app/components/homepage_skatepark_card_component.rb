@@ -1,4 +1,4 @@
-class SkateparkCardComponent < ViewComponent::Base
+class HomepageSkateparkCardComponent < ViewComponent::Base
   def initialize(skatepark:, badge_type:)
     super
     @skatepark = skatepark

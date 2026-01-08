@@ -98,7 +98,7 @@ ViewComponents (app/components/):
 
 - ButtonComponent
 - LinkComponent
-- SkateparkCardComponent
+- HomepageSkateparkCardComponent
 - TextFieldComponent
 
 Stimulus Controllers (app/javascript/controllers/):
