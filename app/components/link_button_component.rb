@@ -11,8 +11,8 @@ class LinkButtonComponent < ViewComponent::Base
   private
 
   def base_classes
-    'rounded-lg py-2 px-4 focus:outline-2 focus:outline-offset-2 ' \
-      'focus:outline-neutral-700 dark:focus:outline-neutral-200'
+    'rounded-lg py-2 px-4 focus-visible:outline-2 focus-visible:outline-offset-2 ' \
+      'focus-visible:outline-neutral-700 dark:focus-visible:outline-neutral-200'
   end
 
   def state_classes
