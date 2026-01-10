@@ -1,24 +1,51 @@
 pre-commit:
-  parallel: true
+  piped: true
   commands:
-    rubocop:
+    prettier-fix:
+      glob: "*.{js,ts,json,css}"
+      run: yarn prettier --write {staged_files}
+      stage_fixed: true
+      priority: 1
+
+    herb-format-fix:
+      glob: "*.erb"
+      run: yarn herb:format {staged_files}
+      stage_fixed: true
+      priority: 1
+
+    herb-lint-fix:
+      glob: "*.erb"
+      run: yarn herb:lint --fix {staged_files}
+      stage_fixed: true
+      priority: 1
+
+    rubocop-fix:
       glob: "*.rb"
-      run: bundle exec rubocop --force-exclusion {staged_files}
+      run: bundle exec rubocop -A --force-exclusion {staged_files}
+      stage_fixed: true
+      priority: 1
 
     prettier:
       glob: "*.{js,ts,json,css}"
       run: yarn prettier:check {staged_files}
+      priority: 2
 
     herb-lint:
       glob: "*.erb"
       run: yarn herb:lint {staged_files}
+      priority: 2
 
     herb-format:
       glob: "*.erb"
       run: yarn herb:format:check {staged_files}
+      priority: 2
+
+    rubocop:
+      glob: "*.rb"
+      run: bundle exec rubocop --force-exclusion {staged_files}
+      priority: 2
 
 pre-push:
   commands:
     brakeman:
       run: bundle exec brakeman -q --no-pager
-
