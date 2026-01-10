@@ -1,7 +1,7 @@
 <footer class="mx-auto w-full pb-0 mt-12 lg:mt-20">
-  <ul class="mb-4 flex items-center justify-center gap-8 sm:mb-0 md:justify-end [&_a]:hover:underline">
-    <li><%= link_to t("about"), about_path %></li>
-    <li><%= link_to t("contact"), contact_path %></li>
+  <ul class="mb-4 flex items-center justify-center gap-8 sm:mb-0 md:justify-end [&_a]:hover:underline [&_a]:p-1">
+    <li><%= render LinkButtonComponent.new(title: t("about"), url: about_path) %></li>
+    <li><%= render LinkButtonComponent.new(title: t("contact"), url: contact_path) %></li>
   </ul>
 
   <hr class="my-6 border-neutral-400 sm:mx-auto lg:my-8 dark:border-neutral-700">
