@@ -5,6 +5,3 @@ import "flowbite";
 
 import "trix";
 import "@rails/actiontext";
-
-import "leaflet";
-import "leaflet-providers";

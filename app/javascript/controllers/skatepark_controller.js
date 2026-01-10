@@ -15,17 +15,17 @@ export default class extends Controller {
     this.touchstartX = 0;
     this.touchstartY = 0;
 
-    import("leaflet").then((L) => {
-      this.map = L.map(this.containerTarget, {
+    import("leaflet").then(({ Map, TileLayer, Marker }) => {
+      this.map = new Map(this.containerTarget, {
         zoomDelta: 0.5,
         zoomSnap: 0.5,
       }).setView([this.latValue, this.lngValue], 20);
 
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      new TileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
       }).addTo(this.map);
 
-      L.marker([this.latValue, this.lngValue]).addTo(this.map);
+      new Marker([this.latValue, this.lngValue]).addTo(this.map);
     });
 
     document.addEventListener("click", (event) => {
@@ -45,7 +45,7 @@ export default class extends Controller {
     document.addEventListener("touchend", this.galleryTouchEndHandler);
   }
 
-  galleryTargetDisonnected() {
+  galleryTargetDisconnected() {
     document.removeEventListener("keydown", this.modalKeysHandler);
     document.removeEventListener("touchstart", this.galleryTouchStartHandler);
     document.removeEventListener("touchend", this.galleryTouchEndHandler);

@@ -3,33 +3,16 @@
 } do |form| %>
   <%= form.hidden_field :locale, value: I18n.locale %>
 
-  <div class="flex flex-col items-start gap-1">
-    <%= form.label :country_code, t("country"), class: "block text-sm font-medium" %>
-
-    <%= form.select :country_code,
-                options_for_select(
-                  [[t("all_countries"), ""]] +
-                    @countries.map { |c| [c.translations[I18n.locale], c.alpha2] },
-                  params[:country_code],
-                ),
-                {},
-                {
-                  class:
-                    "w-56 bg-gray-50 border border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500",
-                  data: {
-                    "skateparks--filters-target": "countrySelect",
-                  },
-                } %>
-  </div>
+  <%= render "country_select", countries: @countries %>
 
   <%= render "state_select", states: @states %>
 
-  <div class="ms-0 flex items-center gap-4 lg:ms-auto xl:ms-8 xl:gap-6">
+  <div class="ms-0 flex items-center gap-4 xl:ms-8 xl:gap-6">
     <%= link_to t("reset_filters"), skateparks_path %>
 
     <%= form.button t("search"),
                 type: "submit",
                 class:
-                  "py-2.5 px-5 text-sm font-medium focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 cursor-pointer" %>
+                  "py-2.5 px-5 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 cursor-pointer" %>
   </div>
 <% end %>

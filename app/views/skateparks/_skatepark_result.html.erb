@@ -1,8 +1,9 @@
 <%= link_to skatepark_path(skatepark),
                 id: dom_id(skatepark),
-                class: "flex flex-col items-stretch bg-neutral-50 border border-gray-200 w-full rounded-lg hover:drop-shadow-md md:flex-row dark:border-gray-700 dark:bg-gray-800" do %>
+                class: "flex flex-col items-stretch border border-neutral-300 w-full rounded-lg hover:drop-shadow-md md:flex-row dark:border-neutral-500" do %>
   <%= cl_image_tag skatepark.cover_image.key,
   size: "600x450",
+  fetchpriority: "high",
   class:
     "object-cover w-full h-80 md:w-3/5 -skew-y-1 origin-bottom-left rounded-lg shadow-lg",
   alt: "#{skatepark.name} cover image",
@@ -14,31 +15,8 @@
       sm:ps-6
     "
   >
-    <h5
-      class="
-        text-2xl font-bold tracking-tight text-neutral-700 sm:mb-3 lg:max-xl:text-xl xl:text-2xl
-        dark:text-neutral-200
-      "
-    >
-      <%= skatepark.name %>
-    </h5>
+    <h5 class="text-2xl font-bold tracking-tight sm:mb-3"><%= skatepark.name %></h5>
 
     <p class="font-normal sm:mb-1"><%= "#{skatepark.images.size} #{t("photos")}" %></p>
-
-    <svg
-      class="h-6 w-6 self-end transition-all hover:h-7 hover:w-7 sm:mt-auto"
-      aria-hidden="true"
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 16 16"
-    >
-      <path
-        stroke="currentColor"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        stroke-width="2"
-        d="M11 1h4m0 0v4m0-4-5 5.243M5 15H1m0 0v-4m0 4 5.243-5"
-      />
-    </svg>
   </div>
 <% end %>
