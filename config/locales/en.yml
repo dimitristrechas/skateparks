@@ -1,9 +1,10 @@
 en:
+  opens_in_new_tab: "(opens in new tab)"
   made_with: "Made with"
   city_of_origin: "Kavala, Greece"
   photos: "photos"
-  country: 'Country'
-  country_state: 'State/Region'
+  country: "Country"
+  country_state: "State/Region"
   back_to_skateparks: "Back to all skateparks"
   open_in_google_maps: "Open skatepark in google maps"
   delete_confirm: "Are you sure?"

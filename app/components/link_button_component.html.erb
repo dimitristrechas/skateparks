@@ -1,4 +1,11 @@
-<%= link_to @title,
-            @url,
+<%= link_to @url,
             target: @target,
-            class: [base_classes, state_classes, @classnames].compact.join(" ") %>
+            rel: (@target == '_blank' ? 'noopener noreferrer' : nil),
+            aria: (@active ? { current: 'page' } : nil),
+            class: [base_classes, state_classes, ghost_classes, @classnames].compact.join(" ") do %>
+  <%= @title %>
+
+  <% if @target == '_blank' %>
+    <span class="sr-only"><%= t('opens_in_new_tab') %></span>
+  <% end %>
+<% end %>

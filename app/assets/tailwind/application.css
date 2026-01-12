@@ -17,3 +17,9 @@
   --grid-template-rows-layout: auto 1fr auto;
   --font-sans: Nunito, system-ui, sans-serif;
 }
+
+@layer base {
+  a:focus-visible {
+    @apply rounded-lg outline outline-offset-2 outline-neutral-700 dark:outline-neutral-200;
+  }
+}

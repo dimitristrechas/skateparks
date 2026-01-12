@@ -1,9 +1,10 @@
 el:
+  opens_in_new_tab: "(ανοίγει σε νέα καρτέλα)"
   made_with: "Φτιαγμένο με"
   city_of_origin: "Καβάλα, Ελλάδα"
   photos: "φωτογραφίες"
-  country: 'Χώρα'
-  country_state: 'Νομός/Περιφέρεια'
+  country: "Χώρα"
+  country_state: "Νομός/Περιφέρεια"
   back_to_skateparks: "Πίσω σε όλα τα skateparks"
   open_in_google_maps: "Δες το πάρκο στο google maps"
   delete_confirm: "Είσαι σίγουρος;"

@@ -1,4 +1,4 @@
-<%= link_to skatepark_path(@skatepark), class: "flex rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-700 dark:focus-visible:outline-neutral-200" do %>
+<%= link_to skatepark_path(@skatepark), class: "flex" do %>
   <div class="relative size-40 shrink-0 overflow-hidden rounded-full lg:size-48">
     <%= cl_image_tag @skatepark.cover_image.key,
                      size: "160x160",
