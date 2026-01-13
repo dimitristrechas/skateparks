@@ -24,7 +24,7 @@ class LinkButtonComponent < ViewComponent::Base
 
   def state_classes
     if @active
-      'bg-pink-600/90 text-white font-semibold dark:bg-pink-600/75 dark:text-white'
+      'bg-pink-600/85 text-white dark:bg-pink-600/65 dark:text-white'
     else
       ''
     end
