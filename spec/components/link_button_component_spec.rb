@@ -9,7 +9,8 @@ RSpec.describe LinkButtonComponent, type: :component do
   let(:target) { '_self' }
   let(:active) { false }
   let(:ghost) { false }
-  let(:component) { described_class.new(title:, url:, target:, active:, ghost:) }
+  let(:large) { false }
+  let(:component) { described_class.new(title:, url:, target:, active:, ghost:, large:) }
 
   describe '#render' do
     subject(:rendered) { render_inline(component) }
@@ -74,6 +75,53 @@ RSpec.describe LinkButtonComponent, type: :component do
       it 'raises ArgumentError' do
         expect { described_class.new(title:, url:, ghost: true, active: true) }
           .to raise_error(ArgumentError, 'ghost and active cannot both be true')
+      end
+    end
+
+    context 'when large true' do
+      let(:large) { true }
+
+      it 'includes large size classes' do
+        html = rendered.to_html
+        aggregate_failures do
+          expect(html).to include('text-xl')
+          expect(html).to include('px-6')
+          expect(html).to include('py-3')
+        end
+      end
+    end
+
+    context 'with icon_before slot' do
+      it 'renders icon before title' do
+        html = render_inline(component) do |c|
+          c.with_icon_before { '<svg class="test-icon-before"></svg>'.html_safe }
+        end
+
+        expect(html.to_html).to include('test-icon-before')
+        expect(html.css('.flex.items-center.gap-2')).to be_present
+      end
+    end
+
+    context 'with icon_after slot' do
+      it 'renders icon after title' do
+        html = render_inline(component) do |c|
+          c.with_icon_after { '<svg class="test-icon-after"></svg>'.html_safe }
+        end
+
+        expect(html.to_html).to include('test-icon-after')
+      end
+    end
+
+    context 'with both icon slots' do
+      it 'renders both icons in correct order' do
+        html = render_inline(component) do |c|
+          c.with_icon_before { '<svg class="icon-before"></svg>'.html_safe }
+          c.with_icon_after { '<svg class="icon-after"></svg>'.html_safe }
+        end
+
+        content = html.to_html
+        expect(content.index('icon-before')).to be < content.index(title)
+        expect(content.index(title)).to be < content.index('icon-after')
       end
     end
   end

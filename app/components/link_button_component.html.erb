@@ -2,8 +2,12 @@
             target: @target,
             rel: (@target == '_blank' ? 'noopener noreferrer' : nil),
             aria: (@active ? { current: 'page' } : nil),
-            class: [base_classes, state_classes, ghost_classes, @classnames].compact.join(" ") do %>
-  <%= @title %>
+            class: [base_classes, state_classes, ghost_classes, large_classes, @classnames].compact.join(" ") do %>
+  <span class="flex items-center gap-2">
+    <%= icon_before if icon_before? %>
+    <%= @title %>
+    <%= icon_after if icon_after? %>
+  </span>
 
   <% if @target == '_blank' %>
     <span class="sr-only"><%= t('opens_in_new_tab') %></span>
