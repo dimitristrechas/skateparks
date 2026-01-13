@@ -18,7 +18,7 @@ class LinkButtonComponent < ViewComponent::Base
   private
 
   def base_classes
-    'inline-flex items-center rounded-lg py-2 px-4 min-h-11 min-w-11 ' \
+    'inline-flex items-center rounded-lg px-3 min-h-8 min-w-8 ' \
       'hover:outline hover:outline-offset-1 hover:outline-neutral-700 hover:dark:outline-neutral-200'
   end
 
