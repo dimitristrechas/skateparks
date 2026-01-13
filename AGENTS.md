@@ -1,171 +1,161 @@
-## Code Quality Standards
+# AGENTS.md - Agentic Coding Guide
 
-- All generated code must include RSpec tests (use rspec-test-writer agent)
-- All generated code must have zero RuboCop violations (use rubocop-enforcer agent)
-- All generated code must have zero Herb lint and format violations (use frontend-expert agent)
-- Verify generated code compliance with `sh scripts.sh` options in "Tests & Linting & Formatting"
-- Pre-commit hook blocks commits with RuboCop/Herb/Prettier errors
+## Running Tests (Docker required)
 
-## Pre-commit Hook (Lefthook)
+```bash
+# All tests with coverage
+docker compose -f docker-compose.test.yml exec skateparks-web-test bash -c "COVERAGE=true bundle exec rspec"
 
-Runs automatically on `git commit`:
+# Single test file
+docker compose -f docker-compose.test.yml exec skateparks-web-test bundle exec rspec spec/models/skatepark_spec.rb
 
-- rubocop: Checks staged `*.rb` files
-- herb-lint: Lints staged `*.erb` files
-- herb-format: Checks formatting of staged `*.erb` files
-- prettier: Checks staged `*.{js,css,json,md}` files
+# Single test by line number
+docker compose -f docker-compose.test.yml exec skateparks-web-test bundle exec rspec spec/models/skatepark_spec.rb:5
+```
+
+## Linting & Formatting
+
+```bash
+bundle exec rubocop                 # Check Ruby
+bundle exec rubocop -A              # Auto-fix Ruby
+yarn herb:lint                      # Lint ERB
+yarn herb:lint --fix                # Fix ERB lint
+yarn herb:format                    # Format ERB
+yarn prettier:check                 # Check JS/CSS/JSON
+yarn prettier:fix                   # Fix JS/CSS/JSON
+bundle exec brakeman -q --no-pager  # Security scan
+```
+
+## Development Server
+
+```bash
+sh scripts.sh  # Interactive menu for all operations
+docker compose -f docker-compose.development.yml up -d
+docker compose -f docker-compose.development.yml exec skateparks-web bundle exec rails console
+```
+
+## Pre-commit Hooks (Lefthook)
+
+Auto-runs on `git commit` with auto-fix:
+
+- RuboCop: `*.rb` files
+- Herb lint/format: `*.erb` files
+- Prettier: `*.{js,ts,json,css}` files
+- Brakeman: runs on `git push`
+
+## Ruby Style (RuboCop)
+
+```ruby
+# Single quotes unless interpolation
+name = 'skatepark'
+greeting = "Hello, #{name}"
+
+# Trailing commas in multiline
+STATUSES = [
+  :draft,
+  :published,
+]
+
+# Limits: 120 line length, 25 method length, 20 ABC size
+# No frozen_string_literal or class docs required
+```
+
+## RSpec Conventions
+
+```ruby
+require 'rails_helper'
+
+RSpec.describe Skatepark do
+  let(:skatepark) { build(:skatepark) }  # build() unsaved, create() persisted
+
+  describe 'validations' do
+    it 'requires name' do
+      skatepark.name = nil
+      expect(skatepark.save).to be false
+    end
+  end
+end
+# Limits: 5 expectations/example, 10 lines/example, 5 nested groups
+```
+
+## ERB/Views (Herb)
+
+- Indent: 2 spaces, line length: 120 max
+- Tailwind classes auto-sorted
+- No duplicate IDs or attributes
+
+## JavaScript (Stimulus)
+
+```javascript
+import { Controller } from "@hotwired/stimulus";
+
+export default class extends Controller {
+  static targets = ["element"];
+  static values = { url: String };
+  connect() {}
+  handleClick = (event) => {}; // arrow functions for handlers
+}
+```
+
+## Prettier (JS/CSS/JSON)
+
+Print width: 120, tab: 2, semicolons, double quotes, trailing comma: es5
+
+## Models
+
+- Mobility for i18n: `translates :name, type: :string`
+- ActionText: `translates :description, backend: :action_text`
+- Cache invalidation in `after_save`/`after_destroy`
+- Enums: `enum :status, { draft: 0, published: 1 }`
+
+## Controllers
+
+- `before_action` for shared setup
+- `Rails.cache.fetch('key', expires_in: 1.year)`
+- Strong params: `params.expect(model: [:field])`
+
+## ViewComponents
+
+```ruby
+class ButtonComponent < ViewComponent::Base
+  def initialize(title:, form:, type:)
+    super
+    @title, @form, @type = title, form, type
+  end
+end
+```
+
+## Factories (FactoryBot)
+
+```ruby
+FactoryBot.define do
+  factory :skatepark do
+    sequence(:name_en) { |n| "Skatepark #{n}" }
+    status { :published }
+    trait :draft do
+      status { :draft }
+    end
+  end
+end
+```
 
 ## Specialized Agents
 
-Available in `.claude/agents/` for Claude Code and in `.github/agents` for GitHub Copilot:
+In `.claude/agents/` or `.github/agents/`:
 
-- rspec-test-writer: Writing/debugging RSpec tests, FactoryBot factories
-- rubocop-enforcer: RuboCop compliance checking and auto-fixing
-- frontend-expert: Stimulus controllers, Tailwind CSS, ViewComponents
-- rails-backend-architect: Models, controllers, services, database design
-- gem-dependency-manager: Dependency updates, security audits
+- **rspec-test-writer**: RSpec tests, FactoryBot
+- **rubocop-enforcer**: RuboCop compliance
+- **frontend-expert**: Stimulus, Tailwind, ViewComponents, Herb
+- **rails-backend-architect**: Models, controllers, services, DB
+- **gem-dependency-manager**: Dependency updates, security
 
-## Development Commands (`sh scripts.sh`)
+## Tech Stack
 
-Server:
+Rails 8.0, Ruby 3.3.6, PostgreSQL 17, Hotwire (Turbo + Stimulus), Tailwind CSS 4.0, Flowbite, ViewComponent, Sidekiq + Redis, Cloudinary, Mobility (i18n), Kaminari (pagination), ISO3166 (countries)
 
-1. Start dev server
-2. Fresh build & start
-3. Attach to server
-4. Rails console
-5. Docker console
-6. View logs
-7. Stop server
+## Rules
 
-Testing:
-
-8. Start test server
-9. Fresh build & start test
-10. Test console
-11. Test logs
-12. RSpec with coverage
-
-Code Quality:
-
-13. Brakeman security scan
-14. Check Herb format
-15. Run Herb format
-16. Check Herb lint
-17. Run Herb lint auto-fix
-18. Check RuboCop errors
-19. Run RuboCop auto-fix
-20. Check Prettier errors
-21. Run Prettier
-
-Database:
-
-22. Seed database
-23. Reset & migrate
-24. Clear Rails cache
-
-Other:
-
-25. Stop Docker containers
-26. Show Docker status
-
-## Architecture
-
-### Models
-
-- Skatepark: Main entity with i18n (Greek/English via Mobility gem)
-  - Location: lat/lng, country_code, state (ISO3166 gem)
-  - Images: Cloudinary (cover_image + multiple attachments)
-  - Rich text: ActionText descriptions
-  - Status: draft/published/archived enum
-  - URLs: Friendly slug-based
-
-- PopularSkatepark: Featured skateparks with position ordering
-  - belongs_to :skatepark, uniqueness validation
-  - Cache invalidation on save/destroy
-  - Default scope ordered by position
-
-### Controllers
-
-- SkateparksController: Public listing/detail, filtering by country/state
-- HomeController: Static pages (about, contact)
-- Admin::SkateparksController: Admin CRUD
-- Admin::PopularSkateparksController: Featured skateparks management
-- Admin::DashboardController: Admin dashboard
-
-### Views & Components
-
-ViewComponents (app/components/):
-
-- ButtonComponent
-- LinkComponent
-- HomepageSkateparkCardComponent
-- TextFieldComponent
-
-Stimulus Controllers (app/javascript/controllers/):
-
-- header_controller.js
-- skatepark_controller.js
-- admin/skateparks/form_controller.js
-- skateparks/filters_controller.js
-
-### Helpers
-
-- LocaleHelper: I18n utilities, country/state names with flags
-- SchemaHelper: JSON-LD structured data for SEO
-- SkateparksHelper: Skatepark-specific view helpers
-
-### Tech Stack
-
-- Rails 8.0 + Ruby 3.3.6 + PostgreSQL
-- Propshaft (asset pipeline) + Importmap
-- Hotwire: Turbo + Stimulus
-- Tailwind CSS 4.0 + Flowbite
-- ViewComponent: Component-based views
-- Sidekiq + Sidekiq-Cron: Background jobs + scheduling
-- Redis 5.0: Caching + Sidekiq backend
-- Cloudinary: Image storage/processing (ActiveStorage)
-- Kaminari: Pagination
-- Mobility: I18n (Greek/English) + ActionText integration
-- Countries: Country/subdivision data
-- Sitemap Generator: SEO sitemaps
-
-### Testing Infrastructure
-
-- RSpec 8.0: Test framework
-- FactoryBot: Test data factories
-- Faker: Realistic fake data
-- Capybara: System/feature tests
-- Rails Controller Testing: Controller specs
-- SimpleCov: Coverage reports
-- RuboCop: Style enforcement (Rails, RSpec, FactoryBot, Capybara, RSpec Rails)
-- Brakeman: Security scanning
-- Herb Tools: ERB linting + formatting
-- Prettier: JS/CSS/JSON/MD formatting
-- Lefthook: Git hooks
-
-Factories in `spec/factories/`: skateparks.rb, popular_skateparks.rb
-Shared contexts: `spec/support/shared_contexts/admin_auth.rb`
-
-### Data Flow
-
-- Published skateparks only on public pages
-- Country/state filtering with caching
-- Redis caching for popular skateparks list
-- SEO meta tags per skatepark with structured data
-- Emoji flags for location-friendly names
-
-## Environment Setup
-
-1. Clone repo
-2. Get credentials: `config/credentials/{development,production,test}.key`
-3. Copy `.env.example` → `.env` + `.env.test`, set RAILS_MASTER_KEY
-4. `bundle install && yarn install`
-5. `sh scripts.sh` option 2 (fresh build)
-6. Open `localhost:3000`
-7. Optional: seed database (option 17)
-
-Docker-first workflow: All ops via `scripts.sh` interactive menu.
-
-## Generic rules
-
-Do not commit code unless specifically instructed to do so.
+- Do not commit unless explicitly instructed
+- All code must pass RuboCop, Herb lint/format, Prettier checks
+- All code must include RSpec tests
+- Verify with `sh scripts.sh` before committing

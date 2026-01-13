@@ -1,8 +1,8 @@
-class SkateparkCardComponentPreview < ViewComponent::Preview
+class HomepageSkateparkCardComponentPreview < ViewComponent::Preview
   # @label Latest
   def latest
     skatepark = Skatepark.published.with_attached_cover_image.with_attached_images.last
-    render(SkateparkCardComponent.new(skatepark:, badge_type: :latest)) if skatepark
+    render(HomepageSkateparkCardComponent.new(skatepark:, badge_type: :latest)) if skatepark
   end
 
   # @label Popular
