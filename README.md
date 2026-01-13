@@ -13,6 +13,15 @@
 9. Open browser on `localhost:3000`
 10. Optionally seed the database with "Seed the database" option in `./scripts.sh`
 
+### MCP Secrets (OpenCode)
+
+MCP integrations in `opencode.json` use tokens stored in `.secrets/`:
+1. `mkdir .secrets`
+2. Add token files (raw token, no extension):
+   - `.secrets/github-mcp-token`
+   - `.secrets/linear-token`
+3. Folder is gitignored
+
 ### How to run tests
 
 1. `./scripts.sh`

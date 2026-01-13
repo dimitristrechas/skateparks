@@ -51,4 +51,6 @@ node_modules
 /coverage/
 /spec/examples.txt
 .DS_Store
-opencode.json
+
+# OpenCode secrets
+.secrets/
