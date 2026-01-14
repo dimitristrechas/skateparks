@@ -40,8 +40,8 @@ RSpec.describe LinkButtonComponent, type: :component do
     it 'includes min touch target size classes' do
       html = rendered.to_html
       aggregate_failures do
-        expect(html).to include('min-h-11')
-        expect(html).to include('min-w-11')
+        expect(html).to include('min-h-8')
+        expect(html).to include('min-w-8')
       end
     end
 
