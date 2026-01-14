@@ -7,10 +7,10 @@ RSpec.describe LinkButtonComponent, type: :component do
   let(:title) { 'Explore' }
   let(:url) { '/explore' }
   let(:target) { '_self' }
-  let(:active) { false }
+  let(:current) { false }
   let(:ghost) { false }
   let(:large) { false }
-  let(:component) { described_class.new(title:, url:, target:, active:, ghost:, large:) }
+  let(:component) { described_class.new(title:, url:, target:, current:, ghost:, large:) }
 
   describe '#render' do
     subject(:rendered) { render_inline(component) }
@@ -22,8 +22,8 @@ RSpec.describe LinkButtonComponent, type: :component do
       end
     end
 
-    context 'when active true' do
-      let(:active) { true }
+    context 'when current true' do
+      let(:current) { true }
 
       it 'adds aria-current=page' do
         expect(rendered).to have_css("a[aria-current='page']")
@@ -71,10 +71,31 @@ RSpec.describe LinkButtonComponent, type: :component do
       end
     end
 
-    context 'when ghost and active both true' do
+    context 'when ghost and current both true' do
       it 'raises ArgumentError' do
-        expect { described_class.new(title:, url:, ghost: true, active: true) }
-          .to raise_error(ArgumentError, 'ghost and active cannot both be true')
+        expect { described_class.new(title:, url:, ghost: true, current: true) }
+          .to raise_error(ArgumentError, 'only one of ghost, contained, current can be true')
+      end
+    end
+
+    context 'when ghost and contained both true' do
+      it 'raises ArgumentError' do
+        expect { described_class.new(title:, url:, ghost: true, contained: true) }
+          .to raise_error(ArgumentError, 'only one of ghost, contained, current can be true')
+      end
+    end
+
+    context 'when current and contained both true' do
+      it 'raises ArgumentError' do
+        expect { described_class.new(title:, url:, current: true, contained: true) }
+          .to raise_error(ArgumentError, 'only one of ghost, contained, current can be true')
+      end
+    end
+
+    context 'when ghost, contained, and current all true' do
+      it 'raises ArgumentError' do
+        expect { described_class.new(title:, url:, ghost: true, contained: true, current: true) }
+          .to raise_error(ArgumentError, 'only one of ghost, contained, current can be true')
       end
     end
 

@@ -5,7 +5,7 @@
         <%= render LinkButtonComponent.new(
           title: LOCALES[locale],
           url: url_for({ locale: locale, country_code: params[:country_code], state: params[:state], page: params[:page] }.compact),
-          active: I18n.locale == locale
+          current: I18n.locale == locale
         ) %>
       </li>
     <% end %>

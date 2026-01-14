@@ -1,8 +1,8 @@
 <%= link_to @url,
             target: @target,
             rel: (@target == '_blank' ? 'noopener noreferrer' : nil),
-            aria: (@active ? { current: 'page' } : nil),
-            class: class_names(base_classes, state_classes, ghost_classes, large_classes, @classnames) do %>
+            aria: (@current ? { current: 'page' } : nil),
+            class: class_names(base_classes, current_classes, contained_classes, ghost_classes, large_classes, @classnames) do %>
   <span class="flex items-center text-center gap-2">
     <%= icon_before if icon_before? %>
     <%= @title %>

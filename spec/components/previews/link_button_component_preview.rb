@@ -4,9 +4,14 @@ class LinkButtonComponentPreview < ViewComponent::Preview
     render(LinkButtonComponent.new(title: 'Click me', url: '#'))
   end
 
-  # @label Active
-  def active
-    render(LinkButtonComponent.new(title: 'Current Page', url: '#', active: true))
+  # @label Current
+  def current
+    render(LinkButtonComponent.new(title: 'Current Page', url: '#', current: true))
+  end
+
+  # @label Contained
+  def contained
+    render(LinkButtonComponent.new(title: 'Contained Button', url: '#', contained: true))
   end
 
   # @label Ghost

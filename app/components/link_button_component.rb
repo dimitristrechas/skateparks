@@ -3,10 +3,12 @@ class LinkButtonComponent < ViewComponent::Base
   renders_one :icon_after
 
   def initialize(title:, url:, **options)
-    @active = options.fetch(:active, false)
+    @current = options.fetch(:current, false)
+    @contained = options.fetch(:contained, false)
     @ghost = options.fetch(:ghost, false)
     @large = options.fetch(:large, false)
-    raise ArgumentError, 'ghost and active cannot both be true' if @ghost && @active
+    styles = { ghost: @ghost, contained: @contained, current: @current }.select { |_, v| v }
+    raise ArgumentError, 'only one of ghost, contained, current can be true' if styles.size > 1
 
     super
     @title = title
@@ -22,12 +24,16 @@ class LinkButtonComponent < ViewComponent::Base
       'hover:outline hover:outline-offset-1 hover:outline-neutral-700 hover:dark:outline-neutral-200'
   end
 
-  def state_classes
-    if @active
-      'bg-pink-600/85 text-white dark:bg-pink-600/65 dark:text-white'
-    else
-      ''
-    end
+  def current_classes
+    return '' unless @current
+
+    'underline underline-offset-2'
+  end
+
+  def contained_classes
+    return '' unless @contained
+
+    'bg-pink-600/85 text-white dark:bg-pink-600/65 dark:text-white'
   end
 
   def ghost_classes
