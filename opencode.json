@@ -3,30 +3,35 @@
     "frontend-expert": {
       "description": "Use this agent when working on frontend tasks including: JavaScript/Stimulus controllers, Hotwire/Turbo functionality, HTML templates, CSS/Tailwind styling, ViewComponents, accessibility improvements, responsive design, or any client-side code.",
       "mode": "subagent",
+      "temperature": 0.1,
       "model": "github-copilot/claude-opus-4.5",
       "prompt": "{file:./.claude/agents/frontend-expert.md}"
     },
     "gem-dependency-manager": {
       "description": "Use this agent when: adding/updating gems in Gemfile, reviewing security vulnerabilities, planning dependency updates, investigating outdated packages, or before production deployments to check dependency health.",
       "mode": "subagent",
+      "temperature": 0.1,
       "model": "github-copilot/claude-opus-4.5",
       "prompt": "{file:./.claude/agents/gem-dependency-manager.md}"
     },
     "rails-backend-architect": {
       "description": "Use this agent when: backend architecture decisions needed, database schema design/optimization, Rails model/controller/service implementation, background job setup, caching strategy, API design, performance optimization, SOLID violations, ActiveRecord queries, Redis integration, database migrations, test coverage for backend logic.",
       "mode": "subagent",
+      "temperature": 0.1,
       "model": "github-copilot/claude-opus-4.5",
       "prompt": "{file:./.claude/agents/rails-backend-architect.md}"
     },
     "rspec-test-writer": {
       "description": "Use this agent when writing new RSpec tests, debugging failing specs, refactoring tests, adding test coverage, setting up FactoryBot factories, implementing mocking/stubbing, or writing Capybara system tests.",
       "mode": "subagent",
+      "temperature": 0.1,
       "model": "github-copilot/claude-opus-4.5",
       "prompt": "{file:./.claude/agents/rspec-test-writer.md}"
     },
     "rubocop-enforcer": {
       "description": "Use this agent when checking Ruby/Rails code style, fixing RuboCop violations, requesting code quality analysis, or ensuring code follows project standards after implementing features.",
       "mode": "subagent",
+      "temperature": 0.1,
       "model": "github-copilot/claude-opus-4.5",
       "prompt": "{file:./.claude/agents/rubocop-enforcer.md}"
     }
