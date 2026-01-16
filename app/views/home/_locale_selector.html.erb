@@ -2,11 +2,7 @@
   <ul class="flex gap-4">
     <% I18n.available_locales.each do |locale| %>
       <li>
-        <%= render LinkButtonComponent.new(
-          title: LOCALES[locale],
-          url: url_for({ locale: locale, country_code: params[:country_code], state: params[:state], page: params[:page] }.compact),
-          current: I18n.locale == locale
-        ) %>
+        <%= render LinkComponent.new(title: LOCALES[locale], url: url_for({ locale: locale, country_code: params[:country_code], state: params[:state], page: params[:page] }.compact), current: I18n.locale == locale) %>
       </li>
     <% end %>
   </ul>

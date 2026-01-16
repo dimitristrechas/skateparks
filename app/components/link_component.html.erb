@@ -1,4 +1,11 @@
-<%= link_to @title,
-            @url,
+<%= link_to @url,
             target: @target,
-            class: ("text-blue-700 dark:text-blue-400 hover:underline " + @classnames.to_s).rstrip %>
+            rel: (@target == '_blank' ? 'noopener noreferrer' : nil),
+            aria: (@current ? { current: 'page' } : nil),
+            class: class_names(base_classes, current_classes, @classnames) do %>
+  <%= @title %>
+
+  <% if @target == '_blank' %>
+    <span class="sr-only"><%= t('opens_in_new_tab') %></span>
+  <% end %>
+<% end %>
