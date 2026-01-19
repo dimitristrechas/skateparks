@@ -1,13 +1,13 @@
-<header data-controller="header" class="mb-12 flex items-start gap-2 lg:mb-20">
-  <%= link_to root_path do %>
+<header data-controller="header" class="mb-8 sm:mb-12 flex flex-wrap items-start gap-2 lg:mb-20">
+  <%= link_to root_path, class: 'order-1 sm:order-0 mx-auto sm:mx-0' do %>
     <%= image_tag(
       "skateparks-logo-2.png",
       alt: "skateparks.gr logo",
-      class: "h-12 sm:h-24 md:h-32 w-auto dark:drop-shadow-[0_0_3px_rgba(255,255,255,1)]",
+      class: "max-w-110 h-auto sm:h-22 sm:w-auto dark:drop-shadow-[0_0_3px_rgba(255,255,255,1)]",
     ) %>
   <% end %>
 
-  <div class="item ms-auto flex sm:gap-4">
+  <div class="order-0 item ms-auto flex gap-2 sm:gap-4">
     <%= render "home/locale_selector" %>
     <%= render "home/dark_mode_switch" %>
   </div>
