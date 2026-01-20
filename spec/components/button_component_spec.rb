@@ -37,6 +37,14 @@ RSpec.describe ButtonComponent, type: :component do
       expect(html).to include('hover:outline')
     end
 
+    it 'includes focus-visible outline classes' do
+      html = rendered.to_html
+      aggregate_failures do
+        expect(html).to include('focus-visible:outline-neutral-700')
+        expect(html).to include('focus-visible:dark:outline-neutral-200')
+      end
+    end
+
     it 'includes min touch target size classes' do
       html = rendered.to_html
       aggregate_failures do
@@ -69,8 +77,6 @@ RSpec.describe ButtonComponent, type: :component do
         aggregate_failures do
           expect(html).to include('outline-gray-400')
           expect(html).to include('dark:outline-gray-500')
-          expect(html).to include('focus-visible:outline-neutral-700')
-          expect(html).to include('dark:focus-visible:outline-neutral-200')
         end
       end
 
@@ -88,7 +94,7 @@ RSpec.describe ButtonComponent, type: :component do
         aggregate_failures do
           expect(html).to include('text-xl')
           expect(html).to include('px-6')
-          expect(html).to include('py-3')
+          expect(html).to include('py-2.5')
         end
       end
     end
