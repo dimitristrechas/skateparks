@@ -46,6 +46,6 @@ class LinkButtonComponent < ViewComponent::Base
   def large_classes
     return '' unless @large
 
-    'text-xl px-6 py-3'
+    'text-xl px-6 py-2.5'
   end
 end
