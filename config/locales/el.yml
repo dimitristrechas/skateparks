@@ -26,6 +26,7 @@ el:
   contact_details: "Contact"
   search: "Αναζήτηση"
   reset_filters: "Επαναφορά"
+  filters: "Φίλτρα"
   all_countries: "Όλες"
   all_states: "Όλες"
   explore_all_skateparks: "Εξερεύνησε Skateparks στην Ελλάδα & τον Κόσμο"

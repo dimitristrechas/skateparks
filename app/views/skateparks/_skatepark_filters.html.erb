@@ -1,12 +1,33 @@
-<%= form_with url: skateparks_path, method: :get, class: 'flex flex-wrap items-end gap-4 mb-12', data: {
-  controller: 'skateparks--filters'
-} do |form| %>
-  <%= form.hidden_field :locale, value: I18n.locale %>
-  <%= render "country_select", countries: @countries %>
-  <%= render "state_select", states: @states %>
+<details open class="mb-12 group" data-controller="skateparks--filters">
+  <summary
+    class="
+      w-fit cursor-pointer list-none flex items-center gap-2 mb-2 sm:mb-4 font-medium select-none
+      focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-700
+      dark:focus-visible:outline-neutral-200 [&::-webkit-details-marker]:hidden
+    "
+  >
+    <svg
+      class="size-5 transition-transform group-open:rotate-90"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      stroke-width="2"
+      aria-hidden="true"
+    >
+      <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+    </svg>
 
-  <div class="ms-auto lg:ms-0 flex items-center gap-4 xl:gap-6">
-    <%= render LinkButtonComponent.new(title: t("reset_filters"), url: skateparks_path, large: true) %>
-    <%= render ButtonComponent.new(title: t("search"), type: :submit, form:, large: true) %>
-  </div>
-<% end %>
+    <%= t("filters") %>
+  </summary>
+
+  <%= form_with url: skateparks_path, method: :get, class: "flex flex-col md:flex-row md:items-end gap-6" do |form| %>
+    <%= form.hidden_field :locale, value: I18n.locale %>
+    <%= render "country_select", countries: @countries %>
+    <%= render "state_select", states: @states %>
+
+    <div class="flex items-center gap-4 ms-auto md:ms-0">
+      <%= render LinkButtonComponent.new(title: t("reset_filters"), url: skateparks_path, large: true) %>
+      <%= render ButtonComponent.new(title: t("search"), type: :submit, form:, large: true) %>
+    </div>
+  <% end %>
+</details>
