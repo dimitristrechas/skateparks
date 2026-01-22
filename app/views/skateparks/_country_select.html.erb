@@ -1,17 +1,11 @@
 <div class="flex flex-col items-start gap-1" id="country_select">
   <%= label_tag :country_code, t("country"), class: "block" %>
 
-  <%= select_tag :country_code,
-  options_for_select(
-    [[t("all_countries"), ""]] +
-      countries.map { |c| [c.translations[I18n.locale], c.alpha2] },
-    params[:country_code],
-  ),
-  {
-    class:
-      "w-full md:w-56 bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500",
-    data: {
-      "skateparks--filters-target": "countrySelect",
-    },
-  } %>
+  <%= render SelectComponent.new(
+    name: :country_code,
+    options: [[t("all_countries"), ""]] + countries.map { |c| [c.translations[I18n.locale], c.alpha2] },
+    selected: params[:country_code],
+    large: true,
+    data: { "skateparks--filters-target": "countrySelect" }
+  ) %>
 </div>

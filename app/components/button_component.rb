@@ -14,7 +14,7 @@ class ButtonComponent < ViewComponent::Base
     'inline-flex items-center rounded-lg px-3 min-h-8 min-w-8 ' \
       'hover:outline hover:outline-offset-1 hover:outline-neutral-700 hover:dark:outline-neutral-200 ' \
       'focus-visible:outline focus-visible:outline-offset-1 focus-visible:outline-neutral-700 ' \
-      'focus-visible:dark:outline-neutral-200'
+      'focus-visible:dark:outline-neutral-200 cursor-pointer'
   end
 
   def default_classes
@@ -32,7 +32,7 @@ class ButtonComponent < ViewComponent::Base
   def large_classes
     return '' unless @large
 
-    'text-xl px-6 py-2.5'
+    'px-6 py-2.5'
   end
 
   def button_classes

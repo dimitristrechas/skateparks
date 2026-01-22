@@ -105,7 +105,6 @@ RSpec.describe LinkButtonComponent, type: :component do
       it 'includes large size classes' do
         html = rendered.to_html
         aggregate_failures do
-          expect(html).to include('text-xl')
           expect(html).to include('px-6')
           expect(html).to include('py-2.5')
         end

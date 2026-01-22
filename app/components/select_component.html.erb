@@ -1,0 +1,8 @@
+<%= select_tag @name,
+    options_for_select(@options, @selected),
+    id: @id,
+    disabled: @disabled,
+    required: @required,
+    class: select_classes,
+    **aria_attributes,
+    **@html_options %>

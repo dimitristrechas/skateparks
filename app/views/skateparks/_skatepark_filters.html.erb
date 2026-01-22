@@ -26,7 +26,7 @@
     <%= render "state_select", states: @states %>
 
     <div class="flex items-center gap-4 ms-auto md:ms-0">
-      <%= render LinkButtonComponent.new(title: t("reset_filters"), url: skateparks_path, large: true) %>
+      <%= render LinkButtonComponent.new(title: t("reset_filters"), url: skateparks_path) %>
       <%= render ButtonComponent.new(title: t("search"), type: :submit, form:, large: true) %>
     </div>
   <% end %>
