@@ -2,7 +2,7 @@
   <%= render(SelectComponent.new(
     name: :country,
     options: [['Select a country', ''], ['United States', 'us'], ['Canada', 'ca'], ['Mexico', 'mx']],
-    aria_describedby: 'country-help'
+    aria: { describedby: 'country-help' }
   )) %>
 
   <p id="country-help" class="mt-1 text-sm text-neutral-500">

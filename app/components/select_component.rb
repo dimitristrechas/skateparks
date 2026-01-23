@@ -1,8 +1,7 @@
 class SelectComponent < ViewComponent::Base
   # rubocop:disable Metrics/ParameterLists
   def initialize(name:, options:, selected: nil, disabled: false, large: false,
-                 id: nil, required: false, aria_label: nil, aria_describedby: nil,
-                 aria_required: nil, aria_invalid: nil, **html_options)
+                 id: nil, required: false, aria: {}, **html_options)
     super
     @name = name
     @options = options
@@ -11,10 +10,7 @@ class SelectComponent < ViewComponent::Base
     @large = large
     @id = id
     @required = required
-    @aria_label = aria_label
-    @aria_describedby = aria_describedby
-    @aria_required = aria_required
-    @aria_invalid = aria_invalid
+    @aria = aria
     @html_options = html_options
   end
   # rubocop:enable Metrics/ParameterLists
@@ -42,10 +38,10 @@ class SelectComponent < ViewComponent::Base
 
   def aria_attributes
     {}.tap do |attrs|
-      attrs['aria-label'] = @aria_label if @aria_label
-      attrs['aria-describedby'] = @aria_describedby if @aria_describedby
-      attrs['aria-invalid'] = @aria_invalid.to_s if @aria_invalid
-      aria_req = @aria_required.nil? ? @required : @aria_required
+      attrs['aria-label'] = @aria[:label] if @aria[:label]
+      attrs['aria-describedby'] = @aria[:describedby] if @aria[:describedby]
+      attrs['aria-invalid'] = @aria[:invalid].to_s if @aria[:invalid]
+      aria_req = @aria[:required].nil? ? @required : @aria[:required]
       attrs['aria-required'] = aria_req.to_s if aria_req
     end
   end

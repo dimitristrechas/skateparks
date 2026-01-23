@@ -131,7 +131,7 @@ RSpec.describe SelectComponent, type: :component do
     end
 
     context 'with aria-label' do
-      let(:component) { described_class.new(name:, options:, aria_label: 'Select your country') }
+      let(:component) { described_class.new(name:, options:, aria: { label: 'Select your country' }) }
 
       it 'renders aria-label attribute' do
         expect(rendered).to have_css('select[aria-label="Select your country"]')
@@ -139,7 +139,7 @@ RSpec.describe SelectComponent, type: :component do
     end
 
     context 'with aria-describedby' do
-      let(:component) { described_class.new(name:, options:, aria_describedby: 'country-help') }
+      let(:component) { described_class.new(name:, options:, aria: { describedby: 'country-help' }) }
 
       it 'renders aria-describedby attribute' do
         expect(rendered).to have_css('select[aria-describedby="country-help"]')
@@ -147,7 +147,7 @@ RSpec.describe SelectComponent, type: :component do
     end
 
     context 'with explicit aria-required' do
-      let(:component) { described_class.new(name:, options:, aria_required: true) }
+      let(:component) { described_class.new(name:, options:, aria: { required: true }) }
 
       it 'renders aria-required attribute' do
         expect(rendered).to have_css('select[aria-required="true"]')
@@ -155,7 +155,7 @@ RSpec.describe SelectComponent, type: :component do
     end
 
     context 'with aria-invalid' do
-      let(:component) { described_class.new(name:, options:, aria_invalid: true) }
+      let(:component) { described_class.new(name:, options:, aria: { invalid: true }) }
 
       it 'renders aria-invalid attribute' do
         expect(rendered).to have_css('select[aria-invalid="true"]')
