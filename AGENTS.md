@@ -6,6 +6,11 @@ Rails 8.0 skatepark directory app (Ruby 3.3.6, PostgreSQL 17, Hotwire, Tailwind 
 
 ```bash
 sh scripts.sh                       # Interactive menu (dev, test, lint)
+
+# Run tests (MUST use Docker - local will fail)
+docker compose -f docker-compose.test.yml exec skateparks-web-test bundle exec rspec spec/path/to_spec.rb
+
+# Linting (can run locally)
 bundle exec rubocop -A              # Auto-fix Ruby
 yarn herb:lint --fix && yarn herb:format  # Fix ERB
 ```
