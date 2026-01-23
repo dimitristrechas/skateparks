@@ -31,6 +31,20 @@ RSpec.describe Admin::SkateparksController do
       expect(response).to be_successful
       expect(assigns(:skateparks)).to include(skatepark)
     end
+
+    context 'ordering' do
+      before do
+        create(:skatepark, name_en: 'Zebra Park', name_el: 'Zebra Park')
+        create(:skatepark, name_en: 'Alpha Park', name_el: 'Alpha Park')
+        create(:skatepark, name_en: 'Middle Park', name_el: 'Middle Park')
+      end
+
+      it 'returns skateparks in alphabetical order by name' do
+        get :index
+        names = assigns(:skateparks).map(&:name)
+        expect(names).to eq(names.sort)
+      end
+    end
   end
 
   describe 'GET #show' do

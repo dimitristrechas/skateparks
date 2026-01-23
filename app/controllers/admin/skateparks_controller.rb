@@ -7,7 +7,7 @@ module Admin
 
     # GET /skateparks or /skateparks.json
     def index
-      @skateparks = Skatepark.all
+      @skateparks = Skatepark.i18n.order(:name)
     end
 
     # GET /skateparks/1 or /skateparks/1.json

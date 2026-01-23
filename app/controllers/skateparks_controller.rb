@@ -39,7 +39,7 @@ class SkateparksController < ApplicationController
     skateparks = Skatepark.published
     skateparks = skateparks.where(country_code: params[:country_code]) if params[:country_code].present?
     skateparks = skateparks.where(state: params[:state]) if params[:state].present? && params[:country_code].present?
-    skateparks
+    skateparks.i18n.order(:name)
   end
 
   def cached_countries
