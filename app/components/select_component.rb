@@ -22,7 +22,7 @@ class SelectComponent < ViewComponent::Base
   private
 
   def base_classes
-    'w-full md:w-56 rounded-lg border block ' \
+    'w-full md:w-56 rounded-lg border block shadow-none focus:shadow-none focus:ring-0 ' \
       'bg-white border-neutral-300 ' \
       'dark:bg-neutral-700 dark:border-neutral-600 ' \
       'focus-visible:outline focus-visible:outline-offset-1 focus-visible:outline-neutral-700 ' \
