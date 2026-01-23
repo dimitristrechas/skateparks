@@ -1,5 +1,4 @@
-<%= render(TitleComponent.new(title: "Edit #{@skatepark.name}")) %>
-
+<h1 class="mb-8 text-3xl font-bold">Edit <%= @skatepark.name %></h1>
 <%= render "form", skatepark: @skatepark %>
 
 <div class="flex"><%= render(
