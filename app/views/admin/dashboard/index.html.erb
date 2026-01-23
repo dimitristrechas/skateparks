@@ -1,17 +1,17 @@
-<div class="mx-auto max-w-4xl p-8">
-  <%= render TitleComponent.new(title: "Dashboard", classnames: "mb-8") %>
+<h1 class="mb-8 text-3xl font-bold">Dashboard</h1>
 
-  <div class="space-y-4">
-    <%= render LinkComponent.new(
+<div class="flex flex-col md:flex-row gap-4">
+  <%= render LinkButtonComponent.new(
       title: "Manage Skateparks",
       url: admin_skateparks_path,
-      classnames: "!text-gray-900 !no-underline block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100"
+      large: true,
+      ghost: true
     ) %>
 
-    <%= render LinkComponent.new(
+  <%= render LinkButtonComponent.new(
       title: "Manage Popular Skateparks",
       url: admin_popular_skateparks_path,
-      classnames: "!text-gray-900 !no-underline block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100"
+      large: true,
+      ghost: true
     ) %>
-  </div>
 </div>
