@@ -68,15 +68,23 @@
     <%= favicon_link_tag asset_path("favicon/favicon.ico") %>
 
     <script>
-      if (
-        localStorage.theme === "dark" ||
-        (!("theme" in localStorage) &&
-          window.matchMedia("(prefers-color-scheme: dark)").matches)
-      ) {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
+      function applyTheme() {
+        if (
+          localStorage.theme === "dark" ||
+          (!("theme" in localStorage) &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches)
+        ) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
       }
+
+      applyTheme();
+
+      window.addEventListener('pageshow', (e) => {
+          if (e.persisted) applyTheme();
+      })
     </script>
 
     <% if Rails.env.production? && !request.path.start_with?("/admin") %>
