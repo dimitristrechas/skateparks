@@ -36,7 +36,7 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - RAILS_MASTER_KEY=${RAILS_MASTER_KEY}
       - REDIS_URL=${REDIS_URL}
-      - PORT=${PORT:-3000}
+      - PORT=${PORT:-3002}
     volumes:
       - app-storage:/rails/storage
       - ${CODEBASE_VOLUME}:/rails
@@ -44,7 +44,7 @@ services:
       - skateparks-db
       - skateparks-redis
     ports:
-      - "3000:3000"
+      - "3002:3002"
 
 volumes:
   postgres_data: {}
