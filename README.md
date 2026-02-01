@@ -12,6 +12,9 @@
 8. `./scripts.sh`, select option "Fresh build & start development server" to build the docker containers from scratch
 9. Open browser on `localhost:3002`
 10. Optionally seed the database with "Seed the database" option in `./scripts.sh`
+11. Optionally set MCP token environment variables in shell profile (~/.zshrc or ~/.bashrc):
+    - `export GITHUB_MCP_TOKEN=<your-token>`
+    - `export LINEAR_TOKEN=<your-token>`
 
 ### MCP Secrets (OpenCode)
 

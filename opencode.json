@@ -42,7 +42,7 @@
       "url": "https://api.githubcopilot.com/mcp/",
       "enabled": false,
       "headers": {
-        "Authorization": "Bearer {file:./.secrets/github-mcp-token}"
+        "Authorization": "Bearer {env:GITHUB_MCP_TOKEN}"
       }
     },
     "linear": {
@@ -50,7 +50,7 @@
       "url": "https://mcp.linear.app/mcp",
       "enabled": true,
       "headers": {
-        "Authorization": "Bearer {file:./.secrets/linear-token}"
+        "Authorization": "Bearer {env:LINEAR_MCP_TOKEN}"
       }
     }
   },
