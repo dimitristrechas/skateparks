@@ -14,7 +14,7 @@
 10. Optionally seed the database with "Seed the database" option in `./scripts.sh`
 11. Optionally set MCP token environment variables in shell profile (~/.zshrc or ~/.bashrc):
     - `export GITHUB_MCP_TOKEN=<your-token>`
-    - `export LINEAR_TOKEN=<your-token>`
+    - `export LINEAR_MCP_TOKEN=<your-token>`
 
 ### MCP Secrets (OpenCode)
 
