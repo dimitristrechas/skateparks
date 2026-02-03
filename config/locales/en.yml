@@ -8,6 +8,13 @@ en:
   back_to_skateparks: "Back to all skateparks"
   open_in_google_maps: "Open skatepark in google maps"
   delete_confirm: "Are you sure?"
+  image_gallery: "Image gallery"
+  gallery_image_announcement: "Image %{current} of %{total}"
+  view_image_in_gallery: "View image %{number} in gallery"
+  previous_image: "Previous image"
+  next_image: "Next image"
+  close_gallery: "Close gallery"
+  go_to_image: "Go to image %{number}"
   skatepark:
     name: "Name"
     images: "Images"

@@ -3,17 +3,20 @@ import { Controller } from "@hotwired/stimulus";
 const swipeThreshold = 50;
 
 export default class extends Controller {
-  static targets = ["container", "previewImage", "gallery", "galleryImage", "galleryImageIndicator"];
+  static targets = ["container", "previewImage", "gallery", "galleryImage", "galleryImageIndicator", "announcer"];
 
   static values = {
     lat: String,
     lng: String,
+    announcementPattern: String,
   };
 
   connect() {
     this.imageIndexOpened = 0;
     this.touchstartX = 0;
     this.touchstartY = 0;
+    this.lastFocusedElement = null;
+    this.focusableElements = null;
 
     import("leaflet").then(({ Map, TileLayer, Marker }) => {
       this.map = new Map(this.containerTarget, {
@@ -27,26 +30,18 @@ export default class extends Controller {
 
       new Marker([this.latValue, this.lngValue]).addTo(this.map);
     });
-
-    document.addEventListener("click", (event) => {
-      // Check if click target is the modal element itself
-      const isModal = event.target === this.galleryTarget;
-
-      // If clicked outside or on padding, call the callback function
-      if (!isModal && !this.galleryTarget.contains(event.target)) {
-        // console.log("outside");
-      }
-    });
   }
 
-  galleryTargetConnected(element) {
+  galleryTargetConnected() {
     document.addEventListener("keydown", this.modalKeysHandler);
+    document.addEventListener("keydown", this.focusTrapHandler);
     document.addEventListener("touchstart", this.galleryTouchStartHandler);
     document.addEventListener("touchend", this.galleryTouchEndHandler);
   }
 
   galleryTargetDisconnected() {
     document.removeEventListener("keydown", this.modalKeysHandler);
+    document.removeEventListener("keydown", this.focusTrapHandler);
     document.removeEventListener("touchstart", this.galleryTouchStartHandler);
     document.removeEventListener("touchend", this.galleryTouchEndHandler);
   }
@@ -62,8 +57,10 @@ export default class extends Controller {
   }
 
   onImageClick(event) {
+    this.lastFocusedElement = event.currentTarget;
+
     this.previewImageTargets.forEach((img, idx) => {
-      if (img.id === event.target.id) {
+      if (img.id === event.currentTarget.id) {
         this.imageIndexOpened = idx;
       }
     });
@@ -73,11 +70,46 @@ export default class extends Controller {
 
     this.showGalleryImage(this.imageIndexOpened);
     window.document.body.classList.add("overflow-hidden");
+
+    requestAnimationFrame(() => {
+      this.setupFocusTrap();
+      this.focusFirstModalElement();
+    });
   }
 
-  onPreviousGalleryImage(event) {
+  setupFocusTrap() {
+    const focusableSelectors = 'button:not([disabled]), [tabindex]:not([tabindex="-1"])';
+    this.focusableElements = Array.from(this.galleryTarget.querySelectorAll(focusableSelectors)).filter(
+      (element) => element.getClientRects().length > 0
+    );
+  }
+
+  focusFirstModalElement() {
+    if (this.focusableElements && this.focusableElements.length > 0) {
+      this.focusableElements[0].focus();
+    }
+  }
+
+  focusTrapHandler = (event) => {
+    if (event.key !== "Tab" || !this.focusableElements || this.focusableElements.length === 0) {
+      return;
+    }
+
+    const firstElement = this.focusableElements[0];
+    const lastElement = this.focusableElements[this.focusableElements.length - 1];
+
+    if (event.shiftKey && document.activeElement === firstElement) {
+      event.preventDefault();
+      lastElement.focus();
+    } else if (!event.shiftKey && document.activeElement === lastElement) {
+      event.preventDefault();
+      firstElement.focus();
+    }
+  };
+
+  onPreviousGalleryImage() {
     this.hideGalleryImage(this.imageIndexOpened);
-    if (this.imageIndexOpened == 0) {
+    if (this.imageIndexOpened === 0) {
       this.imageIndexOpened = this.galleryImageTargets.length - 1;
     } else {
       this.imageIndexOpened--;
@@ -85,9 +117,9 @@ export default class extends Controller {
     this.showGalleryImage(this.imageIndexOpened);
   }
 
-  onNextGalleryImage(event) {
+  onNextGalleryImage() {
     this.hideGalleryImage(this.imageIndexOpened);
-    if (this.imageIndexOpened == this.galleryImageTargets.length - 1) {
+    if (this.imageIndexOpened === this.galleryImageTargets.length - 1) {
       this.imageIndexOpened = 0;
     } else {
       this.imageIndexOpened++;
@@ -97,14 +129,20 @@ export default class extends Controller {
 
   showGalleryImage(idx) {
     this.galleryImageTargets[idx].classList.remove("hidden");
-    this.galleryImageIndicatorTargets[idx].classList.remove("opacity-25");
-    this.galleryImageIndicatorTargets[idx].classList.add("opacity-100");
+    this.galleryImageIndicatorTargets[idx].classList.remove("opacity-50");
+    this.galleryImageIndicatorTargets[idx].classList.add("opacity-100", "scale-125");
+
+    if (this.hasAnnouncerTarget && this.hasAnnouncementPatternValue) {
+      this.announcerTarget.textContent = this.announcementPatternValue
+        .replace("{current}", idx + 1)
+        .replace("{total}", this.galleryImageTargets.length);
+    }
   }
 
   hideGalleryImage(idx) {
     this.galleryImageTargets[idx].classList.add("hidden");
-    this.galleryImageIndicatorTargets[idx].classList.add("opacity-25");
-    this.galleryImageIndicatorTargets[idx].classList.remove("opacity-100");
+    this.galleryImageIndicatorTargets[idx].classList.add("opacity-50");
+    this.galleryImageIndicatorTargets[idx].classList.remove("opacity-100", "scale-125");
   }
 
   onModalClose() {
@@ -112,11 +150,11 @@ export default class extends Controller {
   }
 
   modalKeysHandler = (event) => {
-    if (event.keyCode == 27) {
+    if (event.keyCode === 27) {
       this.onModalClose();
-    } else if (event.code == "ArrowRight") {
+    } else if (event.code === "ArrowRight") {
       this.onNextGalleryImage();
-    } else if (event.code == "ArrowLeft") {
+    } else if (event.code === "ArrowLeft") {
       this.onPreviousGalleryImage();
     }
   };
@@ -147,6 +185,7 @@ export default class extends Controller {
   disconnect() {
     this.map.remove();
     document.removeEventListener("keydown", this.modalKeysHandler);
+    document.removeEventListener("keydown", this.focusTrapHandler);
     document.removeEventListener("touchstart", this.galleryTouchStartHandler);
     document.removeEventListener("touchend", this.galleryTouchEndHandler);
     this.hideModalElements();
@@ -156,12 +195,15 @@ export default class extends Controller {
     this.galleryTarget.classList.add("hidden");
     this.galleryTarget.classList.remove("flex");
     this.galleryImageTargets.forEach((img) => img.classList.add("hidden"));
-    this.galleryImageIndicatorTargets.forEach((img) =>
-      img.classList.add("opacity-25", "w-4", "h-4", "lg:w-5", "lg:h-5")
-    );
-    this.galleryImageIndicatorTargets.forEach((img) =>
-      img.classList.remove("opacity-100", "w-5", "h-5", "lg:w-6", "lg:h-6")
-    );
+    this.galleryImageIndicatorTargets.forEach((img) => img.classList.add("opacity-50"));
+    this.galleryImageIndicatorTargets.forEach((img) => img.classList.remove("opacity-100", "scale-125"));
     window.document.body.classList.remove("overflow-hidden");
+
+    if (this.lastFocusedElement) {
+      this.lastFocusedElement.focus();
+      this.lastFocusedElement = null;
+    }
+
+    this.focusableElements = null;
   }
 }

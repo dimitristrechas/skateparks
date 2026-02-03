@@ -8,6 +8,13 @@ el:
   back_to_skateparks: "Πίσω σε όλα τα skateparks"
   open_in_google_maps: "Δες το πάρκο στο google maps"
   delete_confirm: "Είσαι σίγουρος;"
+  image_gallery: "Γκαλερί φωτογραφιών"
+  gallery_image_announcement: "Φωτογραφία %{current} από %{total}"
+  view_image_in_gallery: "Δες την φωτογραφία %{number} στη γκαλερί"
+  previous_image: "Προηγούμενη φωτογραφία"
+  next_image: "Επόμενη φωτογραφία"
+  close_gallery: "Κλείσιμο γκαλερί"
+  go_to_image: "Πήγαινε στη φωτογραφία %{number}"
   skatepark:
     name: "Όνομα"
     images: "Φωτογραφίες"

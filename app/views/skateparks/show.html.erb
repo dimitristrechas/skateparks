@@ -49,11 +49,22 @@
 
   <div class="mb-6 grid auto-rows-[8rem] grid-cols-3 gap-1 sm:mb-8 md:auto-rows-[14rem] lg:grid-cols-4 xl:auto-rows-[20rem]">
     <% @skatepark.images.each_with_index do |image, index| %>
-      <div class="hover:cursor-pointer hover:opacity-50">
+      <button
+        type="button"
+        id="previewImage-<%= index %>"
+        role="img"
+        class="
+          overflow-hidden cursor-pointer transition-opacity hover:opacity-50 focus-visible:outline
+          focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-neutral-700
+          dark:focus-visible:outline-neutral-200
+        "
+        data-skatepark-target="previewImage"
+        data-action="click->skatepark#onImageClick"
+        aria-label="<%= t('view_image_in_gallery', number: index + 1) %>"
+      >
         <%= cl_image_tag image.key,
         width: 400,
         height: 400,
-        id: "previewImage-#{index}",
         class: "h-full w-full object-cover",
         loading: index < 5 ? "eager" : "lazy",
         srcset:
@@ -61,102 +72,143 @@
             "#{cloudinary_url(image.key, width: 400, height: 400, **CLOUDINARY_DEFAULT_SETTINGS)} 640w, " \
             "#{cloudinary_url(image.key, width: 600, height: 600, **CLOUDINARY_DEFAULT_SETTINGS)} 1600w",
         sizes: "(max-width: 640px) 320px, 100vw",
-        data: {
-          "skatepark-target": "previewImage",
-          action: "click->skatepark#onImageClick",
-        } %>
-      </div>
+        alt: "" %>
+      </button>
     <% end %>
   </div>
 
   <div
-    class="fixed inset-0 z-10 hidden bg-neutral-700/80 px-4 py-16 md:px-16 md:py-16 lg:px-24 lg:py-24"
+    class="fixed inset-0 z-10 hidden bg-neutral-700/95 px-4 py-16 md:px-16 md:py-16 lg:px-24 lg:py-24"
     data-skatepark-target="gallery"
+    data-skatepark-announcement-pattern-value="<%= t('gallery_image_announcement', current: '{current}', total: '{total}') %>"
+    role="dialog"
+    aria-modal="true"
+    aria-label="<%= t('image_gallery') %>"
   >
-    <svg
-      class="absolute top-4 right-2 size-8 cursor-pointer md:top-8 md:right-8 lg:top-12 lg:right-12 lg:size-12"
-      aria-hidden="true"
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      data-action="click->skatepark#onModalClose"
-    >
-      <path
-        stroke="currentColor"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        stroke-width="2"
-        d="M6 18 18 6m0 12L6 6"
-      />
-    </svg>
-
-    <svg
-      class="absolute top-1/2 left-2 hidden h-14 w-14 cursor-pointer sm:block lg:left-6"
-      aria-hidden="true"
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      fill="none"
-      viewBox="0 0 24 24"
-      data-action="click->skatepark#onPreviousGalleryImage"
-    >
-      <path
-        stroke="currentColor"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        stroke-width="2"
-        d="m15 19-7-7 7-7"
-      />
-    </svg>
-
-    <div
+    <button
+      type="button"
       class="
-        relative flex h-full w-full flex-col items-center justify-between gap-2 overflow-hidden rounded-lg bg-white
-        px-4 py-8
+        absolute top-4 right-2 size-8 cursor-pointer text-white transition-opacity hover:opacity-75
+        focus-visible:outline focus-visible:outline-2 focus-visible:outline-white md:top-8 md:right-8 lg:top-12
+        lg:right-12 lg:size-12
       "
+      data-action="click->skatepark#onModalClose"
+      aria-label="<%= t('close_gallery') %>"
     >
+      <svg
+        aria-hidden="true"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        class="h-full w-full"
+      >
+        <path
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M6 18 18 6m0 12L6 6"
+        />
+      </svg>
+    </button>
+
+    <button
+      type="button"
+      class="
+        absolute top-1/2 left-2 hidden h-14 w-14 -translate-y-1/2 cursor-pointer text-white transition-opacity
+        hover:opacity-75 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white sm:block
+        lg:left-6
+      "
+      data-action="click->skatepark#onPreviousGalleryImage"
+      aria-label="<%= t('previous_image') %>"
+    >
+      <svg
+        aria-hidden="true"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        class="h-full w-full"
+      >
+        <path
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="m15 19-7-7 7-7"
+        />
+      </svg>
+    </button>
+
+    <div class="relative flex h-full w-full items-center justify-center">
+      <div
+        class="sr-only"
+        aria-live="polite"
+        aria-atomic="true"
+        data-skatepark-target="announcer"
+      ></div>
+
       <% @skatepark.images.each_with_index do |image, index| %>
         <%= cl_image_tag image.key,
         id: "galleryImage-#{index}",
         quality: :auto,
         fetch_format: :auto,
-        class: "hidden object-contain w-full h-[92%]",
+        class: "hidden object-contain w-full h-full",
         loading: "lazy",
+        alt: "#{@skatepark.name} - Image #{index + 1} of #{@skatepark.images.length}",
         data: {
           "skatepark-target": "galleryImage",
         } %>
       <% end %>
 
-      <div class="flex flex-wrap items-center justify-center gap-2">
+      <div class="absolute inset-x-0 bottom-0 h-24 pointer-events-none"></div>
+
+      <div
+        class="absolute inset-x-0 bottom-6 flex flex-wrap items-center justify-center gap-3"
+        role="group"
+        aria-label="Image indicators"
+      >
         <% @skatepark.images.each_with_index do |_, index| %>
-          <div
-            class="h-3 w-3 cursor-pointer rounded-full bg-gray-400 opacity-25"
+          <button
+            type="button"
+            class="
+              h-3 w-3 sm:h-2 sm:w-2 cursor-pointer rounded-full bg-white opacity-50 transition-all
+              focus-visible:outline focus-visible:outline-2 focus-visible:outline-white
+            "
             id="<%= "indicatorImage-#{index}" %>"
-            data-action="click->skatepark#onGalleryImageIndicatorClick"
+            data-action="click->skatepark#onGalleryImageIndicatorClick focus->skatepark#onGalleryImageIndicatorClick"
             data-skatepark-target="galleryImageIndicator"
-          ></div>
+            aria-label="<%= t('go_to_image', number: index + 1) %>"
+          ></button>
         <% end %>
       </div>
     </div>
 
-    <svg
-      class="absolute top-1/2 right-2 hidden h-14 w-14 cursor-pointer sm:block lg:right-6"
-      aria-hidden="true"
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      fill="none"
-      viewBox="0 0 24 24"
+    <button
+      type="button"
+      class="
+        absolute top-1/2 right-2 hidden h-14 w-14 -translate-y-1/2 cursor-pointer text-white transition-opacity
+        hover:opacity-75 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white sm:block
+        lg:right-6
+      "
       data-action="click->skatepark#onNextGalleryImage"
+      aria-label="<%= t('next_image') %>"
     >
-      <path
-        stroke="currentColor"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        stroke-width="2"
-        d="m9 5 7 7-7 7"
-      />
-    </svg>
+      <svg
+        aria-hidden="true"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        class="h-full w-full"
+      >
+        <path
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="m9 5 7 7-7 7"
+        />
+      </svg>
+    </button>
   </div>
 
   <div class="hidden sm:block">
