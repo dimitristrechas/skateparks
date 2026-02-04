@@ -51,6 +51,3 @@ node_modules
 /coverage/
 /spec/examples.txt
 .DS_Store
-
-# OpenCode secrets
-.secrets/
