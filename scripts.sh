@@ -64,7 +64,7 @@ echo -e " ${BLUE}(10)${NC} Connect to test Docker console"
 echo -e " ${BLUE}(11)${NC} View test server logs"
 echo ""
 echo -e "${GREEN}--- Tests & Linting & Formatting ---${NC}"
-echo -e " ${BLUE}(12)${NC} Run RSpec tests"
+echo -e " ${BLUE}(12)${NC} Run tests"
 echo -e " ${BLUE}(13)${NC} Run Brakeman security scan"
 echo -e " ${BLUE}(14)${NC} Check Herb format"
 echo -e " ${BLUE}(15)${NC} Run Herb format"
@@ -173,8 +173,8 @@ case $OPTION in
     ;;
 
     12)
-    echo -e "${GREEN}Running RSpec tests with coverage...${NC}"
-    docker compose -f $TEST_COMPOSE_FILE exec $TEST_SERVICE_NAME bash -c "COVERAGE=true bundle exec rspec --format progress"
+    echo -e "${GREEN}Running tests with coverage...${NC}"
+    docker compose -f $TEST_COMPOSE_FILE exec $TEST_SERVICE_NAME bash -c "COVERAGE=true bin/rails test"
     echo ""
     echo -e "${CYAN}Coverage report: ${NC}file://$(pwd)/coverage/index.html"
     ;;

@@ -117,7 +117,7 @@
     </div>
 
     <div class="col-span-2 flex flex-wrap place-items-center gap-4">
-      <% if skatepark&.id %>
+      <% if skatepark&.id && skatepark.cover_image.attached? %>
         <%= image_tag skatepark.cover_image, size: "600x450", class: "rounded" %>
       <% end %>
     </div>

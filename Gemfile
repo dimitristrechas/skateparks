@@ -46,8 +46,6 @@ group :development, :test do
   gem 'debug', platforms: %i[mri windows]
 
   gem 'pry-rails'
-
-  gem 'rspec-rails', '~> 8.0'
 end
 
 group :development do
@@ -70,8 +68,6 @@ group :development do
   gem 'rubocop-capybara', require: false
   gem 'rubocop-factory_bot', require: false
   gem 'rubocop-rails', require: false
-  gem 'rubocop-rspec', require: false
-  gem 'rubocop-rspec_rails', require: false
 
   gem 'brakeman', require: false
 end
@@ -81,8 +77,8 @@ group :test do
   gem 'capybara'
   gem 'factory_bot_rails'
   gem 'faker'
+  gem 'mocha'
   gem 'rails-controller-testing'
-  gem 'simplecov', require: false
 end
 
 gem 'tailwindcss-rails', '~> 4.0'

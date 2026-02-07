@@ -19,6 +19,7 @@
 ### MCP Secrets (OpenCode)
 
 MCP integrations in `opencode.json` use tokens stored in `.secrets/`:
+
 1. `mkdir .secrets`
 2. Add token files (raw token, no extension):
    - `.secrets/github-mcp-token`
@@ -29,4 +30,6 @@ MCP integrations in `opencode.json` use tokens stored in `.secrets/`:
 
 1. `./scripts.sh`
 2. Select option "Fresh build & start test server" to build the docker containers from scratch
-3. Select option "Run RSpec tests" to run the specs
+3. Select option "Run tests" to run the test suite
+
+**Note**: This project uses Minitest (Rails default). See [docs/minitest-implementation.md](docs/minitest-implementation.md) for detailed testing guide.
