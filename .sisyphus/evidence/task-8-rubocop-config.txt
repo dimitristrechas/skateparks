@@ -1,0 +1,28 @@
+Task 8: Update .rubocop.yml - Remove RSpec plugins and update paths
+
+## Verification Results
+
+### 1. RSpec plugins removed
+$ grep -q "rubocop-rspec" .rubocop.yml && echo "FOUND" || echo "REMOVED"
+REMOVED
+
+### 2. RuboCop loads successfully
+$ bundle exec rubocop --version
+1.79.2
+
+## Changes Made
+- Removed rubocop-rspec from plugins section
+- Removed rubocop-rspec_rails from plugins section
+- Removed all RSpec/* configuration sections (lines 56-72)
+- Updated Metrics/MethodLength exclude: spec/**/* → test/**/*
+- Updated Metrics/BlockLength exclude: spec/**/* → test/**/*
+- Kept rubocop-capybara (works with Minitest)
+- Kept rubocop-factory_bot (works with Minitest)
+
+## Final .rubocop.yml Structure
+- Lines 4-6: Only rubocop-capybara and rubocop-factory_bot in plugins
+- Lines 23-26: Metrics/MethodLength excludes test/**/*
+- Lines 28-31: Metrics/BlockLength excludes test/**/*
+- No RSpec/* configuration sections remain
+
+Status: ✅ COMPLETE
