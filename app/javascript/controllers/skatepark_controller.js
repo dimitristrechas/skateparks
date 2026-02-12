@@ -15,6 +15,7 @@ export default class extends Controller {
     this.imageIndexOpened = 0;
     this.touchstartX = 0;
     this.touchstartY = 0;
+    this.isMultiTouchGesture = false;
     this.lastFocusedElement = null;
     this.focusableElements = null;
 
@@ -160,11 +161,22 @@ export default class extends Controller {
   };
 
   galleryTouchStartHandler = (event) => {
+    if (event.touches.length > 1) {
+      this.isMultiTouchGesture = true;
+      return;
+    }
+    this.isMultiTouchGesture = false;
     this.touchstartX = event.changedTouches[0].screenX;
     this.touchstartY = event.changedTouches[0].screenY;
   };
 
   galleryTouchEndHandler = (event) => {
+    if (this.isMultiTouchGesture) {
+      if (event.touches.length === 0) {
+        this.isMultiTouchGesture = false;
+      }
+      return;
+    }
     if (event.changedTouches.length > 1) return;
 
     const touchendX = event.changedTouches[0].screenX;
