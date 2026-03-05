@@ -1,5 +1,17 @@
 require 'open-uri'
 
+return if Rails.env.production?
+
+if User.where(role: :admin).none? && ENV['ADMIN_EMAIL'].present? && ENV['ADMIN_PASSWORD'].present?
+  admin = User.create!(
+    email_address: ENV.fetch('ADMIN_EMAIL', nil),
+    password: ENV.fetch('ADMIN_PASSWORD', nil),
+    password_confirmation: ENV.fetch('ADMIN_PASSWORD', nil),
+    role: :admin
+  )
+  Rails.logger.debug { "Created admin user: #{admin.email_address}" }
+end
+
 COVER_IMAGE_URL = 'https://picsum.photos/200/300'.freeze
 
 def skatepark_name(subdivision_name, suffix)
@@ -35,12 +47,21 @@ def build_skatepark(location, suffix)
 end
 
 def attach_images(skatepark, index)
-  cover_image = URI.parse(COVER_IMAGE_URL).open
-  skatepark.cover_image.attach(io: cover_image, filename: "skatepark#{index}_cover.jpg", content_type: 'image/jpeg')
+  uri = URI.parse(COVER_IMAGE_URL)
+  options = { open_timeout: 10, read_timeout: 30 }
+
+  begin
+    cover_image = uri.open(**options)
+    skatepark.cover_image.attach(io: cover_image, filename: "skatepark#{index}_cover.jpg", content_type: 'image/jpeg')
+  rescue OpenURI::HTTPError, Net::OpenTimeout, Net::ReadTimeout => e
+    Rails.logger.error { "Failed to download cover image: #{e.message}" }
+  end
 
   rand(3..5).times do |j|
-    image = URI.parse(COVER_IMAGE_URL).open
+    image = uri.open(**options)
     skatepark.images.attach(io: image, filename: "skatepark#{index}_image#{j}.jpg", content_type: 'image/jpeg')
+  rescue OpenURI::HTTPError, Net::OpenTimeout, Net::ReadTimeout => e
+    Rails.logger.error { "Failed to download image #{j}: #{e.message}" }
   end
 end
 

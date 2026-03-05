@@ -1,16 +1,29 @@
-<h1 class="mb-8 text-3xl font-bold">Dashboard</h1>
-
+<div class="flex justify-between items-center mb-8">
+  <h1 class="text-3xl font-bold"><%= t('admin.dashboard.title') %></h1>
+  <%= button_to t('admin.sign_out'), session_path, method: :delete, class: "inline-flex items-center rounded-lg px-3 min-h-8 min-w-8 hover:outline hover:outline-offset-1 hover:outline-neutral-700 hover:dark:outline-neutral-200 focus-visible:outline focus-visible:outline-offset-1 focus-visible:outline-neutral-700 focus-visible:dark:outline-neutral-200 cursor-pointer bg-pink-600/85 text-white dark:bg-pink-600/65 dark:text-white" %>
+</div>
 <div class="flex flex-col md:flex-row gap-4">
   <%= render LinkButtonComponent.new(
-      title: "Manage Skateparks",
+      title: t('admin.dashboard.manage_skateparks'),
       url: admin_skateparks_path,
       large: true,
       ghost: true
     ) %>
-
   <%= render LinkButtonComponent.new(
-      title: "Manage Popular Skateparks",
+      title: t('admin.dashboard.manage_popular_skateparks'),
       url: admin_popular_skateparks_path,
+      large: true,
+      ghost: true
+    ) %>
+  <%= render LinkButtonComponent.new(
+      title: t('admin.users.title'),
+      url: admin_users_path,
+      large: true,
+      ghost: true
+    ) %>
+  <%= render LinkButtonComponent.new(
+      title: t('admin.dashboard.edit_account'),
+      url: edit_account_profile_path,
       large: true,
       ghost: true
     ) %>

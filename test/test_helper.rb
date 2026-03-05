@@ -27,4 +27,25 @@ module ActiveSupport
   end
 end
 
+module ActionDispatch
+  class IntegrationTest
+    def login_as(user)
+      session_record = user.sessions.create!(
+        user_agent: 'Test',
+        ip_address: '127.0.0.1',
+        expires_at: 2.weeks.from_now
+      )
+      # Build a properly signed cookie value using the Rails key generator,
+      # then inject it into the Rack::Test jar after a GET (which establishes
+      # the test.host domain context so Rack sends the cookie on subsequent requests).
+      env = Rails.application.env_config.merge('HTTP_HOST' => 'test.host')
+      request = ActionDispatch::Request.new(env)
+      jar = ActionDispatch::Cookies::CookieJar.build(request, {})
+      jar.signed[:session_token] = { value: session_record.session_token, httponly: true }
+      get new_session_url
+      cookies[:session_token] = jar[:session_token]
+    end
+  end
+end
+
 Rails.application.routes.default_url_options[:host] = 'http://test.host'

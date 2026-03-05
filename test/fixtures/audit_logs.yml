@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  actor: one
+  target_type: Skatepark
+  target_id: 1
+  action: create
+  details:
+
+two:
+  actor: two
+  target_type: Skatepark
+  target_id: 1
+  action: update
+  details:

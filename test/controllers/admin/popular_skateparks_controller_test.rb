@@ -5,14 +5,13 @@ module Admin
     include Rails.application.routes.url_helpers
 
     def setup
+      @admin = create(:user, :admin)
+      login_as(@admin)
       @first_published_skatepark = create(:skatepark)
       @second_published_skatepark = create(:skatepark)
       @draft_skatepark = create(:skatepark, :draft)
       @first_popular_skatepark = create(:popular_skatepark, skatepark: @first_published_skatepark, position: 1)
       @second_popular_skatepark = create(:popular_skatepark, skatepark: @second_published_skatepark, position: 2)
-
-      # Mock authentication
-      ApplicationController.any_instance.stubs(:http_basic_authenticate_or_request_with).returns(true)
     end
 
     def test_get_index_returns_success
@@ -298,21 +297,12 @@ module Admin
       assert_response :not_found
     end
 
-    def test_authentication_required_in_production
-      ApplicationController.any_instance.unstub(:http_basic_authenticate_or_request_with)
-      Rails.stubs(:env).returns(ActiveSupport::StringInquirer.new('production'))
-      Rails.application.credentials.config[:admin] = { username: 'nice', password: 'try' }
-
+    def test_non_admin_blocked_from_popular_skateparks
+      user = create(:user, role: :user)
+      login_as(user)
       get admin_popular_skateparks_path
-      assert_response :unauthorized
-    end
-
-    def test_authentication_not_required_in_development
-      ApplicationController.any_instance.unstub(:http_basic_authenticate_or_request_with)
-      Rails.stubs(:env).returns(ActiveSupport::StringInquirer.new('development'))
-
-      get admin_popular_skateparks_path
-      assert_response :success
+      assert_redirected_to root_path
+      assert_match(/not authorized/, flash[:alert])
     end
   end
 end

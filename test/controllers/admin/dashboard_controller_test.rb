@@ -3,8 +3,8 @@ require 'test_helper'
 module Admin
   class DashboardControllerTest < ActionDispatch::IntegrationTest
     def setup
-      # Mock authentication
-      ApplicationController.any_instance.stubs(:http_basic_authenticate_or_request_with).returns(true)
+      @admin = create(:user, :admin)
+      login_as(@admin)
     end
 
     def test_get_index_returns_success
@@ -15,6 +15,14 @@ module Admin
     def test_get_index_renders_index_template
       get admin_root_path
       assert_template :index
+    end
+
+    def test_non_admin_blocked_from_dashboard
+      user = create(:user, role: :user)
+      login_as(user)
+      get admin_root_path
+      assert_redirected_to root_path
+      assert_match(/not authorized/, flash[:alert])
     end
   end
 end

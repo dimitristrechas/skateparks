@@ -1,9 +1,6 @@
 module Admin
-  class PopularSkateparksController < ApplicationController
+  class PopularSkateparksController < BaseController
     before_action :set_popular_skatepark, only: %i[update destroy]
-    http_basic_authenticate_with name: Rails.application.credentials.dig(:admin, :username),
-                                 password: Rails.application.credentials.dig(:admin, :password),
-                                 unless: -> { Rails.env.development? }
 
     def index
       @popular_skateparks = PopularSkatepark.includes(:skatepark)

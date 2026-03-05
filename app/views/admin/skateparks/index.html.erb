@@ -1,11 +1,8 @@
 <p style="color: green"><%= notice %></p>
-
 <h1 class="mb-8 text-3xl font-bold">List of skateparks</h1>
-
 <div class="my-4 flex flex-row-reverse">
   <%= render(LinkButtonComponent.new(title: "New skatepark", url: new_admin_skatepark_path, contained: true)) %>
 </div>
-
 <%= render(TableComponent.new) do |table| %>
   <% table.with_header do %>
     <th scope="col" class="px-6 py-3"><%= t("skatepark.name") %></th>
@@ -14,20 +11,16 @@
     <th scope="col" class="px-6 py-3"><%= t("skatepark.google_id") %></th>
     <th scope="col" class="px-6 py-3"></th>
   <% end %>
-
   <% @skateparks.each do |skatepark| %>
     <% table.with_row do %>
       <th scope="row" class="px-6 py-4 font-medium whitespace-nowrap text-gray-900 dark:text-white">
         <%= skatepark.name %>
       </th>
-
       <td class="px-6 py-4"><%= skatepark.images.size %></td>
       <td class="px-6 py-4"><%= skatepark.status %></td>
       <td class="px-6 py-4"><%= skatepark.google_id.present? %></td>
-
       <td class="flex gap-4 px-6 py-4">
         <%= render(LinkButtonComponent.new(title: "edit", url: edit_admin_skatepark_path(skatepark), ghost: true)) %>
-
         <% if Rails.env.development? %>
           <%= form_with url: admin_skatepark_path(skatepark), method: :delete, data: { turbo_confirm: t("delete_confirm") } do |form| %>
             <%= render(ButtonComponent.new(title: "destroy", type: :submit, form: form, ghost: true)) %>
@@ -37,3 +30,11 @@
     <% end %>
   <% end %>
 <% end %>
+<%= render(
+  LinkComponent.new(
+    title: t("back_to_admin"),
+    url: admin_root_path,
+    classnames:
+      "flex flex-col sm:flex-row my-8 gap-4 items-center sm:items-start justify-end",
+  ),
+) %>

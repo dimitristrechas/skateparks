@@ -2,18 +2,33 @@ require 'sidekiq/web'
 require 'sidekiq/cron/web'
 
 Rails.application.routes.draw do
+  resource :session
+  resources :password_resets, param: :token
   mount Lookbook::Engine, at: '/lookbook' if Rails.env.development?
+
+  namespace :account do
+    resource :profile, only: %i[show edit update]
+    resource :password, only: %i[edit update]
+  end
 
   namespace :admin do
     root to: 'dashboard#index'
     resources :skateparks
     resources :popular_skateparks, only: %i[index create update destroy], path: 'skateparks_popular'
-
-    Sidekiq::Web.use Rack::Auth::Basic do |username, password|
-      ActiveSupport::SecurityUtils.secure_compare(username, Rails.application.credentials.dig(:admin, :username)) &&
-        ActiveSupport::SecurityUtils.secure_compare(password, Rails.application.credentials.dig(:admin, :password))
+    resources :users, only: %i[index show] do
+      member do
+        post :ban
+        post :unban
+      end
     end
-    mount Sidekiq::Web => '/sidekiq'
+
+    constraints lambda { |request|
+      session_token = request.cookie_jar.signed[:session_token]
+      session = Session.find_by(session_token: session_token) if session_token
+      session && !session.expired? && session.user.active? && session.user.admin?
+    } do
+      mount Sidekiq::Web => '/sidekiq'
+    end
 
     get 'states/:country_code', to: 'skateparks#states'
   end
