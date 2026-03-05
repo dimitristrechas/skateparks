@@ -44,16 +44,21 @@ el:
   cancel: "Ακύρωση"
   sessions:
     title: "Σύνδεση"
+    email_label: "Διεύθυνση email"
     email_placeholder: "Εισάγετε τη διεύθυνση email σας"
+    password_label: "Κωδικός"
     password_placeholder: "Εισάγετε τον κωδικό σας"
     submit: "Σύνδεση"
     forgot_password: "Ξεχάσατε τον κωδικό;"
   passwords:
     new_title: "Ξεχάσατε τον κωδικό σας;"
+    email_label: "Διεύθυνση email"
     email_placeholder: "Εισάγετε τη διεύθυνση email σας"
     submit: "Αποστολή οδηγιών επαναφοράς"
     edit_title: "Ενημέρωση κωδικού"
+    password_label: "Νέος κωδικός"
     password_placeholder: "Εισάγετε νέο κωδικό"
+    password_confirmation_label: "Επιβεβαίωση νέου κωδικού"
     password_confirmation_placeholder: "Επαναλάβετε τον νέο κωδικό"
     save: "Αποθήκευση"
   passwords_mailer:

@@ -1,4 +1,4 @@
-<p style="color: green"><%= notice %></p>
+<%= render "shared/flash" %>
 
 <h1 class="mb-8 text-3xl font-bold"><%= t('admin.users.title') %></h1>
 
@@ -33,7 +33,7 @@
         <% end %>
       </td>
 
-      <td class="px-6 py-4"><%= user.created_at.strftime("%Y-%m-%d %H:%M") %></td>
+      <td class="px-6 py-4"><%= format_datetime(user.created_at) %></td>
 
       <td class="px-6 py-4">
         <%= link_to t('admin.users.view'), admin_user_path(user), class: "text-blue-500 hover:underline" %>

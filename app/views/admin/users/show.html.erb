@@ -1,5 +1,4 @@
-<p style="color: green"><%= notice %></p>
-<p style="color: red"><%= alert %></p>
+<%= render "shared/flash" %>
 
 <h1 class="mb-8 text-3xl font-bold">User: <%= @user.email_address %></h1>
 
@@ -33,7 +32,7 @@
 
     <div>
       <dt class="font-semibold text-gray-700 dark:text-gray-300"><%= t('admin.users.created_at') %></dt>
-      <dd class="text-gray-900 dark:text-white"><%= @user.created_at.strftime("%Y-%m-%d %H:%M") %></dd>
+      <dd class="text-gray-900 dark:text-white"><%= format_datetime(@user.created_at) %></dd>
     </div>
 
     <% if @user.banned? %>
@@ -57,7 +56,7 @@
 
         <%= form.text_area :reason,
                            placeholder: t('admin.users.ban_reason_placeholder'),
-                           class: "rounded p-2 text-neutral-600 dark:text-neutral-700",
+                           class: "rounded-md border border-gray-400 p-2 text-gray-900 bg-white dark:text-white dark:bg-gray-700 dark:border-gray-600",
                            rows: 3 %>
 
         <%= form.submit t('admin.users.ban_submit'), class: "rounded bg-red-500 px-4 py-2 text-white hover:bg-red-600 cursor-pointer" %>
@@ -86,8 +85,8 @@
         <% table.with_row do %>
           <td class="px-6 py-4"><%= session.user_agent %></td>
           <td class="px-6 py-4"><%= session.ip_address %></td>
-          <td class="px-6 py-4"><%= session.expires_at&.strftime("%Y-%m-%d %H:%M") %></td>
-          <td class="px-6 py-4"><%= session.created_at.strftime("%Y-%m-%d %H:%M") %></td>
+          <td class="px-6 py-4"><%= format_datetime(session.expires_at) %></td>
+          <td class="px-6 py-4"><%= format_datetime(session.created_at) %></td>
         <% end %>
       <% end %>
     <% end %>
@@ -115,7 +114,7 @@
           <td class="px-6 py-4 font-medium text-gray-900 dark:text-white"><%= log.action.titleize %></td>
           <td class="px-6 py-4"><%= log.actor.email_address %></td>
           <td class="px-6 py-4"><%= log.details['reason'] if log.details['reason'].present? %></td>
-          <td class="px-6 py-4"><%= log.created_at.strftime("%Y-%m-%d %H:%M") %></td>
+          <td class="px-6 py-4"><%= format_datetime(log.created_at) %></td>
         <% end %>
       <% end %>
     <% end %>

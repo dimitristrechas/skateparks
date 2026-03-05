@@ -44,16 +44,21 @@ en:
   cancel: "Cancel"
   sessions:
     title: "Sign in"
+    email_label: "Email address"
     email_placeholder: "Enter your email address"
+    password_label: "Password"
     password_placeholder: "Enter your password"
     submit: "Sign in"
     forgot_password: "Forgot password?"
   passwords:
     new_title: "Forgot your password?"
+    email_label: "Email address"
     email_placeholder: "Enter your email address"
     submit: "Email reset instructions"
     edit_title: "Update your password"
+    password_label: "New password"
     password_placeholder: "Enter new password"
+    password_confirmation_label: "Confirm new password"
     password_confirmation_placeholder: "Repeat new password"
     save: "Save"
   passwords_mailer:
