@@ -7,14 +7,13 @@ Custom session-based auth. No Devise/JWT. Primitives: BCrypt + DB sessions + sig
 ## Data Model
 
 ```
-users:      email_address, password_digest, role {user:0, admin:1}, banned_at, ban_reason, discarded_at
+users:      email_address, password_digest, role {user:0, admin:1}, banned_at, ban_reason
 sessions:   user_id(FK), session_token(urlsafe_base64 32B), ip_address, user_agent, expires_at
 audit_logs: actor_id(FK→users), target(polymorphic), action, details(jsonb)
 ```
 
 **User model:**
 - `has_secure_password` (BCrypt)
-- `include Discard::Model` — soft delete via `discarded_at`
 - `enum :role, { user: 0, admin: 1 }, default: :user`
 - `normalizes :email_address` — strip + downcase on save
 - Password min 12 chars (validated on `password_digest_changed?`)
@@ -50,7 +49,6 @@ sessions: user_id(FK), session_token(urlsafe_base64 32B), ip_address, user_agent
 
 - Token generated via `before_validation :generate_token` (`SecureRandom.urlsafe_base64(32)`)
 - `expired?` — `expires_at < Time.current`
-- `find_by_token(token)` — wraps `find_by(session_token:)`
 - Scopes: `Session.expired` / `Session.active`
 - `belongs_to :user`; user has `has_many :sessions, dependent: :destroy`
 
@@ -73,7 +71,6 @@ namespace :admin do
     member do
       post :ban
       post :unban
-      post :discard
     end
   end
   mount Sidekiq::Web => '/sidekiq'  # constraint: session.user.admin?
@@ -109,7 +106,7 @@ POST /session
       User.find_by(email_address)
       if nil: BCrypt.create(dummy) → return nil   ← timing attack mitigation
       user.authenticate(password)                 ← BCrypt compare via has_secure_password
-      user.active? (!discarded? && !banned?)
+      user.active? (!banned?)
   → start_new_session_for(user)
       sessions.create!(user_agent, ip, expires_at: 2.weeks)
       Current.session = session
@@ -236,7 +233,6 @@ GET  /admin/users          → index (all users, ordered by created_at desc)
 GET  /admin/users/:id      → show (user details, sessions list, audit log last 20)
 POST /admin/users/:id/ban  → ban!(reason:) + AuditLog entry
 POST /admin/users/:id/unban → update(banned_at: nil) + AuditLog entry
-POST /admin/users/:id/discard → discard (soft delete via Discard gem) + AuditLog entry
 ```
 
 Every action creates an `AuditLog` record with `actor: current_user`, `target: @user`, `action`, and optional `details` (e.g. ban reason).
@@ -255,17 +251,6 @@ end
 ```
 
 `active?` returns `false` for banned users, so `resume_session` rejects them on the next request. The transaction ensures sessions are destroyed atomically with the ban.
-
----
-
-## Soft Delete (Discard)
-
-`User` includes `Discard::Model` (`discard` gem). Discarded users have `discarded_at` set.
-
-- `user.discarded?` — `discarded_at.present?`
-- `user.active?` — `!discarded? && !banned?`
-
-Discarded users cannot log in (`active?` check in `resume_session` and `authenticate_user`). Unlike banning, discarding does not automatically destroy sessions — the user is rejected on the next request via `active?`.
 
 ---
 
@@ -303,7 +288,7 @@ Scheduled daily at 3:00 AM via `config/schedule.yml`. The `Session.expired` scop
 | Password storage | BCrypt via `has_secure_password` |
 | Password minimum length | 12 characters (validated on digest change) |
 | Timing attack mitigation | Dummy BCrypt on missing user |
-| User enumeration prevention | Generic error for banned/discarded users; no-op on unknown email in reset flow |
+| User enumeration prevention | Generic error for banned users; no-op on unknown email in reset flow |
 | CSRF | Rails `protect_from_forgery` + SameSite=Lax cookie |
 | Session fixation | New `Session` record created per login |
 | Token entropy | `urlsafe_base64(32)` = 256 bits |
@@ -313,4 +298,3 @@ Scheduled daily at 3:00 AM via `config/schedule.yml`. The `Session.expired` scop
 | WebSocket auth failure | `reject_unauthorized_connection` closes the connection |
 | Sidekiq UI protection | Route constraint checks `session.user.admin?` (no HTTP Basic) |
 | Audit trail | `AuditLog` records admin actions with actor, target, action, details |
-| Soft delete | `discard` gem; discarded users blocked via `active?` check |

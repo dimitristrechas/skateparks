@@ -117,6 +117,7 @@ en:
       ban_reason: "Ban Reason"
       ban_reason_placeholder: "Reason for banning this user"
       ban_submit: "Ban User"
+      ban_self_forbidden: "You cannot ban yourself."
       ban_success: "User has been banned."
       unban_success: "User has been unbanned."
       ban_failed: "Failed to ban user."

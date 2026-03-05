@@ -11,7 +11,6 @@ class User < ApplicationRecord
   validates :email_address, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
   validates :password, length: { minimum: 12 }, if: :password_digest_changed?
 
-  after_initialize :set_default_role, if: :new_record?
   after_update :destroy_sessions_on_role_change, if: :saved_change_to_role?
 
   def active?
@@ -34,10 +33,6 @@ class User < ApplicationRecord
   end
 
   private
-
-  def set_default_role
-    self.role ||= :user
-  end
 
   def destroy_sessions_on_role_change
     sessions.destroy_all

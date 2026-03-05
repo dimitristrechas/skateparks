@@ -12,6 +12,8 @@ module Admin
     end
 
     def ban
+      return redirect_to admin_user_path(@user), alert: t('admin.users.ban_self_forbidden') if @user == current_user
+
       @user.ban!(reason: params[:reason])
       log_audit_action(:ban, reason: params[:reason])
       redirect_to admin_user_path(@user), notice: t('admin.users.ban_success')

@@ -69,6 +69,18 @@ module Admin
       assert_equal 'unban', log.action
     end
 
+    test 'admin cannot ban themselves' do
+      login_as @admin
+
+      assert_no_difference 'AuditLog.count' do
+        post ban_admin_user_url(@admin), params: { reason: 'Self ban attempt' }
+      end
+
+      assert_redirected_to admin_user_path(@admin)
+      assert_equal I18n.t('admin.users.ban_self_forbidden'), flash[:alert]
+      assert_not @admin.reload.banned?
+    end
+
     test 'regular user cannot access admin users' do
       login_as @regular_user
       get admin_users_url

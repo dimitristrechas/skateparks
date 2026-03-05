@@ -59,6 +59,20 @@ module Account
       assert_equal 'new@example.com', user.reload.email_address
     end
 
+    test 'admin sees back to admin link on profile' do
+      admin = create(:user, :admin)
+      sign_in_as(admin)
+      get account_profile_url
+      assert_match(I18n.t('back_to_admin'), response.body)
+    end
+
+    test 'regular user does not see back to admin link on profile' do
+      user = create(:user)
+      sign_in_as(user)
+      get account_profile_url
+      assert_no_match(I18n.t('back_to_admin'), response.body)
+    end
+
     private
 
     def sign_in_as(user)

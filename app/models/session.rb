@@ -12,10 +12,6 @@ class Session < ApplicationRecord
     expires_at && expires_at < Time.current
   end
 
-  def self.find_by_token(token)
-    find_by(session_token: token)
-  end
-
   private
 
   def generate_token
