@@ -5,7 +5,7 @@ module Account
     end
 
     def edit
-      redirect_to account_profile_path
+      @user = Current.session.user
     end
 
     def update
@@ -21,7 +21,7 @@ module Account
     private
 
     def profile_params
-      params.expect(user: [])
+      params.expect(user: [:email_address])
     end
   end
 end

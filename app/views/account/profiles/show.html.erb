@@ -2,20 +2,25 @@
   <% if alert = flash[:alert] %>
     <p class="py-2 px-3 bg-red-50 mb-5 text-red-500 font-medium rounded-lg inline-block" id="alert"><%= alert %></p>
   <% end %>
+
   <% if notice = flash[:notice] %>
     <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-lg inline-block" id="notice">
       <%= notice %>
     </p>
   <% end %>
+
   <h1 class="font-bold text-4xl"><%= t('account.profiles.title') %></h1>
+
   <div class="my-5">
     <p class="block font-medium"><%= t('account.profiles.email_label') %></p>
     <p class="mt-2 text-gray-700 dark:text-gray-300"><%= @user.email_address %></p>
   </div>
+
   <div class="my-5">
     <%= link_to t('account.profiles.change_password_link'), edit_account_password_path, class: "rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white inline-block font-medium" %>
   </div>
 </div>
+
 <%= render(
   LinkComponent.new(
     title: t("back_to_admin"),

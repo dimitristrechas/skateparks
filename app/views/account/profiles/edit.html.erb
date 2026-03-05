@@ -1,0 +1,36 @@
+<div class="mx-auto md:w-2/3 w-full">
+  <% if alert = flash[:alert] %>
+    <p class="py-2 px-3 bg-red-50 mb-5 text-red-500 font-medium rounded-lg inline-block" id="alert"><%= alert %></p>
+  <% end %>
+
+  <h1 class="font-bold text-4xl"><%= t('account.profiles.edit_title') %></h1>
+
+  <%= form_with model: @user, url: account_profile_path, method: :patch, class: "contents" do |form| %>
+    <% if @user.errors.any? %>
+      <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
+        <h2><%= t('account.profiles.errors_header', count: @user.errors.count) %></h2>
+
+        <ul>
+          <% @user.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="my-5">
+      <%= form.label :email_address, t('account.profiles.email_label'), class: "block font-medium" %>
+      <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full text-gray-900 bg-white dark:text-white dark:bg-gray-700 dark:border-gray-600" %>
+    </div>
+
+    <div class="col-span-6 sm:flex sm:items-center sm:gap-4">
+      <div class="inline">
+        <%= form.submit t('account.profiles.submit'), class: "w-full sm:w-auto text-center rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white inline-block font-medium cursor-pointer" %>
+      </div>
+
+      <div class="mt-4 text-sm sm:mt-0">
+        <%= link_to t('cancel'), account_profile_path, class: "text-gray-700 underline hover:no-underline dark:text-gray-300" %>
+      </div>
+    </div>
+  <% end %>
+</div>
