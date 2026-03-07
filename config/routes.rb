@@ -1,6 +1,3 @@
-require 'sidekiq/web'
-require 'sidekiq/cron/web'
-
 Rails.application.routes.draw do
   resource :session
   resources :password_resets, param: :token

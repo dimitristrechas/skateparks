@@ -1,3 +1,6 @@
+require 'sidekiq/web'
+require 'sidekiq/cron/web'
+
 schedule_file = 'config/schedule.yml'
 
 redis_config = { url: ENV.fetch('REDIS_URL', 'redis://localhost:6379/1') }
