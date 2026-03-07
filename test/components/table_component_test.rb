@@ -14,6 +14,7 @@ class TableComponentTest < ViewComponent::TestCase
     end
 
     html = rendered.to_html
+
     assert_includes html, 'shadow-md'
     assert_includes html, 'sm:rounded-lg'
   end
@@ -71,6 +72,7 @@ class TableComponentTest < ViewComponent::TestCase
     end
 
     html = rendered.to_html
+
     assert_includes html, 'odd:bg-white'
     assert_includes html, 'even:bg-gray-50'
   end

@@ -10,6 +10,6 @@ class LocaleHelperTest < ActionView::TestCase
   end
 
   def test_locales_constant_is_frozen
-    assert LocaleHelper::LOCALES.frozen?
+    assert_predicate LocaleHelper::LOCALES, :frozen?
   end
 end

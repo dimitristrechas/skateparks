@@ -13,6 +13,7 @@ class HomepageSkateparkCardComponentTest < ViewComponent::TestCase
 
     with_request_url '/' do
       rendered = render_inline(component)
+
       assert_includes rendered.to_html, skatepark_path(@skatepark)
     end
   end
@@ -22,6 +23,7 @@ class HomepageSkateparkCardComponentTest < ViewComponent::TestCase
 
     with_request_url '/' do
       rendered = render_inline(component)
+
       assert_match @skatepark.name, rendered.to_html
     end
   end
@@ -31,6 +33,7 @@ class HomepageSkateparkCardComponentTest < ViewComponent::TestCase
 
     with_request_url '/' do
       rendered = render_inline(component)
+
       assert_match "#{@skatepark.images.size} #{I18n.t('photos')}", rendered.to_html
     end
   end
@@ -40,6 +43,7 @@ class HomepageSkateparkCardComponentTest < ViewComponent::TestCase
 
     with_request_url '/' do
       render_inline(component)
+
       assert_selector "img[alt='#{@skatepark.name} cover image']"
     end
   end
@@ -49,6 +53,7 @@ class HomepageSkateparkCardComponentTest < ViewComponent::TestCase
 
     with_request_url '/' do
       rendered = render_inline(component)
+
       assert_match I18n.t(:new), rendered.to_html
     end
   end
@@ -58,6 +63,7 @@ class HomepageSkateparkCardComponentTest < ViewComponent::TestCase
 
     with_request_url '/' do
       rendered = render_inline(component)
+
       assert_match I18n.t(:popular), rendered.to_html
     end
   end

@@ -16,11 +16,13 @@ module Admin
 
     def test_get_index_returns_success
       get admin_popular_skateparks_path
+
       assert_response :success
     end
 
     def test_get_index_assigns_all_popular_skateparks
       get admin_popular_skateparks_path
+
       assert_equal [@first_popular_skatepark, @second_popular_skatepark].sort, assigns(:popular_skateparks).sort
     end
 
@@ -75,6 +77,7 @@ module Admin
       }
 
       post admin_popular_skateparks_path, params: valid_params
+
       assert_redirected_to admin_popular_skateparks_url
     end
 
@@ -88,6 +91,7 @@ module Admin
       }
 
       post admin_popular_skateparks_path, params: valid_params
+
       assert_equal I18n.t('admin.popular_skateparks.added_notice'), flash[:notice]
     end
 
@@ -113,6 +117,7 @@ module Admin
       }
 
       post admin_popular_skateparks_path, params: invalid_params
+
       assert_template :index
     end
 
@@ -125,6 +130,7 @@ module Admin
       }
 
       post admin_popular_skateparks_path, params: invalid_params
+
       assert_response :unprocessable_content
     end
 
@@ -137,6 +143,7 @@ module Admin
       }
 
       post admin_popular_skateparks_path, params: invalid_params
+
       assert_equal [@first_popular_skatepark, @second_popular_skatepark].sort, assigns(:popular_skateparks).sort
     end
 
@@ -149,6 +156,7 @@ module Admin
       }
 
       post admin_popular_skateparks_path, params: invalid_params
+
       assert_not_nil assigns(:available_skateparks)
     end
 
@@ -180,6 +188,7 @@ module Admin
       }
 
       patch admin_popular_skatepark_path(@first_popular_skatepark), params: { popular_skatepark: { position: 10 } }
+
       assert_redirected_to admin_popular_skateparks_url
     end
 
@@ -190,6 +199,7 @@ module Admin
       }
 
       patch admin_popular_skatepark_path(@first_popular_skatepark), params: { popular_skatepark: { position: 10 } }
+
       assert_equal I18n.t('admin.popular_skateparks.updated_notice'), flash[:notice]
     end
 
@@ -223,6 +233,7 @@ module Admin
       }
 
       patch admin_popular_skatepark_path(@first_popular_skatepark), params: { popular_skatepark: { position: nil } }
+
       assert_template :index
     end
 
@@ -233,6 +244,7 @@ module Admin
       }
 
       patch admin_popular_skatepark_path(@first_popular_skatepark), params: { popular_skatepark: { position: nil } }
+
       assert_response :unprocessable_content
     end
 
@@ -243,6 +255,7 @@ module Admin
       }
 
       patch admin_popular_skatepark_path(@first_popular_skatepark), params: { popular_skatepark: { position: nil } }
+
       assert_equal [@first_popular_skatepark, @second_popular_skatepark].sort, assigns(:popular_skateparks).sort
     end
 
@@ -253,11 +266,13 @@ module Admin
       }
 
       patch admin_popular_skatepark_path(@first_popular_skatepark), params: { popular_skatepark: { position: nil } }
+
       assert_not_nil assigns(:available_skateparks)
     end
 
     def test_patch_update_raises_error_when_not_found
       patch admin_popular_skatepark_path(99_999), params: { popular_skatepark: { position: 5 } }
+
       assert_response :not_found
     end
 
@@ -269,11 +284,13 @@ module Admin
 
     def test_delete_destroy_redirects_to_index
       delete admin_popular_skatepark_path(@first_popular_skatepark)
+
       assert_redirected_to admin_popular_skateparks_url
     end
 
     def test_delete_destroy_sets_flash_notice
       delete admin_popular_skatepark_path(@first_popular_skatepark)
+
       assert_equal I18n.t('admin.popular_skateparks.removed_notice'), flash[:notice]
     end
 
@@ -294,6 +311,7 @@ module Admin
 
     def test_delete_destroy_raises_error_when_not_found
       delete admin_popular_skatepark_path(999_999)
+
       assert_response :not_found
     end
 
@@ -301,6 +319,7 @@ module Admin
       user = create(:user, role: :user)
       login_as(user)
       get admin_popular_skateparks_path
+
       assert_redirected_to root_path
       assert_match(/not authorized/, flash[:alert])
     end

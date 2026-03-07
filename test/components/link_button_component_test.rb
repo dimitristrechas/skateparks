@@ -120,6 +120,7 @@ class LinkButtonComponentTest < ViewComponent::TestCase
     end
 
     html = rendered.to_html
+
     assert_includes html, 'test-icon-before'
     assert_selector '.flex.items-center.gap-2'
   end
@@ -132,6 +133,7 @@ class LinkButtonComponentTest < ViewComponent::TestCase
     end
 
     html = rendered.to_html
+
     assert_includes html, 'test-icon-after'
   end
 
@@ -144,8 +146,9 @@ class LinkButtonComponentTest < ViewComponent::TestCase
     end
 
     content = rendered.to_html
-    assert content.index('icon-before') < content.index(@title)
-    assert content.index(@title) < content.index('icon-after')
+
+    assert_operator content.index('icon-before'), :<, content.index(@title)
+    assert_operator content.index(@title), :<, content.index('icon-after')
   end
 
   def test_includes_current_underline_classes_when_current_true

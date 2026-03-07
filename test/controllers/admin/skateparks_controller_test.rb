@@ -23,6 +23,7 @@ module Admin
 
     def test_get_index_returns_success_and_assigns_skateparks
       get admin_skateparks_path
+
       assert_response :success
       assert_includes assigns(:skateparks), @skatepark
     end
@@ -34,23 +35,27 @@ module Admin
 
       get admin_skateparks_path
       names = assigns(:skateparks).map(&:name)
+
       assert_equal names.sort, names
     end
 
     def test_get_show_returns_success_and_assigns_skatepark
       get admin_skatepark_path(@skatepark)
+
       assert_response :success
       assert_equal @skatepark, assigns(:skatepark)
     end
 
     def test_get_new_returns_success_and_assigns_new_skatepark
       get new_admin_skatepark_path
+
       assert_response :success
-      assert assigns(:skatepark).new_record?
+      assert_predicate assigns(:skatepark), :new_record?
     end
 
     def test_get_edit_returns_success_and_assigns_skatepark
       get edit_admin_skatepark_path(@skatepark)
+
       assert_response :success
       assert_equal @skatepark, assigns(:skatepark)
     end
@@ -63,6 +68,7 @@ module Admin
 
     def test_post_create_with_valid_params_redirects_to_skateparks_list
       post admin_skateparks_path, params: { skatepark: @valid_attributes }
+
       assert_redirected_to admin_skateparks_url
     end
 
@@ -74,6 +80,7 @@ module Admin
 
     def test_post_create_with_invalid_params_renders_new_template
       post admin_skateparks_path, params: { skatepark: @invalid_attributes }
+
       assert_template 'new'
     end
 
@@ -87,9 +94,10 @@ module Admin
 
       patch admin_skatepark_path(@skatepark), params: { skatepark: new_attributes }
       @skatepark.reload
+
       assert_equal 'Updated Skatepark', @skatepark.name_el
-      assert_equal 23.456, @skatepark.lat
-      assert_equal 78.901, @skatepark.lng
+      assert_in_delta(23.456, @skatepark.lat)
+      assert_in_delta(78.901, @skatepark.lng)
       assert_equal 'An updated description', @skatepark.description_el.to_plain_text
     end
 
@@ -102,11 +110,13 @@ module Admin
       }
 
       patch admin_skatepark_path(@skatepark), params: { skatepark: new_attributes }
+
       assert_redirected_to admin_skateparks_url
     end
 
     def test_patch_update_with_invalid_params_renders_edit_template
       patch admin_skatepark_path(@skatepark), params: { skatepark: @invalid_attributes }
+
       assert_template 'edit'
     end
 
@@ -118,6 +128,7 @@ module Admin
 
     def test_delete_destroy_redirects_to_skateparks_list
       delete admin_skatepark_path(@skatepark)
+
       assert_redirected_to admin_skateparks_url
     end
 
@@ -125,6 +136,7 @@ module Admin
       user = create(:user, role: :user)
       login_as(user)
       get admin_skateparks_path
+
       assert_redirected_to root_path
       assert_match(/not authorized/, flash[:alert])
     end

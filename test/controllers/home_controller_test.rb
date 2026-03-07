@@ -8,6 +8,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
 
   def test_get_index_returns_success
     get root_path
+
     assert_response :success
   end
 
@@ -40,12 +41,13 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_not_nil published_index
     assert_not_nil newer_index
     assert_not_nil older_index
-    assert published_index < newer_index, 'Most recent should come before newer'
-    assert newer_index < older_index, 'Newer should come before older'
+    assert_operator published_index, :<, newer_index, 'Most recent should come before newer'
+    assert_operator newer_index, :<, older_index, 'Newer should come before older'
   end
 
   def test_get_index_assigns_locale_from_params
     get root_path(locale: 'el')
+
     assert_equal 'el', assigns(:locale)
   end
 
@@ -59,6 +61,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     get root_path
 
     cached_value = Rails.cache.read('skateparks_latest')
+
     assert_equal assigns(:skateparks_latest), cached_value
   end
 
@@ -86,6 +89,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     get root_path
 
     cached_value = Rails.cache.read('skateparks_popular')
+
     assert_equal assigns(:skateparks_popular), cached_value
   end
 
@@ -103,22 +107,26 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
 
   def test_get_about_returns_success
     get about_path
+
     assert_response :success
   end
 
   def test_get_about_assigns_title_and_meta_description
     get about_path
+
     assert_equal I18n.t('about'), assigns(:title)
     assert_equal I18n.t('about_details'), assigns(:meta_description)
   end
 
   def test_get_contact_returns_success
     get contact_path
+
     assert_response :success
   end
 
   def test_get_contact_assigns_title_and_meta_description
     get contact_path
+
     assert_equal I18n.t('contact'), assigns(:title)
     assert_equal I18n.t('contact_details'), assigns(:meta_description)
   end

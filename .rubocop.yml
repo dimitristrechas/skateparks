@@ -56,3 +56,6 @@ Style/TrailingCommaInArrayLiteral:
 
 Style/TrailingCommaInHashLiteral:
   EnforcedStyleForMultiline: consistent_comma
+
+Minitest/MultipleAssertions:
+  Max: 5

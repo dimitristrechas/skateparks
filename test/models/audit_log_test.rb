@@ -12,7 +12,7 @@ class AuditLogTest < ActiveSupport::TestCase
       details: { reason: 'Spam' }
     )
 
-    assert log.persisted?
+    assert_predicate log, :persisted?
     assert_equal actor, log.actor
     assert_equal target, log.target
     assert_equal 'ban', log.action
@@ -31,11 +31,13 @@ class AuditLogTest < ActiveSupport::TestCase
 
   test 'belongs to actor' do
     log = AuditLog.new
+
     assert_respond_to log, :actor
   end
 
   test 'belongs to target polymorphically' do
     log = AuditLog.new
+
     assert_respond_to log, :target
   end
 end
