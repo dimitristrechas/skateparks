@@ -22,6 +22,16 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
+    strategy:
+      matrix:
+        include:
+          - name: components
+            test_dirs: test/components
+          - name: core
+            test_dirs: test/controllers test/models test/helpers test/jobs test/workers test/mailers
+
+    name: test (${{ matrix.name }})
+
     services:
       postgres:
         image: postgres:17-alpine
@@ -56,6 +66,7 @@ jobs:
       REDIS_URL: redis://localhost:6379
       RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
       RUBY_YJIT_ENABLE: "0"
+      DISABLE_SIMPLECOV: "true"
 
     steps:
       - uses: actions/checkout@v6
@@ -78,11 +89,14 @@ jobs:
       - name: Setup database
         run: bundle exec rails db:create db:schema:load
 
+      - name: Check autoloader
+        run: bundle exec rails zeitwerk:check
+
       - name: Precompile assets
         run: bundle exec rails assets:precompile
 
-      - name: Run tests
-        run: bundle exec rails test
+      - name: Run tests (${{ matrix.name }})
+        run: bundle exec rails test ${{ matrix.test_dirs }}
 
   rubocop-brakeman:
     runs-on: ubuntu-latest
@@ -95,6 +109,7 @@ jobs:
           bundler-cache: true
       - run: bundle exec rubocop --force-exclusion
       - run: bundle exec brakeman -q --no-pager
+      - run: bundle exec bundle-audit check --update
 
   herb-prettier:
     runs-on: ubuntu-latest
@@ -109,3 +124,4 @@ jobs:
       - run: yarn prettier:check
       - run: yarn herb:lint
       - run: yarn herb:format:check
+      - run: yarn audit --audit-level moderate

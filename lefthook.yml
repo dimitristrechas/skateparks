@@ -49,3 +49,5 @@ pre-push:
   commands:
     brakeman:
       run: bundle exec brakeman -q --no-pager
+    bundler-audit:
+      run: bundle exec bundle-audit check --update

@@ -66,23 +66,25 @@ echo ""
 echo -e "${GREEN}--- Tests & Linting & Formatting ---${NC}"
 echo -e " ${BLUE}(12)${NC} Run tests"
 echo -e " ${BLUE}(13)${NC} Run Brakeman security scan"
-echo -e " ${BLUE}(14)${NC} Check Herb format"
-echo -e " ${BLUE}(15)${NC} Run Herb format"
-echo -e " ${BLUE}(16)${NC} Check Herb lint"
-echo -e " ${BLUE}(17)${NC} Run Herb lint auto-fix"
-echo -e " ${BLUE}(18)${NC} Check for RuboCop errors"
-echo -e " ${BLUE}(19)${NC} Run RuboCop auto-fix"
-echo -e " ${BLUE}(20)${NC} Check for Prettier errors"
-echo -e " ${BLUE}(21)${NC} Run Prettier"
+echo -e " ${BLUE}(14)${NC} Run bundle-audit security scan"
+echo -e " ${BLUE}(15)${NC} Run yarn audit"
+echo -e " ${BLUE}(16)${NC} Check Herb format"
+echo -e " ${BLUE}(17)${NC} Run Herb format"
+echo -e " ${BLUE}(18)${NC} Check Herb lint"
+echo -e " ${BLUE}(19)${NC} Run Herb lint auto-fix"
+echo -e " ${BLUE}(20)${NC} Check for RuboCop errors"
+echo -e " ${BLUE}(21)${NC} Run RuboCop auto-fix"
+echo -e " ${BLUE}(22)${NC} Check for Prettier errors"
+echo -e " ${BLUE}(23)${NC} Run Prettier"
 echo ""
 echo -e "${GREEN}--- Database & Cache ---${NC}"
-echo -e " ${BLUE}(22)${NC} Seed the database"
-echo -e " ${BLUE}(23)${NC} Reset database & migrate"
-echo -e " ${BLUE}(24)${NC} Clear all Rails cache"
+echo -e " ${BLUE}(24)${NC} Seed the database"
+echo -e " ${BLUE}(25)${NC} Reset database & migrate"
+echo -e " ${BLUE}(26)${NC} Clear all Rails cache"
 echo ""
 echo -e "${GREEN}--- Other ---${NC}"
-echo -e " ${BLUE}(25)${NC} Stop skateparks Docker containers"
-echo -e " ${BLUE}(26)${NC} Show Docker container status"
+echo -e " ${BLUE}(27)${NC} Stop skateparks Docker containers"
+echo -e " ${BLUE}(28)${NC} Show Docker container status"
 echo ""
 echo -e "${YELLOW}Choose an option:${NC} "
 read OPTION
@@ -174,7 +176,7 @@ case $OPTION in
 
     12)
     echo -e "${GREEN}Running tests with coverage...${NC}"
-    docker compose -f $TEST_COMPOSE_FILE exec $TEST_SERVICE_NAME bash -c "COVERAGE=true bin/rails test"
+    docker compose -f $TEST_COMPOSE_FILE exec $TEST_SERVICE_NAME bash -c "bin/rails test"
     echo ""
     echo -e "${CYAN}Coverage report: ${NC}file://$(pwd)/coverage/index.html"
     ;;
@@ -189,6 +191,24 @@ case $OPTION in
     ;;
 
     14)
+    echo -e "${GREEN}Running bundle-audit security scan...${NC}"
+    if bundle exec bundle-audit check --update; then
+        echo -e "${GREEN}✅ No vulnerable dependencies found${NC}"
+    else
+        echo -e "${RED}❌ Vulnerable dependencies detected${NC}"
+    fi
+    ;;
+
+    15)
+    echo -e "${GREEN}Running yarn audit...${NC}"
+    if yarn audit --audit-level moderate; then
+        echo -e "${GREEN}✅ No yarn vulnerabilities found${NC}"
+    else
+        echo -e "${RED}❌ Yarn vulnerabilities detected${NC}"
+    fi
+    ;;
+
+    16)
     echo -e "${GREEN}Checking Herb format...${NC}"
     if yarn herb:format:check; then
         echo -e "${GREEN}✅ ERB files are properly formatted${NC}"
@@ -197,7 +217,7 @@ case $OPTION in
     fi
     ;;
 
-    15)
+    17)
     echo -e "${GREEN}Formatting ERB files with Herb...${NC}"
     if yarn herb:format; then
         echo -e "${GREEN}✅ ERB files formatted successfully${NC}"
@@ -206,7 +226,7 @@ case $OPTION in
     fi
     ;;
 
-    16)
+    18)
     echo -e "${GREEN}Linting ERB files with Herb...${NC}"
     if yarn herb:lint; then
         echo -e "${GREEN}✅ No Herb lint errors found${NC}"
@@ -215,7 +235,7 @@ case $OPTION in
     fi
     ;;
 
-    17)
+    19)
     echo -e "${GREEN}Running Herb lint auto-fix...${NC}"
     if yarn herb:lint:fix; then
         echo -e "${GREEN}✅ Herb lint issues fixed${NC}"
@@ -224,12 +244,12 @@ case $OPTION in
     fi
     ;;
 
-    18)
+    20)
     echo -e "${GREEN}Running Ruby linter (RuboCop)...${NC}"
     bundle exec rubocop
     ;;
 
-    19)
+    21)
     echo -e "${GREEN}Running RuboCop auto-fix...${NC}"
     if bundle exec rubocop -A; then
         echo -e "${GREEN}✅ RuboCop auto-fixes applied successfully${NC}"
@@ -238,7 +258,7 @@ case $OPTION in
     fi
     ;;
 
-    20)
+    22)
     echo -e "${GREEN}Checking Prettier errors...${NC}"
     if yarn prettier:check; then
         echo -e "${GREEN}✅ No Prettier errors found${NC}"
@@ -247,7 +267,7 @@ case $OPTION in
     fi
     ;;
 
-    21)
+    23)
     echo -e "${GREEN}Running Prettier...${NC}"
     if yarn prettier:fix; then
         echo -e "${GREEN}✅ Files formatted with Prettier successfully${NC}"
@@ -257,7 +277,7 @@ case $OPTION in
     ;;
 
 
-    22)
+    24)
     echo -e "${GREEN}Seeding the database...${NC}"
     if docker compose -f $DEV_COMPOSE_FILE exec $SERVICE_NAME bash -c "bundle exec rails db:seed"; then
         echo -e "${GREEN}✅ Database seeded successfully${NC}"
@@ -266,13 +286,13 @@ case $OPTION in
     fi
     ;;
 
-    23)
+    25)
     confirm_action "This will reset and migrate the database. All data will be lost!"
     echo -e "${GREEN}Resetting and migrating database...${NC}"
     docker compose -f $DEV_COMPOSE_FILE exec $SERVICE_NAME bash -c "bundle exec rails db:reset db:migrate"
     ;;
 
-    24)
+    26)
     echo -e "${GREEN}Clearing Rails cache...${NC}"
     if docker compose -f $DEV_COMPOSE_FILE exec $SERVICE_NAME bash -c "bundle exec rails runner 'Rails.cache.clear'"; then
         echo -e "${GREEN}✅ Cache cleared successfully${NC}"
@@ -281,7 +301,7 @@ case $OPTION in
     fi
     ;;
 
-    25)
+    27)
     confirm_action "This will stop all skateparks-related Docker containers."
     echo -e "${YELLOW}Stopping skateparks Docker containers...${NC}"
     STOPPED=false
@@ -298,14 +318,14 @@ case $OPTION in
     fi
     ;;
 
-    26)
+    28)
     show_docker_status
     ;;
 
 
     *)
     echo -e "${RED}❌ Unknown option: $OPTION${NC}"
-    echo -e "${YELLOW}Please choose a valid option (1-26)${NC}"
+    echo -e "${YELLOW}Please choose a valid option (1-28)${NC}"
     exit 1
     ;;
 esac

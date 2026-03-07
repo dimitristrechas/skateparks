@@ -1,5 +1,10 @@
-require 'coverage'
-Coverage.start(:all)
+unless ENV['DISABLE_SIMPLECOV']
+  require 'simplecov'
+  SimpleCov.start 'rails' do
+    add_filter '/test/'
+    minimum_coverage 80
+  end
+end
 
 ENV['RAILS_ENV'] ||= 'test'
 require_relative '../config/environment'

@@ -67,14 +67,18 @@ group :development do
   gem 'rubocop', require: false
   gem 'rubocop-capybara', require: false
   gem 'rubocop-factory_bot', require: false
+  gem 'rubocop-minitest', require: false
+  gem 'rubocop-performance', require: false
   gem 'rubocop-rails', require: false
 
   gem 'brakeman', require: false
+  gem 'bundler-audit', require: false
 end
 
 group :test do
   # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
   gem 'capybara'
+  gem 'simplecov', require: false
   gem 'factory_bot_rails'
   gem 'faker'
   gem 'mocha'
@@ -106,3 +110,5 @@ gem 'foreman', '~> 0.88.1'
 gem 'countries', '~> 8.0'
 
 gem 'kaminari'
+
+gem 'strong_migrations'
