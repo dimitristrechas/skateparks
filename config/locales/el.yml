@@ -106,7 +106,7 @@ el:
       title: "Πίνακας ελέγχου"
       manage_skateparks: "Διαχείριση Skateparks"
       manage_popular_skateparks: "Διαχείριση Δημοφιλών Skateparks"
-      edit_account: "Επεξεργασία Λογαριασμού"
+      view_account: "Διαχελιριση Λογαριασμού"
     users:
       title: "Διαχείριση Χρηστών"
       email: "Email"

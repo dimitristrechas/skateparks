@@ -106,7 +106,7 @@ en:
       title: "Dashboard"
       manage_skateparks: "Manage Skateparks"
       manage_popular_skateparks: "Manage Popular Skateparks"
-      edit_account: "Edit Account"
+      view_account: "Manage Account"
     users:
       title: "Manage Users"
       email: "Email"

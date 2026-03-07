@@ -13,6 +13,7 @@ audit_logs: actor_id(FK→users), target(polymorphic), action, details(jsonb)
 ```
 
 **User model:**
+
 - `has_secure_password` (BCrypt)
 - `enum :role, { user: 0, admin: 1 }, default: :user`
 - `normalizes :email_address` — strip + downcase on save
@@ -32,10 +33,10 @@ end
 
 `ActiveSupport::CurrentAttributes` provides thread-safe, fiber-local storage reset automatically between requests. Two accessors:
 
-| Accessor | Value |
-|---|---|
-| `Current.session` | The `Session` AR record for this request |
-| `Current.user` | Delegated to `Current.session.user` (nil-safe) |
+| Accessor          | Value                                          |
+| ----------------- | ---------------------------------------------- |
+| `Current.session` | The `Session` AR record for this request       |
+| `Current.user`    | Delegated to `Current.session.user` (nil-safe) |
 
 The `current_user` helper in `Authentication` concern (`Current.session&.user`) is exposed to all controllers and views via `helper_method`. Account controllers bypass the helper and read `Current.session.user` directly.
 
@@ -57,23 +58,28 @@ sessions: user_id(FK), session_token(urlsafe_base64 32B), ip_address, user_agent
 ## Routes
 
 ```
-resource  :session                          # POST /session (login), DELETE /session (logout)
-resources :passwords, param: :token         # POST /passwords (request reset), PATCH /passwords/:token (apply)
+resource  :session                                          # GET/POST /session/new, POST /session, DELETE /session
+resources :password_resets, param: :token                   # POST /password_resets, PATCH /password_resets/:token
 
 namespace :account do
-  resource :profile, only: %i[show edit update]   # /account/profile
-  resource :password, only: %i[edit update]        # /account/password
+  resource :profile, only: %i[show edit update]             # /account/profile
+  resource :password, only: %i[edit update]                 # /account/password
 end
 
 namespace :admin do
-  root → dashboard#index
+  root to: 'dashboard#index'
+  resources :skateparks                                      # full CRUD
+  resources :popular_skateparks,                            # curated homepage list
+    only: %i[index create update destroy],
+    path: 'skateparks_popular'
   resources :users, only: %i[index show] do
     member do
       post :ban
       post :unban
     end
   end
-  mount Sidekiq::Web => '/sidekiq'  # constraint: session.user.admin?
+  mount Sidekiq::Web => '/sidekiq'                          # constraint: session.user.admin?
+  get 'states/:country_code', to: 'skateparks#states'
 end
 ```
 
@@ -125,15 +131,15 @@ POST /session
 
 ## Cookie Architecture
 
-| Property | Value |
-|---|---|
-| Name | `session_token` |
-| Value | HMAC-signed via Rails signed cookies (`secret_key_base`) |
-| HttpOnly | true |
-| SameSite | Lax |
-| Secure | production only |
-| Client expiry | 2 weeks |
-| Server expiry | DB `expires_at` checked on every request |
+| Property      | Value                                                    |
+| ------------- | -------------------------------------------------------- |
+| Name          | `session_token`                                          |
+| Value         | HMAC-signed via Rails signed cookies (`secret_key_base`) |
+| HttpOnly      | true                                                     |
+| SameSite      | Lax                                                      |
+| Secure        | production only                                          |
+| Client expiry | 2 weeks                                                  |
+| Server expiry | DB `expires_at` checked on every request                 |
 
 ---
 
@@ -150,13 +156,13 @@ DELETE /session
 ## Password Reset (Unauthenticated)
 
 ```
-POST /passwords
+POST /password_resets
   User.find_by(email) → nil = no-op  ← prevents user enumeration
   user.signed_id(expires_in: 15min, purpose: :password_reset)
   PasswordsMailer.reset(user).deliver_later
   redirect with generic notice
 
-PATCH /passwords/:token
+PATCH /password_resets/:token
   User.find_signed(token, purpose: :password_reset)  ← HMAC + expiry validation
   nil → redirect (expired or forged token)
   user.update(password, password_confirmation)
@@ -283,18 +289,18 @@ Scheduled daily at 3:00 AM via `config/schedule.yml`. The `Session.expired` scop
 
 ## Security Properties
 
-| Property | Implementation |
-|---|---|
-| Password storage | BCrypt via `has_secure_password` |
-| Password minimum length | 12 characters (validated on digest change) |
-| Timing attack mitigation | Dummy BCrypt on missing user |
+| Property                    | Implementation                                                       |
+| --------------------------- | -------------------------------------------------------------------- |
+| Password storage            | BCrypt via `has_secure_password`                                     |
+| Password minimum length     | 12 characters (validated on digest change)                           |
+| Timing attack mitigation    | Dummy BCrypt on missing user                                         |
 | User enumeration prevention | Generic error for banned users; no-op on unknown email in reset flow |
-| CSRF | Rails `protect_from_forgery` + SameSite=Lax cookie |
-| Session fixation | New `Session` record created per login |
-| Token entropy | `urlsafe_base64(32)` = 256 bits |
-| Server-side expiry | DB `expires_at` checked on every request |
-| Session invalidation | On password change/reset and ban: `sessions.destroy_all` |
-| Role change invalidation | `after_update` callback destroys sessions on role change |
-| WebSocket auth failure | `reject_unauthorized_connection` closes the connection |
-| Sidekiq UI protection | Route constraint checks `session.user.admin?` (no HTTP Basic) |
-| Audit trail | `AuditLog` records admin actions with actor, target, action, details |
+| CSRF                        | Rails `protect_from_forgery` + SameSite=Lax cookie                   |
+| Session fixation            | New `Session` record created per login                               |
+| Token entropy               | `urlsafe_base64(32)` = 256 bits                                      |
+| Server-side expiry          | DB `expires_at` checked on every request                             |
+| Session invalidation        | On password change/reset and ban: `sessions.destroy_all`             |
+| Role change invalidation    | `after_update` callback destroys sessions on role change             |
+| WebSocket auth failure      | `reject_unauthorized_connection` closes the connection               |
+| Sidekiq UI protection       | Route constraint checks `session.user.admin?` (no HTTP Basic)        |
+| Audit trail                 | `AuditLog` records admin actions with actor, target, action, details |
