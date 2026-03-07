@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_12_13_202644) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_02_123837) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -59,25 +59,18 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_13_202644) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
-  create_table "admin_skateparks", force: :cascade do |t|
-    t.string "title"
-    t.decimal "lat", precision: 10, scale: 6
-    t.decimal "lng", precision: 10, scale: 6
-    t.string "description"
+  create_table "audit_logs", force: :cascade do |t|
+    t.integer "actor_id", null: false
+    t.string "target_type", null: false
+    t.integer "target_id", null: false
+    t.string "action", null: false
+    t.jsonb "details", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-  end
-
-  create_table "admins", force: :cascade do |t|
-    t.string "email", default: "", null: false
-    t.string "encrypted_password", default: "", null: false
-    t.string "reset_password_token"
-    t.datetime "reset_password_sent_at"
-    t.datetime "remember_created_at"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["email"], name: "index_admins_on_email", unique: true
-    t.index ["reset_password_token"], name: "index_admins_on_reset_password_token", unique: true
+    t.index ["action"], name: "index_audit_logs_on_action"
+    t.index ["actor_id"], name: "index_audit_logs_on_actor_id"
+    t.index ["created_at"], name: "index_audit_logs_on_created_at"
+    t.index ["target_type", "target_id"], name: "index_audit_logs_on_target_type_and_target_id"
   end
 
   create_table "mobility_string_translations", force: :cascade do |t|
@@ -113,6 +106,19 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_13_202644) do
     t.index ["skatepark_id"], name: "index_popular_skateparks_on_skatepark_id", unique: true
   end
 
+  create_table "sessions", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "ip_address"
+    t.string "user_agent"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "expires_at"
+    t.string "session_token", null: false
+    t.index ["expires_at"], name: "index_sessions_on_expires_at"
+    t.index ["session_token"], name: "index_sessions_on_session_token", unique: true
+    t.index ["user_id"], name: "index_sessions_on_user_id"
+  end
+
   create_table "skateparks", force: :cascade do |t|
     t.string "name"
     t.decimal "lat", precision: 10, scale: 6
@@ -128,7 +134,21 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_13_202644) do
     t.index ["state"], name: "index_skateparks_on_state"
   end
 
+  create_table "users", force: :cascade do |t|
+    t.string "email_address", null: false
+    t.string "password_digest", null: false
+    t.integer "role", default: 0, null: false
+    t.datetime "banned_at"
+    t.text "ban_reason"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["banned_at"], name: "index_users_on_banned_at"
+    t.index ["email_address"], name: "index_users_on_email_address", unique: true
+  end
+
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "audit_logs", "users", column: "actor_id", on_delete: :restrict
   add_foreign_key "popular_skateparks", "skateparks"
+  add_foreign_key "sessions", "users"
 end

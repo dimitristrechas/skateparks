@@ -1,0 +1,122 @@
+<%= render "shared/flash" %>
+
+<h1 class="mb-8 text-3xl font-bold">User: <%= @user.email_address %></h1>
+
+<div class="mb-8 rounded-lg bg-gray-50 p-6 dark:bg-gray-800">
+  <dl class="grid grid-cols-1 gap-4 md:grid-cols-2">
+    <div>
+      <dt class="font-semibold text-gray-700 dark:text-gray-300"><%= t('admin.users.email') %></dt>
+      <dd class="text-gray-900 dark:text-white"><%= @user.email_address %></dd>
+    </div>
+
+    <div>
+      <dt class="font-semibold text-gray-700 dark:text-gray-300"><%= t('admin.users.role') %></dt>
+      <dd class="text-gray-900 dark:text-white"><%= @user.role.titleize %></dd>
+    </div>
+
+    <div>
+      <dt class="font-semibold text-gray-700 dark:text-gray-300"><%= t('admin.users.status') %></dt>
+
+      <dd>
+        <% if @user.banned? %>
+          <span class="rounded bg-red-100 px-2 py-1 text-xs font-medium text-red-800 dark:bg-red-900 dark:text-red-300">
+            <%= t('admin.users.banned') %>
+          </span>
+        <% else %>
+          <span class="rounded bg-green-100 px-2 py-1 text-xs font-medium text-green-800 dark:bg-green-900 dark:text-green-300">
+            <%= t('admin.users.active') %>
+          </span>
+        <% end %>
+      </dd>
+    </div>
+
+    <div>
+      <dt class="font-semibold text-gray-700 dark:text-gray-300"><%= t('admin.users.created_at') %></dt>
+      <dd class="text-gray-900 dark:text-white"><%= format_datetime(@user.created_at) %></dd>
+    </div>
+
+    <% if @user.banned? %>
+      <div class="md:col-span-2">
+        <dt class="font-semibold text-gray-700 dark:text-gray-300"><%= t('admin.users.ban_reason') %></dt>
+        <dd class="text-gray-900 dark:text-white"><%= @user.ban_reason %></dd>
+      </div>
+    <% end %>
+  </dl>
+</div>
+
+<div class="mb-8 flex gap-4">
+  <% if @user.banned? %>
+    <%= button_to t('admin.users.unban_user'),
+                  unban_admin_user_path(@user),
+                  class: "rounded bg-green-500 px-4 py-2 text-white hover:bg-green-600" %>
+  <% else %>
+    <div class="rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
+      <%= form_with url: ban_admin_user_path(@user), method: :post, class: "flex flex-col gap-4" do |form| %>
+        <%= form.label :reason, t('admin.users.ban_reason'), class: "font-semibold text-gray-700 dark:text-gray-300" %>
+
+        <%= form.text_area :reason,
+                           placeholder: t('admin.users.ban_reason_placeholder'),
+                           class: "rounded-md border border-gray-400 p-2 text-gray-900 bg-white dark:text-white dark:bg-gray-700 dark:border-gray-600",
+                           rows: 3 %>
+
+        <%= form.submit t('admin.users.ban_submit'), class: "rounded bg-red-500 px-4 py-2 text-white hover:bg-red-600 cursor-pointer" %>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+
+<div class="mb-8">
+  <h2 class="mb-4 text-2xl font-bold"><%= t('admin.users.sessions_title') %></h2>
+
+  <%= render(TableComponent.new) do |table| %>
+    <% table.with_header do %>
+      <th scope="col" class="px-6 py-3"><%= t('admin.users.session_user_agent') %></th>
+      <th scope="col" class="px-6 py-3"><%= t('admin.users.session_ip_address') %></th>
+      <th scope="col" class="px-6 py-3"><%= t('admin.users.session_expires_at') %></th>
+      <th scope="col" class="px-6 py-3"><%= t('admin.users.session_created_at') %></th>
+    <% end %>
+
+    <% if @sessions.empty? %>
+      <% table.with_row do %>
+        <td colspan="4" class="px-6 py-4 text-center"><%= t('admin.users.no_sessions') %></td>
+      <% end %>
+    <% else %>
+      <% @sessions.each do |session| %>
+        <% table.with_row do %>
+          <td class="px-6 py-4"><%= session.user_agent %></td>
+          <td class="px-6 py-4"><%= session.ip_address %></td>
+          <td class="px-6 py-4"><%= format_datetime(session.expires_at) %></td>
+          <td class="px-6 py-4"><%= format_datetime(session.created_at) %></td>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+</div>
+
+<div>
+  <h2 class="mb-4 text-2xl font-bold"><%= t('admin.users.audit_log_title') %></h2>
+
+  <%= render(TableComponent.new) do |table| %>
+    <% table.with_header do %>
+      <th scope="col" class="px-6 py-3"><%= t('admin.users.audit_action') %></th>
+      <th scope="col" class="px-6 py-3"><%= t('admin.users.audit_actor') %></th>
+      <th scope="col" class="px-6 py-3"><%= t('admin.users.audit_details') %></th>
+      <th scope="col" class="px-6 py-3"><%= t('admin.users.audit_date') %></th>
+    <% end %>
+
+    <% if @audit_logs.empty? %>
+      <% table.with_row do %>
+        <td colspan="4" class="px-6 py-4 text-center"><%= t('admin.users.no_audit_logs') %></td>
+      <% end %>
+    <% else %>
+      <% @audit_logs.each do |log| %>
+        <% table.with_row do %>
+          <td class="px-6 py-4 font-medium text-gray-900 dark:text-white"><%= log.action.titleize %></td>
+          <td class="px-6 py-4"><%= log.actor.email_address %></td>
+          <td class="px-6 py-4"><%= log.details['reason'] if log.details['reason'].present? %></td>
+          <td class="px-6 py-4"><%= format_datetime(log.created_at) %></td>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+</div>

@@ -37,3 +37,12 @@
     <% end %>
   <% end %>
 <% end %>
+
+<%= render(
+  LinkComponent.new(
+    title: t("back_to_admin"),
+    url: admin_root_path,
+    classnames:
+      "flex flex-col sm:flex-row my-8 gap-4 items-center sm:items-start justify-end",
+  ),
+) %>

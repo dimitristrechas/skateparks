@@ -1,275 +1,18 @@
-# Minitest Implementation Guide
+# Minitest Testing Guide
 
-**Project**: skateparks.gr  
-**Rails Version**: 8.0  
-**Migration**: RSpec → Minitest  
-**Date**: February 2026
+Rails 8.0 — Minitest (Rails default). Assert-style. **All tests must run via Docker.**
 
 ---
 
 ## Table of Contents
 
-1. [What is Minitest?](#what-is-minitest)
-2. [RSpec vs Minitest](#rspec-vs-minitest)
-3. [Migration Changes Made](#migration-changes-made)
-4. [Test Structure](#test-structure)
-5. [Writing Tests](#writing-tests)
+1. [Test Structure](#test-structure)
+2. [Test Data](#test-data)
+3. [Writing Tests](#writing-tests)
+4. [Authentication in Tests](#authentication-in-tests)
+5. [Common Patterns](#common-patterns)
 6. [Running Tests](#running-tests)
-7. [Common Patterns](#common-patterns)
-8. [Troubleshooting](#troubleshooting)
-
----
-
-## What is Minitest?
-
-Minitest is Rails' default testing framework. It's:
-
-- **Built into Ruby** - No external dependencies needed
-- **Fast** - Minimal overhead, quick test runs
-- **Simple** - Plain Ruby classes and methods
-- **Flexible** - Supports both assert-style and spec-style syntax
-
-We use **assert-style** (the default), which looks like standard Ruby code.
-
----
-
-## RSpec vs Minitest
-
-### RSpec (Before)
-
-```ruby
-# spec/models/skatepark_spec.rb
-RSpec.describe Skatepark do
-  describe '#save' do
-    context 'when name is nil' do
-      it 'returns false' do
-        skatepark = build(:skatepark)
-        skatepark.name = nil
-        expect(skatepark.save).to eq(false)
-      end
-    end
-  end
-end
-```
-
-### Minitest (After)
-
-```ruby
-# test/models/skatepark_test.rb
-class SkateparkTest < ActiveSupport::TestCase
-  def test_requires_name_to_be_present
-    skatepark = build(:skatepark)
-    skatepark.name = nil
-    assert_equal false, skatepark.save
-  end
-end
-```
-
-### Key Differences
-
-| Aspect              | RSpec                         | Minitest                                 |
-| ------------------- | ----------------------------- | ---------------------------------------- |
-| **File Location**   | `spec/`                       | `test/`                                  |
-| **File Naming**     | `*_spec.rb`                   | `*_test.rb`                              |
-| **Class Style**     | `RSpec.describe`              | `class MyTest < ActiveSupport::TestCase` |
-| **Test Definition** | `it "does something"`         | `def test_does_something`                |
-| **Assertions**      | `expect(x).to eq(y)`          | `assert_equal y, x`                      |
-| **Setup**           | `before { }` or `let(:x) { }` | `def setup`                              |
-| **Grouping**        | `describe` / `context`        | Method names (convention)                |
-
----
-
-## Migration Changes Made
-
-### 1. Factory Files Recreated
-
-**Problem**: RSpec factories were deleted but not recreated for Minitest.
-
-**Solution**: Created factories in `test/factories/`
-
-```ruby
-# test/factories/skateparks.rb
-FactoryBot.define do
-  factory :skatepark do
-    sequence(:name_en) { |n| "#{Faker::Address.community} Skatepark #{n}" }
-    sequence(:name_el) { |n| "#{Faker::Address.community} Σκέιτπαρκ #{n}" }
-
-    lat { Faker::Address.latitude }
-    lng { Faker::Address.longitude }
-    country_code { 'GR' }
-    state { 'I' }
-
-    description_en { Faker::Lorem.paragraph(sentence_count: 3) }
-    description_el { Faker::Lorem.paragraph(sentence_count: 3) }
-
-    # File attachments using Rack::Test::UploadedFile
-    cover_image do
-      Rack::Test::UploadedFile.new(
-        Rails.root.join('test/fixtures/files/sample_image2.jpg'),
-        'image/jpeg'
-      )
-    end
-
-    images do
-      [
-        Rack::Test::UploadedFile.new(
-          Rails.root.join('test/fixtures/files/sample_image1.jpg'),
-          'image/jpeg'
-        ),
-        Rack::Test::UploadedFile.new(
-          Rails.root.join('test/fixtures/files/sample_image3.jpg'),
-          'image/jpeg'
-        ),
-      ]
-    end
-
-    status { :published }
-
-    # Traits for different states
-    trait :draft do
-      status { :draft }
-    end
-
-    trait :archived do
-      status { :archived }
-    end
-
-    trait :us_location do
-      country_code { 'US' }
-      state { 'CA' }
-    end
-  end
-end
-```
-
-**Key Points**:
-
-- Use `Rack::Test::UploadedFile` for file attachments (NOT `fixture_file_upload` - that's only available in test contexts, not factory contexts)
-- Traits allow different variations: `create(:skatepark, :draft)`
-- Sequences ensure uniqueness: `name_en` gets incrementing numbers
-
-### 2. Test Helper Configuration
-
-**File**: `test/test_helper.rb`
-
-```ruby
-require 'coverage'
-Coverage.start(:all)
-
-ENV['RAILS_ENV'] ||= 'test'
-require_relative '../config/environment'
-require 'rails/test_help'
-require 'mocha/minitest'
-
-abort('The Rails environment is running in production mode!') if Rails.env.production?
-
-begin
-  ActiveRecord::Migration.maintain_test_schema!
-rescue ActiveRecord::PendingMigrationError => e
-  abort e.to_s.strip
-end
-
-Rails.root.glob('test/support/**/*.rb').sort.each { |f| require f }
-
-module ActiveSupport
-  class TestCase
-    fixtures :all
-    self.use_transactional_tests = true
-    self.fixture_paths = [Rails.root.join('test/fixtures')]
-
-    include FactoryBot::Syntax::Methods
-    include ActionDispatch::TestProcess::FixtureFile
-  end
-end
-
-module ActionDispatch
-  class IntegrationTest
-    def before_setup
-      super
-      ActiveStorage::Current.url_options = {
-        host: 'test.host',
-        protocol: 'http'
-      }
-    end
-  end
-end
-
-Rails.application.routes.default_url_options[:host] = 'http://test.host'
-```
-
-**What This Does**:
-
-- **Coverage**: Tracks code coverage for all tests
-- **Transactional tests**: Each test runs in a transaction that rolls back (database stays clean)
-- **FactoryBot integration**: Allows `create(:skatepark)` instead of `FactoryBot.create(:skatepark)`
-- **ActiveStorage URL generation**: Sets URL options so attachment URLs work in tests
-- **Test support files**: Loads any helper files from `test/support/`
-
-### 3. ActiveStorage URL Configuration
-
-**Problem**: Tests failed with "Cannot generate URL for sample_image2.jpg using Disk service"
-
-**Solution**: Added middleware in `config/environments/test.rb`
-
-```ruby
-# Inside Rails.application.configure block
-config.middleware.use(
-  Class.new do
-    def initialize(app)
-      @app = app
-    end
-
-    def call(env)
-      ActiveStorage::Current.url_options = {
-        host: env['HTTP_HOST'] || 'test.host',
-        protocol: 'http'
-      }
-      @app.call(env)
-    end
-  end
-)
-```
-
-**Why This is Needed**:
-
-- ActiveStorage needs to know the host to generate URLs for attachments
-- In tests, there's no real HTTP host, so we provide a fake one
-- This runs for every test request, ensuring URLs always work
-
-### 4. Test Isolation Fixes
-
-**Problem**: Tests expected exact array matches but got different results when running full suite
-
-**Before** (Fragile):
-
-```ruby
-def test_get_index_assigns_only_published_skateparks
-  get root_path
-  assert_equal [@published_skatepark], assigns(:skateparks)
-end
-```
-
-**After** (Robust):
-
-```ruby
-def test_get_index_assigns_only_published_skateparks
-  draft_skatepark = create(:skatepark, :draft)
-  archived_skatepark = create(:skatepark, :archived)
-
-  get root_path
-  skateparks = assigns(:skateparks).to_a
-
-  assert_includes skateparks, @published_skatepark
-  assert_not_includes skateparks, draft_skatepark
-  assert_not_includes skateparks, archived_skatepark
-end
-```
-
-**Why This is Better**:
-
-- Doesn't assume database is empty
-- Tests behavior (published vs draft/archived) instead of exact state
-- Works when running single test or full suite
+7. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -279,37 +22,113 @@ end
 
 ```
 test/
-├── channels/           # ActionCable channel tests
+├── channels/           # ActionCable (no tests written yet)
 ├── components/         # ViewComponent tests
-├── controllers/        # Controller tests
-│   ├── admin/         # Admin namespace
-│   └── ...
-├── factories/          # FactoryBot factories
+├── controllers/        # Controller integration tests
+├── factories/          # FactoryBot factory definitions
 │   ├── skateparks.rb
+│   ├── users.rb
 │   └── popular_skateparks.rb
-├── fixtures/           # Test data (we use factories instead)
-│   └── files/         # Sample files for uploads
-├── helpers/           # Helper tests
-├── jobs/              # ActiveJob tests
-├── mailers/           # ActionMailer tests
-├── models/            # Model tests
-├── system/            # System/integration tests (Capybara)
-└── test_helper.rb     # Global test configuration
+├── fixtures/           # Fixtures for users + audit_logs only
+│   └── files/         # Sample images for file upload tests
+├── helpers/            # ActionView helper tests
+├── jobs/               # ActiveJob tests
+├── mailers/            # ActionMailer tests
+├── models/             # Model unit tests
+├── support/            # Support helpers (currently empty — autoloaded if added)
+├── system/             # Capybara system tests (no tests written yet)
+├── workers/            # Sidekiq worker tests
+└── test_helper.rb
 ```
 
-### Test File Naming
+### Base Classes
 
-| File Type  | Pattern                                 | Example                         |
-| ---------- | --------------------------------------- | ------------------------------- |
-| Model      | `test/models/*_test.rb`                 | `skatepark_test.rb`             |
-| Controller | `test/controllers/*_controller_test.rb` | `skateparks_controller_test.rb` |
-| Helper     | `test/helpers/*_helper_test.rb`         | `schema_helper_test.rb`         |
-| Job        | `test/jobs/*_test.rb`                   | `sitemap_worker_test.rb`        |
-| Component  | `test/components/*_component_test.rb`   | `button_component_test.rb`      |
+| Test type      | Base class                        |
+| -------------- | --------------------------------- |
+| Models         | `ActiveSupport::TestCase`         |
+| Controllers    | `ActionDispatch::IntegrationTest` |
+| ViewComponents | `ViewComponent::TestCase`         |
+| Workers        | `ActiveSupport::TestCase`         |
+| Jobs           | `ActiveSupport::TestCase`         |
+| Helpers        | `ActionView::TestCase`            |
+| Mailers        | `ActionMailer::TestCase`          |
+
+### File Naming
+
+| Type       | Pattern                                 | Example                          |
+| ---------- | --------------------------------------- | -------------------------------- |
+| Model      | `test/models/*_test.rb`                 | `skatepark_test.rb`              |
+| Controller | `test/controllers/*_controller_test.rb` | `skateparks_controller_test.rb`  |
+| Component  | `test/components/*_component_test.rb`   | `button_component_test.rb`       |
+| Worker     | `test/workers/*_test.rb`                | `session_cleanup_worker_test.rb` |
+| Job        | `test/jobs/*_test.rb`                   | `sitemap_worker_test.rb`         |
+| Helper     | `test/helpers/*_helper_test.rb`         | `schema_helper_test.rb`          |
+
+---
+
+## Test Data
+
+### Factories (primary — use for most tests)
+
+Factories live in `test/factories/`. Included in all test classes via `FactoryBot::Syntax::Methods`.
+
+```ruby
+# Build — no DB hit (prefer for validation tests)
+skatepark = build(:skatepark)
+
+# Create — persists to DB
+skatepark = create(:skatepark)
+
+# With attributes
+skatepark = create(:skatepark, name_en: 'Custom Name', country_code: 'US')
+
+# With traits
+draft_park    = create(:skatepark, :draft)
+archived_park = create(:skatepark, :archived)
+us_park       = create(:skatepark, :us_location)
+us_draft      = create(:skatepark, :draft, :us_location)
+
+# Users
+admin       = create(:user, :admin)
+banned_user = create(:user, :banned)
+
+# Popular skateparks
+popular = create(:popular_skatepark)
+```
+
+### Available Factories and Traits
+
+| Factory              | Traits                                |
+| -------------------- | ------------------------------------- |
+| `:skatepark`         | `:draft`, `:archived`, `:us_location` |
+| `:user`              | `:admin`, `:banned`                   |
+| `:popular_skatepark` | —                                     |
+
+The `:skatepark` factory attaches real fixture images (`test/fixtures/files/sample_image{1,2,3}.jpg`) for `cover_image` and `images`.
+
+### Fixtures (users + audit_logs only)
+
+Rails fixtures exist for `users` and `audit_logs`. Access via `users(:one)`, `audit_logs(:one)`. All other models use factories.
 
 ---
 
 ## Writing Tests
+
+### Naming Styles
+
+Both are valid and used in this codebase:
+
+```ruby
+# Method-name style
+def test_requires_name_to_be_present
+  ...
+end
+
+# String-description style
+test 'requires name to be present' do
+  ...
+end
+```
 
 ### Model Tests
 
@@ -317,20 +136,24 @@ test/
 require 'test_helper'
 
 class SkateparkTest < ActiveSupport::TestCase
-  # Setup runs before each test
   def setup
     @skatepark = build(:skatepark)
   end
 
-  # Test method names must start with "test_"
   def test_requires_name_to_be_present
-    @skatepark.name = nil
-    assert_equal false, @skatepark.save
+    @skatepark.name_en = nil
+    assert_not @skatepark.save
   end
 
-  def test_generates_slug_based_on_name
-    skatepark = create(:skatepark, name_en: 'Test Skatepark')
-    assert_equal 'test-skatepark', skatepark.slug
+  def test_generates_slug_on_save
+    skatepark = create(:skatepark, name_en: 'Test Park')
+    assert_equal 'test-park', skatepark.slug
+  end
+
+  def test_validates_format
+    @skatepark.country_code = 'invalid'
+    assert_not @skatepark.save
+    assert_includes @skatepark.errors[:country_code], 'is invalid'
   end
 end
 ```
@@ -345,24 +168,25 @@ class SkateparksControllerTest < ActionDispatch::IntegrationTest
     @skatepark = create(:skatepark)
   end
 
-  def test_get_index_returns_success
-    get skateparks_path
+  def test_index_returns_success
+    get root_path
     assert_response :success
   end
 
-  def test_get_show_assigns_skatepark
-    get skatepark_path(@skatepark)
-    assert_equal @skatepark, assigns(:skatepark)
-  end
-
   def test_filters_by_country_code
-    greece_skatepark = create(:skatepark, country_code: 'GR')
-    us_skatepark = create(:skatepark, country_code: 'US')
+    greece = create(:skatepark, country_code: 'GR')
+    usa    = create(:skatepark, country_code: 'US')
 
     get skateparks_path(country_code: 'US')
 
-    assert_includes assigns(:skateparks), us_skatepark
-    assert_not_includes assigns(:skateparks), greece_skatepark
+    assert_includes assigns(:skateparks), usa
+    assert_not_includes assigns(:skateparks), greece
+  end
+
+  def test_turbo_stream_response
+    get skateparks_path, as: :turbo_stream
+    assert_response :success
+    assert_match(/turbo-stream/, response.content_type)
   end
 end
 ```
@@ -373,207 +197,233 @@ end
 require 'test_helper'
 
 class ButtonComponentTest < ViewComponent::TestCase
-  def test_renders_primary_button
-    render_inline(ButtonComponent.new(variant: :primary)) { "Click me" }
-
-    assert_selector 'button.btn-primary', text: 'Click me'
+  def test_renders_primary_variant
+    render_inline(ButtonComponent.new(variant: :primary)) { 'Click me' }
+    assert_selector 'button', text: 'Click me'
   end
+end
+```
 
-  def test_renders_as_link
-    render_inline(ButtonComponent.new(href: '/path')) { "Link" }
+Components that call route helpers require a `with_request_url` block:
 
-    assert_selector 'a[href="/path"]', text: 'Link'
+```ruby
+def test_renders_skatepark_link
+  with_request_url '/' do
+    render_inline(HomepageSkateparkCardComponent.new(skatepark: create(:skatepark)))
+    assert_selector 'a[href]'
+  end
+end
+```
+
+### Worker Tests
+
+```ruby
+require 'test_helper'
+
+class SessionCleanupWorkerTest < ActiveSupport::TestCase
+  def test_deletes_expired_sessions
+    expired = create(:session, expires_at: 1.day.ago)
+    active  = create(:session, expires_at: 2.weeks.from_now)
+
+    SessionCleanupWorker.new.perform
+
+    assert_not Session.exists?(expired.id)
+    assert Session.exists?(active.id)
   end
 end
 ```
 
 ---
 
-## Common Assertions
+## Authentication in Tests
 
-### Equality & Truthiness
-
-```ruby
-assert_equal expected, actual          # Equal values
-assert_not_equal expected, actual      # Not equal
-assert_same object1, object2           # Same object reference
-assert_nil value                       # Value is nil
-assert value                           # Value is truthy
-refute value                           # Value is falsy
-```
-
-### Collections
+Controller tests that require a logged-in user use `login_as`, defined on `ActionDispatch::IntegrationTest` in `test_helper.rb`.
 
 ```ruby
-assert_empty collection                # Collection is empty
-assert_includes collection, item       # Collection includes item
-assert_not_includes collection, item   # Collection doesn't include item
-```
+class Admin::UsersControllerTest < ActionDispatch::IntegrationTest
+  def setup
+    @admin = create(:user, :admin)
+    login_as(@admin)
+  end
 
-### Responses (Controller Tests)
+  def test_requires_admin
+    login_as(create(:user))  # Regular user
+    get admin_users_path
+    assert_redirected_to root_path
+  end
 
-```ruby
-assert_response :success              # HTTP 200
-assert_response :redirect             # HTTP 3xx
-assert_response :not_found            # HTTP 404
-assert_response :unprocessable_content # HTTP 422
-
-assert_redirected_to root_path        # Redirected to specific path
-```
-
-### Database Changes
-
-```ruby
-assert_difference 'Skatepark.count', 1 do
-  post skateparks_path, params: valid_params
-end
-
-assert_no_difference 'Skatepark.count' do
-  post skateparks_path, params: invalid_params
+  def test_unauthenticated_redirect
+    # No login_as call — request goes as guest
+    delete session_path
+    get admin_users_path
+    assert_redirected_to new_session_path
+  end
 end
 ```
 
-### Selectors (Component/System Tests)
+**How it works**: `login_as` creates a real `Session` record, builds a properly signed cookie, and injects it into the test request context via `cookies[:session_token]`. It is only available on `ActionDispatch::IntegrationTest`.
+
+---
+
+## Common Patterns
+
+### Assertions Reference
 
 ```ruby
+# Equality
+assert_equal expected, actual
+assert_not_equal expected, actual
+
+# Truthiness
+assert value            # truthy
+refute value            # falsy (alias: assert_not)
+assert_nil value
+assert_not_nil value
+
+# Collections
+assert_empty collection
+assert_includes collection, item
+assert_not_includes collection, item
+
+# Strings / Regex
+assert_match /pattern/, string
+assert_no_match /pattern/, string
+
+# HTTP responses (controller tests)
+assert_response :success               # 200
+assert_response :redirect              # 3xx
+assert_response :not_found             # 404
+assert_response :unprocessable_content # 422
+assert_redirected_to some_path
+
+# DB changes
+assert_difference 'Model.count', 1 do
+  post create_path, params: valid_params
+end
+
+assert_no_difference 'Model.count' do
+  post create_path, params: invalid_params
+end
+
+# Email
+assert_emails 1 do
+  post password_resets_path, params: { email_address: user.email_address }
+end
+
+# Exceptions
+assert_raises(ActiveRecord::RecordInvalid) { record.save! }
+
+# Selectors (component tests)
 assert_selector 'h1', text: 'Welcome'
-assert_selector '.btn-primary'
 assert_no_selector '.error-message'
+```
+
+### Mocking with Mocha
+
+Mocha is the primary mocking library (`require 'mocha/minitest'` in `test_helper.rb`).
+
+```ruby
+# Stub instance method on all instances
+SomeClass.any_instance.stubs(:method_name).returns(value)
+
+# Stub class method
+Rails.stubs(:env).returns(ActiveSupport::StringInquirer.new('production'))
+
+# Expect (test fails if not called)
+Rails.cache.expects(:delete).with('skateparks_popular').once
+
+# Stub with dynamic return
+Rake::Task.expects(:[]).with('sitemap:refresh:no_ping').returns(
+  mock.tap { |m| m.expects(:invoke) }
+)
+```
+
+### Caching
+
+Cache is active in tests (`:memory_store`). Clear it in `setup` when your test involves cached data:
+
+```ruby
+def setup
+  Rails.cache.clear
+  @skatepark = create(:skatepark)
+end
+
+def test_caches_result_after_first_request
+  get root_path
+  assert_not_nil Rails.cache.read('skateparks_latest')
+end
+
+def test_cache_invalidated_on_publish
+  # Populate cache
+  get root_path
+
+  @skatepark.update!(status: :published)
+
+  assert_nil Rails.cache.read('skateparks_latest')
+end
+```
+
+### File Uploads
+
+Use `fixture_file_upload` in test methods. Use `Rack::Test::UploadedFile` in factory definitions (factories run outside request context):
+
+```ruby
+# In a test method — fixture_file_upload is available
+def test_requires_cover_image
+  skatepark = build(:skatepark)
+  skatepark.cover_image = nil
+  assert_not skatepark.save
+end
+
+def test_rejects_single_image
+  skatepark = build(:skatepark, images: [fixture_file_upload('sample_image1.jpg')])
+  assert_not skatepark.save   # Requires at least 2 images
+end
+```
+
+### Testing Validations (AAA pattern)
+
+```ruby
+def test_requires_email_address
+  # Arrange
+  user = build(:user, email_address: nil)
+
+  # Act
+  result = user.save
+
+  # Assert
+  assert_not result
+  assert_includes user.errors[:email_address], "can't be blank"
+end
 ```
 
 ---
 
 ## Running Tests
 
-### Via Docker (Required for this project)
+**Always run via Docker** (tests require the test container):
 
 ```bash
-# Interactive menu
-./scripts.sh
-# Select option 12: "Run tests"
-
-# Or directly:
+# All tests
 docker compose -f docker-compose.test.yml exec skateparks-web-test bin/rails test
+
+# All tests with coverage report
+docker compose -f docker-compose.test.yml exec skateparks-web-test bash -c "COVERAGE=true bin/rails test"
+
+# Single file
+docker compose -f docker-compose.test.yml exec skateparks-web-test bin/rails test test/models/skatepark_test.rb
+
+# Single test by line number
+docker compose -f docker-compose.test.yml exec skateparks-web-test bin/rails test test/models/skatepark_test.rb:42
+
+# Single test by name
+docker compose -f docker-compose.test.yml exec skateparks-web-test bin/rails test test/models/skatepark_test.rb -n test_requires_name_to_be_present
 ```
 
-### Run Specific Tests
+Or use the interactive menu:
 
 ```bash
-# Single file
-bin/rails test test/models/skatepark_test.rb
-
-# Single test method
-bin/rails test test/models/skatepark_test.rb:42
-
-# Pattern matching
-bin/rails test test/models/**/*_test.rb
-```
-
-### Coverage Report
-
-Tests automatically generate coverage reports:
-
-```
-coverage/index.html
-```
-
-Open in browser to see line-by-line coverage.
-
----
-
-## Common Patterns
-
-### Using FactoryBot
-
-```ruby
-# Build (doesn't save to database)
-skatepark = build(:skatepark)
-
-# Create (saves to database)
-skatepark = create(:skatepark)
-
-# With attributes
-skatepark = create(:skatepark, name_en: 'Custom Name')
-
-# With traits
-draft = create(:skatepark, :draft)
-archived = create(:skatepark, :archived)
-us_park = create(:skatepark, :us_location)
-
-# Multiple traits
-us_draft = create(:skatepark, :draft, :us_location)
-```
-
-### Using Mocha for Mocking
-
-```ruby
-# Stub instance method
-ApplicationController.any_instance.stubs(:http_basic_authenticate_or_request_with).returns(true)
-
-# Expect method to be called
-Rails.cache.expects(:delete).with('skateparks_popular')
-
-# Stub class method
-Rails.stubs(:env).returns(ActiveSupport::StringInquirer.new('production'))
-
-# Mock object
-rake_task = mock
-rake_task.expects(:invoke)
-Rake::Task.expects(:[]).with('sitemap:refresh').returns(rake_task)
-```
-
-### File Uploads in Tests
-
-```ruby
-# In test
-def test_requires_cover_image
-  skatepark = build(:skatepark)
-  skatepark.cover_image = nil
-  assert_equal false, skatepark.save
-end
-
-# Using fixture_file_upload (only in test context, not factories)
-def test_with_single_image
-  skatepark = build(:skatepark, images: [fixture_file_upload('sample_image1.jpg')])
-  assert_equal false, skatepark.save # Requires at least 2 images
-end
-```
-
-### Testing Validations
-
-```ruby
-def test_requires_field_to_be_present
-  record = build(:model)
-  record.field = nil
-  assert_equal false, record.save
-  assert_includes record.errors[:field], "can't be blank"
-end
-
-def test_validates_format
-  record = build(:model, email: 'invalid')
-  assert_equal false, record.save
-  assert_includes record.errors[:email], "is invalid"
-end
-```
-
-### Testing Callbacks
-
-```ruby
-def test_generates_slug_before_save
-  skatepark = build(:skatepark, name_en: 'Test Park')
-  assert_nil skatepark.slug
-
-  skatepark.save
-  assert_equal 'test-park', skatepark.slug
-end
-
-def test_updates_slug_when_name_changes
-  skatepark = create(:skatepark, name_en: 'Old Name')
-  assert_equal 'old-name', skatepark.slug
-
-  skatepark.update(name_en: 'New Name')
-  assert_equal 'new-name', skatepark.slug
-end
+./scripts.sh   # → "Run tests"
 ```
 
 ---
@@ -582,281 +432,62 @@ end
 
 ### "Factory not registered"
 
-**Problem**: `KeyError: Factory not registered: "skatepark"`
+`KeyError: Factory not registered: "skatepark"`
 
-**Solution**:
-
-1. Check factory file exists: `test/factories/skateparks.rb`
-2. Check factory is defined: `factory :skatepark do`
-3. Restart test server if running in Docker
+1. Check file exists: `test/factories/skateparks.rb`
+2. Check factory name matches: `factory :skatepark do`
+3. Restart the test container if running in Docker
 
 ### "Cannot generate URL for attachment"
 
-**Problem**: `Cannot generate URL for sample_image.jpg using Disk service`
+`Cannot generate URL for sample_image.jpg using Disk service`
 
-**Solution**: Already configured in this project. If you see this:
+Already configured. If this surfaces:
 
-1. Check `config/environments/test.rb` has ActiveStorage middleware
-2. Check `test/test_helper.rb` sets `ActiveStorage::Current.url_options`
+1. Check `config/environments/test.rb` has the `ActiveStorage::Current.url_options` middleware
+2. Check `test_helper.rb` has the `before_setup` block setting `ActiveStorage::Current.url_options` for `ActionDispatch::IntegrationTest`
 
-### "undefined method `fixture_file_upload'"
+### `fixture_file_upload` undefined in factory
 
-**Problem**: Using `fixture_file_upload` in factory file
-
-**Solution**: Use `Rack::Test::UploadedFile` in factories:
+Using `fixture_file_upload` inside a factory definition. Factories don't run in a test request context. Use `Rack::Test::UploadedFile` instead:
 
 ```ruby
-# In factory file
-cover_image do
-  Rack::Test::UploadedFile.new(
-    Rails.root.join('test/fixtures/files/sample.jpg'),
-    'image/jpeg'
-  )
-end
+# In factory — use this
+cover_image { Rack::Test::UploadedFile.new(Rails.root.join('test/fixtures/files/sample.jpg'), 'image/jpeg') }
 
-# In test file (where fixture_file_upload is available)
-skatepark = build(:skatepark, images: [fixture_file_upload('sample.jpg')])
+# In test method — this is fine
+build(:skatepark, images: [fixture_file_upload('sample_image1.jpg')])
 ```
 
-### Tests Failing with Database Pollution
+### Tests pass alone, fail in full suite
 
-**Problem**: Tests pass individually but fail when running full suite
+Database state leaking or cache not cleared. Check:
 
-**Solution**:
-
-1. Check `use_transactional_tests = true` in test_helper.rb
-2. Write tests that verify behavior, not exact state:
+1. `use_transactional_tests = true` in `test_helper.rb` (already set)
+2. Call `Rails.cache.clear` in `setup` if your test depends on cache state
+3. Write assertions against behavior, not exact collection state:
 
 ```ruby
-# Bad (assumes empty database)
-assert_equal [skatepark1], Skatepark.all.to_a
+# Fragile — assumes DB is empty
+assert_equal [@skatepark], Skatepark.published.to_a
 
-# Good (tests behavior)
-assert_includes Skatepark.all, skatepark1
+# Robust — tests membership, not exact state
+assert_includes Skatepark.published, @published_skatepark
+assert_not_includes Skatepark.published, @draft_skatepark
 ```
 
-### Mocha Stubbing Not Working
+### `login_as` undefined
 
-**Problem**: `unexpected invocation` or stub doesn't work
-
-**Solution**:
-
-1. Check `require 'mocha/minitest'` in test_helper.rb
-2. Use correct syntax:
-
-```ruby
-# Stub instance method on all instances
-Model.any_instance.stubs(:method).returns(value)
-
-# Stub class method
-Model.stubs(:class_method).returns(value)
-
-# Expect (will fail if not called)
-Model.expects(:method).returns(value)
-```
+`login_as` is only available on `ActionDispatch::IntegrationTest` (controller tests). It is not on `ActiveSupport::TestCase` — model and worker tests don't need it.
 
 ---
 
-## Test Gems Used
+## Test Gems
 
-### factory_bot_rails
-
-**Purpose**: Create test data  
-**Usage**: `create(:skatepark)`, `build(:skatepark)`  
-**Why**: Easier than Rails fixtures for complex associations/traits
-
-### faker
-
-**Purpose**: Generate varied random data  
-**Usage**: `Faker::Address.community`, `Faker::Lorem.paragraph`  
-**Why**: Catches edge cases with varied data
-
-### mocha
-
-**Purpose**: Mocking and stubbing  
-**Usage**: `Model.expects(:method)`, `stubs(:method).returns(value)`  
-**Why**: More ergonomic than Minitest::Mock for complex cases
-
-### rails-controller-testing
-
-**Purpose**: Controller test helpers  
-**Usage**: `assigns(:variable)` to access instance variables  
-**Why**: Required for `assigns` helper (removed from Rails core)
-
-### capybara
-
-**Purpose**: System/integration tests  
-**Usage**: `visit path`, `click_button`, `fill_in`  
-**Why**: Required for browser-based testing
-
----
-
-## Best Practices
-
-### 1. Test One Thing Per Test
-
-```ruby
-# Bad - tests multiple things
-def test_skatepark_creation
-  skatepark = create(:skatepark)
-  assert_not_nil skatepark.slug
-  assert_equal 'published', skatepark.status
-  assert_not_nil skatepark.cover_image
-end
-
-# Good - separate concerns
-def test_generates_slug_on_creation
-  skatepark = create(:skatepark)
-  assert_not_nil skatepark.slug
-end
-
-def test_defaults_to_published_status
-  skatepark = create(:skatepark)
-  assert_equal 'published', skatepark.status
-end
-```
-
-### 2. Use Descriptive Test Names
-
-```ruby
-# Bad
-def test_skatepark
-  # What does this test?
-end
-
-# Good
-def test_requires_name_to_be_present
-  # Clear what's being tested
-end
-```
-
-### 3. Follow AAA Pattern (Arrange, Act, Assert)
-
-```ruby
-def test_filters_by_country
-  # Arrange - set up test data
-  greece = create(:skatepark, country_code: 'GR')
-  usa = create(:skatepark, country_code: 'US')
-
-  # Act - perform the action
-  get skateparks_path(country_code: 'US')
-
-  # Assert - verify the result
-  assert_includes assigns(:skateparks), usa
-  assert_not_includes assigns(:skateparks), greece
-end
-```
-
-### 4. Keep Tests Fast
-
-```ruby
-# Use build when you don't need database
-skatepark = build(:skatepark)  # Fast
-skatepark.name = nil
-assert_equal false, skatepark.save
-
-# Only use create when needed
-skatepark = create(:skatepark)  # Slower (database hit)
-```
-
-### 5. Avoid Test Interdependence
-
-```ruby
-# Bad - test order matters
-def test_first
-  @global_skatepark = create(:skatepark)
-end
-
-def test_second
-  # Relies on @global_skatepark from previous test
-  assert_not_nil @global_skatepark
-end
-
-# Good - each test is independent
-def test_first
-  skatepark = create(:skatepark)
-  # Test uses local variable
-end
-
-def test_second
-  skatepark = create(:skatepark)
-  # Creates its own data
-end
-```
-
----
-
-## Resources
-
-- [Minitest Documentation](https://github.com/minitest/minitest)
-- [Rails Testing Guide](https://guides.rubyonrails.org/testing.html)
-- [FactoryBot Documentation](https://github.com/thoughtbot/factory_bot)
-- [Mocha Documentation](https://github.com/freerange/mocha)
-- [Capybara Documentation](https://github.com/teamcapybara/capybara)
-
----
-
-## Quick Reference Card
-
-### Test File Template
-
-```ruby
-require 'test_helper'
-
-class MyModelTest < ActiveSupport::TestCase
-  def setup
-    # Runs before each test
-    @record = create(:my_model)
-  end
-
-  def teardown
-    # Runs after each test (rarely needed with transactions)
-  end
-
-  def test_some_behavior
-    # Arrange
-    @record.attribute = new_value
-
-    # Act
-    result = @record.save
-
-    # Assert
-    assert_equal true, result
-  end
-end
-```
-
-### Common Commands
-
-```bash
-# Run all tests
-bin/rails test
-
-# Run single file
-bin/rails test test/models/skatepark_test.rb
-
-# Run single test
-bin/rails test test/models/skatepark_test.rb:42
-
-# Run with coverage (in this project)
-COVERAGE=true bin/rails test
-```
-
-### Assertion Cheat Sheet
-
-```ruby
-assert_equal a, b          # a == b
-assert_not_equal a, b      # a != b
-assert a                   # a is truthy
-refute a                   # a is falsy
-assert_nil a               # a.nil?
-assert_empty a             # a.empty?
-assert_includes coll, item # coll.include?(item)
-assert_match /regex/, str  # str =~ /regex/
-assert_raises(Error) { }   # Block raises Error
-```
-
----
-
-**Last Updated**: February 2026  
-**Maintainer**: AI Assistant (via OpenCode)
+| Gem                        | Purpose                                                                 |
+| -------------------------- | ----------------------------------------------------------------------- |
+| `factory_bot_rails`        | Test data factories                                                     |
+| `faker`                    | Random test data                                                        |
+| `mocha`                    | Mocking and stubbing                                                    |
+| `rails-controller-testing` | `assigns(:var)` in controller tests                                     |
+| `capybara`                 | System test browser automation (installed; no system tests written yet) |

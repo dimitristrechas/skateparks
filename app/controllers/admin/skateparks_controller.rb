@@ -1,9 +1,6 @@
 module Admin
-  class SkateparksController < ApplicationController
+  class SkateparksController < BaseController
     before_action :set_skatepark, only: %i[show edit update destroy]
-    http_basic_authenticate_with name: Rails.application.credentials.dig(:admin, :username),
-                                 password: Rails.application.credentials.dig(:admin, :password),
-                                 unless: -> { Rails.env.development? }
 
     # GET /skateparks or /skateparks.json
     def index

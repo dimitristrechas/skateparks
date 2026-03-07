@@ -11,7 +11,8 @@
   <% end %>
 
   <figcaption class="attachment__caption">
-    <% if caption = blob.try(:caption) %>
+    <% caption = blob.try(:caption) %>
+    <% if caption %>
       <%= caption %>
     <% else %>
       <span class="attachment__name"><%= blob.filename %></span>

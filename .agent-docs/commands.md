@@ -1,21 +1,5 @@
 # Commands Reference
 
-## Testing (Docker)
-
-```bash
-# All tests with coverage
-docker compose -f docker-compose.test.yml exec skateparks-web-test bash -c "COVERAGE=true bin/rails test"
-
-# Single file
-docker compose -f docker-compose.test.yml exec skateparks-web-test bin/rails test test/models/skatepark_test.rb
-
-# Single test by line number
-docker compose -f docker-compose.test.yml exec skateparks-web-test bin/rails test test/models/skatepark_test.rb:42
-
-# Run specific test method by name
-docker compose -f docker-compose.test.yml exec skateparks-web-test bin/rails test test/models/skatepark_test.rb -n test_requires_name_to_be_present
-```
-
 ## Linting
 
 ```bash

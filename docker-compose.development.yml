@@ -37,6 +37,8 @@ services:
       - RAILS_MASTER_KEY=${RAILS_MASTER_KEY}
       - REDIS_URL=${REDIS_URL}
       - PORT=${PORT:-3002}
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
     volumes:
       - app-storage:/rails/storage
       - ${CODEBASE_VOLUME}:/rails

@@ -6,6 +6,8 @@ module Admin
     include Rails.application.routes.url_helpers
 
     def setup
+      @admin = create(:user, :admin)
+      login_as(@admin)
       @skatepark = create(:skatepark)
       @valid_attributes = attributes_for(:skatepark)
       @invalid_attributes = {
@@ -17,9 +19,6 @@ module Admin
         images: [],
         status: nil,
       }
-
-      # Mock authentication
-      ApplicationController.any_instance.stubs(:http_basic_authenticate_or_request_with).returns(true)
     end
 
     def test_get_index_returns_success_and_assigns_skateparks
@@ -120,6 +119,14 @@ module Admin
     def test_delete_destroy_redirects_to_skateparks_list
       delete admin_skatepark_path(@skatepark)
       assert_redirected_to admin_skateparks_url
+    end
+
+    def test_non_admin_blocked_from_skateparks
+      user = create(:user, role: :user)
+      login_as(user)
+      get admin_skateparks_path
+      assert_redirected_to root_path
+      assert_match(/not authorized/, flash[:alert])
     end
   end
 end

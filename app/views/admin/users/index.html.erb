@@ -1,0 +1,52 @@
+<%= render "shared/flash" %>
+
+<h1 class="mb-8 text-3xl font-bold"><%= t('admin.users.title') %></h1>
+
+<%= render(TableComponent.new) do |table| %>
+  <% table.with_header do %>
+    <th scope="col" class="px-6 py-3"><%= t('admin.users.email') %></th>
+    <th scope="col" class="px-6 py-3"><%= t('admin.users.role') %></th>
+    <th scope="col" class="px-6 py-3"><%= t('admin.users.status') %></th>
+    <th scope="col" class="px-6 py-3"><%= t('admin.users.created_at') %></th>
+    <th scope="col" class="px-6 py-3"><%= t('admin.users.actions') %></th>
+  <% end %>
+
+  <% @users.each do |user| %>
+    <% table.with_row do %>
+      <td class="px-6 py-4 font-medium text-gray-900 dark:text-white"><%= user.email_address %></td>
+      <td class="px-6 py-4"><%= user.role.titleize %></td>
+
+      <td class="px-6 py-4">
+        <% if user.banned? %>
+          <span class="rounded bg-red-100 px-2 py-1 text-xs font-medium text-red-800 dark:bg-red-900 dark:text-red-300">
+            <%= t('admin.users.banned') %>
+          </span>
+        <% else %>
+          <span
+            class="
+              rounded bg-green-100 px-2 py-1 text-xs font-medium text-green-800 dark:bg-green-900
+              dark:text-green-300
+            "
+          >
+            <%= t('admin.users.active') %>
+          </span>
+        <% end %>
+      </td>
+
+      <td class="px-6 py-4"><%= format_datetime(user.created_at) %></td>
+
+      <td class="px-6 py-4">
+        <%= link_to t('admin.users.view'), admin_user_path(user), class: "text-blue-500 hover:underline" %>
+      </td>
+    <% end %>
+  <% end %>
+<% end %>
+
+<%= render(
+  LinkComponent.new(
+    title: t("back_to_admin"),
+    url: admin_root_path,
+    classnames:
+      "flex flex-col sm:flex-row my-8 gap-4 items-center sm:items-start justify-end",
+  ),
+) %>
