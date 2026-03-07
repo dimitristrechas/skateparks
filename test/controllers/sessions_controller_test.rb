@@ -23,19 +23,17 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     assert_not Session.exists?(user_id: user.id)
   end
 
-  test 'prevents user enumeration via timing' do
-    create(:user, email_address: 'exists@example.com', password: 'password123456')
-
-    start_time = Time.zone.now
+  test 'prevents user enumeration by running dummy BCrypt when email not found' do
+    BCrypt::Password.expects(:create).with('dummy', cost: BCrypt::Engine::DEFAULT_COST).once
     post session_url, params: { email_address: 'nonexistent@example.com', password: 'password123456' }
-    nonexistent_time = Time.zone.now - start_time
+    assert_redirected_to new_session_path
+  end
 
-    start_time = Time.zone.now
+  test 'does not run dummy BCrypt when email exists' do
+    create(:user, email_address: 'exists@example.com', password: 'password123456')
+    BCrypt::Password.expects(:create).never
     post session_url, params: { email_address: 'exists@example.com', password: 'wrongpassword123' }
-    wrong_password_time = Time.zone.now - start_time
-
-    assert (nonexistent_time - wrong_password_time).abs < 0.5,
-           'Timing difference too large, potential enumeration vector'
+    assert_redirected_to new_session_path
   end
 
   test 'session resumption grants access to protected page' do
