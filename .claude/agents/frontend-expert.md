@@ -5,7 +5,6 @@ description: >-
   controllers, Hotwire/Turbo functionality, HTML templates, CSS/Tailwind
   styling, ViewComponents, accessibility improvements, responsive design, or
   any client-side code.
-model: sonnet
 color: purple
 ---
 

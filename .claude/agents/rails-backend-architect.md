@@ -6,7 +6,6 @@ description: >-
   background job setup, caching strategy, API design, performance optimization,
   SOLID violations, ActiveRecord queries, Redis integration, database
   migrations, test coverage for backend logic.
-model: sonnet
 color: yellow
 ---
 
