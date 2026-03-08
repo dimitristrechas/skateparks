@@ -23,6 +23,8 @@ Rails.root.glob('test/support/**/*.rb').sort.each { |f| require f }
 
 module ActiveSupport
   class TestCase
+    parallelize(workers: :number_of_processors)
+
     fixtures :all
     self.use_transactional_tests = true
     self.fixture_paths = [Rails.root.join('test/fixtures')]

@@ -3,12 +3,24 @@ name: CI/CD
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+      - ".github/ISSUE_TEMPLATE/**"
+      - "LICENSE"
+      - ".gitignore"
   pull_request:
     branches: [main]
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+      - ".github/ISSUE_TEMPLATE/**"
+      - "LICENSE"
+      - ".gitignore"
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 permissions:
   contents: read
@@ -23,12 +35,13 @@ jobs:
     timeout-minutes: 10
 
     strategy:
+      fail-fast: false
       matrix:
         include:
           - name: components
             test_dirs: test/components
           - name: core
-            test_dirs: test/controllers test/models test/helpers test/jobs test/workers test/mailers
+            test_dirs: test/controllers test/models test/helpers test/jobs test/workers test/mailers test/channels
 
     name: test (${{ matrix.name }})
 
@@ -43,9 +56,10 @@ jobs:
           - 5432:5432
         options: >-
           --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+          --health-start-period 5s
 
       redis:
         image: redis:7-alpine
@@ -53,9 +67,10 @@ jobs:
           - 6379:6379
         options: >-
           --health-cmd "redis-cli ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+          --health-start-period 5s
 
     env:
       RAILS_ENV: test
@@ -78,7 +93,7 @@ jobs:
           bundler-cache: true
 
       - name: Set up Node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: yarn
@@ -86,13 +101,22 @@ jobs:
       - name: Install JS dependencies
         run: yarn install --frozen-lockfile
 
+      - name: Cache compiled assets
+        id: cache-assets
+        uses: actions/cache@v5
+        with:
+          path: |
+            public/assets
+            app/assets/builds
+          key: assets-${{ runner.os }}-${{ hashFiles('app/assets/**', 'app/javascript/**', 'app/stylesheets/**', 'package.json', 'yarn.lock', 'Gemfile.lock') }}
+          restore-keys: |
+            assets-${{ runner.os }}-
+
       - name: Setup database
         run: bundle exec rails db:create db:schema:load
 
-      - name: Check autoloader
-        run: bundle exec rails zeitwerk:check
-
       - name: Precompile assets
+        if: steps.cache-assets.outputs.cache-hit != 'true'
         run: bundle exec rails assets:precompile
 
       - name: Run tests (${{ matrix.name }})
@@ -101,12 +125,16 @@ jobs:
   rubocop-brakeman:
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    env:
+      RAILS_ENV: test
+      RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
     steps:
       - uses: actions/checkout@v6
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ env.RUBY_VERSION }}
           bundler-cache: true
+      - run: bundle exec rails zeitwerk:check
       - run: bundle exec rubocop --force-exclusion
       - run: bundle exec brakeman -q --no-pager
       - run: bundle exec bundle-audit check --update
@@ -116,7 +144,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: yarn
