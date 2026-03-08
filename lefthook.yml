@@ -1,5 +1,4 @@
 pre-commit:
-  piped: true
   commands:
     prettier-fix:
       glob: "*.{js,ts,json,css}"
@@ -25,19 +24,9 @@ pre-commit:
       stage_fixed: true
       priority: 1
 
-    prettier:
-      glob: "*.{js,ts,json,css}"
-      run: yarn prettier:check {staged_files}
-      priority: 2
-
     herb-lint:
       glob: "*.erb"
       run: yarn herb:lint {staged_files}
-      priority: 2
-
-    herb-format:
-      glob: "*.erb"
-      run: yarn herb:format:check {staged_files}
       priority: 2
 
     rubocop:
@@ -46,6 +35,7 @@ pre-commit:
       priority: 2
 
 pre-push:
+  parallel: true
   commands:
     brakeman:
       run: bundle exec brakeman -q --no-pager
