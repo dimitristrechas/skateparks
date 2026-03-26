@@ -154,19 +154,76 @@ jobs:
       - run: yarn herb:format:check
       - run: yarn audit --audit-level moderate
 
-  deploy:
+  docker-publish:
     runs-on: ubuntu-latest
-    timeout-minutes: 2
+    timeout-minutes: 30
     needs:
       - test
       - rubocop-brakeman
       - herb-prettier
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      image: ${{ steps.image.outputs.name }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Normalize image name
+        id: image
+        env:
+          IMAGE_OWNER: ${{ github.repository_owner }}
+        run: echo "name=ghcr.io/${IMAGE_OWNER,,}/skateparks" >> "$GITHUB_OUTPUT"
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ steps.image.outputs.name }}
+          tags: |
+            type=raw,value=latest
+            type=sha,prefix=sha-
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push application image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    needs:
+      - docker-publish
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
       - name: Trigger Dokploy deployment webhook
         env:
           DOKPLOY_WEBHOOK_KEY: ${{ secrets.DOKPLOY_WEBHOOK_KEY }}
           COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+          IMAGE_NAME: ${{ needs.docker-publish.outputs.image }}
         run: |
           if [ -z "$DOKPLOY_WEBHOOK_KEY" ]; then
             echo "DOKPLOY_WEBHOOK_KEY secret is not set"
@@ -175,6 +232,7 @@ jobs:
 
           dokploy_webhook_url="https://admin.dimitristrechas.com/api/deploy/$DOKPLOY_WEBHOOK_KEY"
           short_sha="${GITHUB_SHA::7}"
+          echo "Triggering Dokploy deployment for ${IMAGE_NAME}:latest"
           payload="$(jq -n \
             --arg ref "$GITHUB_REF" \
             --arg id "$short_sha" \

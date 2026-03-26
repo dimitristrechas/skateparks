@@ -1,0 +1,28 @@
+name: Cleanup GHCR
+
+on:
+  schedule:
+    - cron: "0 0 * * 0"
+  workflow_dispatch:
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      packages: write
+    steps:
+      - name: Delete old package versions
+        uses: actions/delete-package-versions@v5
+        with:
+          package-name: skateparks
+          package-type: container
+          min-versions-to-keep: 5
+          delete-only-untagged-versions: false
+
+      - name: Delete untagged versions
+        uses: actions/delete-package-versions@v5
+        with:
+          package-name: skateparks
+          package-type: container
+          delete-only-untagged-versions: true
