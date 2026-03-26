@@ -66,7 +66,7 @@ module Admin
 
     def states
       country = ISO3166::Country[params[:country_code]]
-      render json: country.subdivisions
+      render json: country ? country.subdivisions : {}
     end
 
     private

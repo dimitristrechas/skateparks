@@ -5,6 +5,7 @@ class SkateparksControllerTest < ActionDispatch::IntegrationTest
   include Rails.application.routes.url_helpers
 
   def setup
+    Rails.cache.clear
     @skatepark = create(:skatepark)
   end
 
@@ -117,6 +118,22 @@ class SkateparksControllerTest < ActionDispatch::IntegrationTest
     assert_equal @skatepark, assigns(:skatepark)
   end
 
+  def test_get_show_returns_not_found_for_draft_skatepark
+    draft_skatepark = create(:skatepark, :draft)
+
+    get skatepark_path(draft_skatepark)
+
+    assert_response :not_found
+  end
+
+  def test_get_show_returns_not_found_for_archived_skatepark
+    archived_skatepark = create(:skatepark, :archived)
+
+    get skatepark_path(archived_skatepark)
+
+    assert_response :not_found
+  end
+
   def test_get_show_sets_meta_tags
     get skatepark_path(@skatepark)
 
@@ -183,8 +200,31 @@ class SkateparksControllerTest < ActionDispatch::IntegrationTest
     assert_equal [], json_response
   end
 
+  def test_get_available_states_returns_empty_array_json_with_invalid_country_code
+    get '/available_states', params: { country_code: 'ZZ' }, as: :json
+
+    assert_response :success
+    assert_equal [], response.parsed_body
+  end
+
   def test_get_available_states_returns_empty_states_turbo_stream_without_country_code
     get '/available_states', as: :turbo_stream
+
+    assert_response :success
+    assert_equal [], assigns(:states)
+  end
+
+  def test_get_available_states_returns_empty_states_turbo_stream_with_invalid_country_code
+    get '/available_states', params: { country_code: 'ZZ' }, as: :turbo_stream
+
+    assert_response :success
+    assert_match(/turbo-stream/, response.content_type)
+    assert_equal [], assigns(:states)
+    assert_includes response.body, 'disabled'
+  end
+
+  def test_get_index_returns_success_with_invalid_country_code
+    get skateparks_path(country_code: 'ZZ')
 
     assert_response :success
     assert_equal [], assigns(:states)

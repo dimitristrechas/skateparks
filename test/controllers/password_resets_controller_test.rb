@@ -1,6 +1,11 @@
 require 'test_helper'
 
 class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
+  def setup
+    Rails.cache.clear
+    ActionMailer::Base.deliveries.clear
+  end
+
   test 'should get new password reset form' do
     get new_password_reset_url
 
@@ -73,5 +78,22 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to edit_password_reset_path(token)
     assert_equal I18n.t('authentication.password_reset_failed'), flash[:alert]
+  end
+
+  test 'should rate limit password reset requests' do
+    user = create(:user)
+
+    5.times do
+      post password_resets_url, params: { email_address: user.email_address }
+
+      assert_redirected_to new_session_path
+    end
+
+    assert_emails 0 do
+      post password_resets_url, params: { email_address: user.email_address }
+    end
+
+    assert_redirected_to new_password_reset_url
+    assert_equal I18n.t('authentication.rate_limit_exceeded'), flash[:alert]
   end
 end

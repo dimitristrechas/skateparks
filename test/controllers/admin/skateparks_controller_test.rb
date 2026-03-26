@@ -140,5 +140,20 @@ module Admin
       assert_redirected_to root_path
       assert_match(/not authorized/, flash[:alert])
     end
+
+    def test_get_states_returns_json_for_valid_country_code
+      get '/admin/states/US', as: :json
+
+      assert_response :success
+      assert_match(/json/, response.content_type)
+      assert_includes response.parsed_body.keys, 'CA'
+    end
+
+    def test_get_states_returns_empty_json_for_invalid_country_code
+      get '/admin/states/ZZ', as: :json
+
+      assert_response :success
+      assert_equal({}, response.parsed_body)
+    end
   end
 end

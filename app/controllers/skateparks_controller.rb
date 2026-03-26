@@ -28,7 +28,7 @@ class SkateparksController < ApplicationController
   private
 
   def set_skatepark
-    @skatepark = Skatepark.find(params[:id])
+    @skatepark = Skatepark.published.find(params[:id])
   end
 
   def skatepark_params
@@ -68,9 +68,12 @@ class SkateparksController < ApplicationController
   end
 
   def filter_subdivisions_by_availability(available_states)
-    ISO3166::Country[params[:country_code]].subdivisions.values
-                                           .select { |subdivision| available_states.include?(subdivision.code) }
-                                           .sort_by(&:name)
+    country = ISO3166::Country[params[:country_code]]
+    return [] unless country
+
+    country.subdivisions.values
+           .select { |subdivision| available_states.include?(subdivision.code) }
+           .sort_by(&:name)
   end
 
   def location_name
