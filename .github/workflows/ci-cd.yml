@@ -19,17 +19,51 @@ on:
       - ".gitignore"
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
-  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+  group: ${{ github.workflow }}-${{ github.event_name == 'push' && github.ref_name || github.head_ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
   contents: read
 
 env:
   RUBY_VERSION: 3.3.6
-  NODE_VERSION: 20
+  NODE_VERSION: 24.14.0
+  ACTIONLINT_VERSION: 1.7.11
+  HADOLINT_VERSION: 2.14.0
+  DOCKER_CACHE_SCOPE: application-image-arm64
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
 jobs:
+  workflow-lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install actionlint
+        run: |
+          curl -sSLO "https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz"
+          curl -sSLO "https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_checksums.txt"
+          grep " actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz$" "actionlint_${ACTIONLINT_VERSION}_checksums.txt" | sha256sum --check
+          tar -xzf "actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz" actionlint
+          chmod +x actionlint
+
+      - name: Run actionlint
+        run: ./actionlint
+
+      - name: Install hadolint
+        run: |
+          curl -sSLO "https://github.com/hadolint/hadolint/releases/download/v${HADOLINT_VERSION}/hadolint-linux-x86_64"
+          curl -sSLO "https://github.com/hadolint/hadolint/releases/download/v${HADOLINT_VERSION}/hadolint-linux-x86_64.sha256"
+          sha256sum --check hadolint-linux-x86_64.sha256
+          chmod +x hadolint-linux-x86_64
+
+      - name: Run hadolint
+        run: |
+          ./hadolint-linux-x86_64 --failure-threshold error Dockerfile
+          ./hadolint-linux-x86_64 --failure-threshold error Dockerfile.development
+          ./hadolint-linux-x86_64 --failure-threshold error Dockerfile.test
+
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -97,6 +131,10 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: yarn
+          cache-dependency-path: yarn.lock
+
+      - name: Enable Corepack
+        run: corepack enable
 
       - name: Install JS dependencies
         run: yarn install --frozen-lockfile
@@ -148,16 +186,44 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: yarn
+          cache-dependency-path: yarn.lock
+      - run: corepack enable
       - run: yarn install --frozen-lockfile
       - run: yarn prettier:check
       - run: yarn herb:lint
       - run: yarn herb:format:check
       - run: yarn audit --audit-level moderate
 
-  docker-publish:
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
+  docker-validate:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 25
     needs:
+      - workflow-lint
+      - test
+      - rubocop-brakeman
+      - herb-prettier
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Validate application image build
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/arm64
+          push: false
+          cache-from: type=gha,scope=${{ env.DOCKER_CACHE_SCOPE }}
+          cache-to: type=gha,mode=max,scope=${{ env.DOCKER_CACHE_SCOPE }}
+
+  docker-publish:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 25
+    needs:
+      - workflow-lint
       - test
       - rubocop-brakeman
       - herb-prettier
@@ -167,6 +233,7 @@ jobs:
       packages: write
     outputs:
       image: ${{ steps.image.outputs.name }}
+      digest: ${{ steps.build.outputs.digest }}
     steps:
       - uses: actions/checkout@v6
 
@@ -176,17 +243,12 @@ jobs:
           IMAGE_OWNER: ${{ github.repository_owner }}
         run: echo "name=ghcr.io/${IMAGE_OWNER,,}/skateparks" >> "$GITHUB_OUTPUT"
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-        with:
-          platforms: arm64
-
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - name: Extract Docker metadata
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: ${{ steps.image.outputs.name }}
           tags: |
@@ -194,14 +256,15 @@ jobs:
             type=sha,prefix=sha-
 
       - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push application image
-        uses: docker/build-push-action@v6
+        id: build
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: ./Dockerfile
@@ -209,12 +272,12 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=${{ env.DOCKER_CACHE_SCOPE }}
+          cache-to: type=gha,mode=max,scope=${{ env.DOCKER_CACHE_SCOPE }}
 
   deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 2
+    timeout-minutes: 15
     needs:
       - docker-publish
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -224,6 +287,8 @@ jobs:
           DOKPLOY_WEBHOOK_KEY: ${{ secrets.DOKPLOY_WEBHOOK_KEY }}
           COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
           IMAGE_NAME: ${{ needs.docker-publish.outputs.image }}
+          IMAGE_DIGEST: ${{ needs.docker-publish.outputs.digest }}
+          APP_HEALTHCHECK_URL: ${{ vars.APP_HEALTHCHECK_URL }}
         run: |
           if [ -z "$DOKPLOY_WEBHOOK_KEY" ]; then
             echo "DOKPLOY_WEBHOOK_KEY secret is not set"
@@ -231,8 +296,10 @@ jobs:
           fi
 
           dokploy_webhook_url="https://admin.dimitristrechas.com/api/deploy/$DOKPLOY_WEBHOOK_KEY"
+          app_healthcheck_url="${APP_HEALTHCHECK_URL:-https://www.skateparks.gr/healthcheck}"
           short_sha="${GITHUB_SHA::7}"
           echo "Triggering Dokploy deployment for ${IMAGE_NAME}:latest"
+          echo "Published image digest: ${IMAGE_DIGEST}"
           payload="$(jq -n \
             --arg ref "$GITHUB_REF" \
             --arg id "$short_sha" \
@@ -258,3 +325,19 @@ jobs:
           fi
 
           echo "Dokploy deployment triggered successfully"
+
+          for attempt in $(seq 1 30); do
+            http_code="$(curl -sS -L --max-time 10 -o "$response_body" -w "%{http_code}" "$app_healthcheck_url" || true)"
+
+            if [ "$http_code" = "200" ]; then
+              echo "Health check passed at $app_healthcheck_url on attempt $attempt"
+              exit 0
+            fi
+
+            echo "Health check attempt $attempt/30 returned HTTP $http_code"
+            sleep 10
+          done
+
+          echo "Health check never became ready at $app_healthcheck_url"
+          cat "$response_body"
+          exit 1

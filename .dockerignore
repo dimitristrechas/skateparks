@@ -35,3 +35,22 @@
 /app/assets/builds/*
 !/app/assets/builds/.keep
 /public/assets
+
+# Ignore CI, docs, and local AI tooling metadata.
+/.agent-docs/
+/.claude/
+/.cursor/
+/.github/
+/docs/
+/test/
+/coverage/
+/README.md
+/AGENTS.md
+/CLAUDE.md
+/.mcp.json
+/opencode.json
+
+# Ignore local container and alternate build definitions.
+/docker-compose*.yml
+/Dockerfile.development
+/Dockerfile.test

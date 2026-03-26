@@ -17,7 +17,7 @@ jobs:
         with:
           package-name: skateparks
           package-type: container
-          min-versions-to-keep: 5
+          min-versions-to-keep: 10
           delete-only-untagged-versions: false
 
       - name: Delete untagged versions
