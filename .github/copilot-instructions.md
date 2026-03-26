@@ -1,2 +1,0 @@
-#file:../AGENTS.md
-

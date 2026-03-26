@@ -1,4 +1,9 @@
-# Rails Testing — Docker + Minitest Quick Reference
+---
+name: rails-testing
+description: Use when writing, debugging, or reviewing tests in this Rails app. Covers Docker-only test commands, Minitest conventions, assertions, stubs, authentication helpers, and Mobility examples.
+---
+
+# Rails Testing
 
 This project uses **Minitest** (not RSpec). Tests **must** run via Docker.
 
@@ -21,7 +26,7 @@ docker compose -f docker-compose.test.yml exec skateparks-web-test bin/rails tes
 docker compose -f docker-compose.test.yml exec skateparks-web-test bin/rails test -n test_method_name
 ```
 
-Container: `skateparks-web-test`. Start with `sh scripts.sh` → "Start test server" if not running.
+Container: `skateparks-web-test`. Start with `sh scripts.sh` -> "Start test server" if not running.
 
 ## Minitest Syntax (not RSpec)
 
