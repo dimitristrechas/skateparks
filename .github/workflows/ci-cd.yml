@@ -153,3 +153,50 @@ jobs:
       - run: yarn herb:lint
       - run: yarn herb:format:check
       - run: yarn audit --audit-level moderate
+
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    needs:
+      - test
+      - rubocop-brakeman
+      - herb-prettier
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: Trigger Dokploy deployment webhook
+        env:
+          DOKPLOY_WEBHOOK_KEY: ${{ secrets.DOKPLOY_WEBHOOK_KEY }}
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+        run: |
+          if [ -z "$DOKPLOY_WEBHOOK_KEY" ]; then
+            echo "DOKPLOY_WEBHOOK_KEY secret is not set"
+            exit 1
+          fi
+
+          dokploy_webhook_url="https://admin.dimitristrechas.com/api/deploy/$DOKPLOY_WEBHOOK_KEY"
+          short_sha="${GITHUB_SHA::7}"
+          payload="$(jq -n \
+            --arg ref "$GITHUB_REF" \
+            --arg id "$short_sha" \
+            --arg msg "$COMMIT_MESSAGE" \
+            '{ref: $ref, head_commit: {id: $id, message: $msg}}')"
+
+          response_body="$(mktemp)"
+          cleanup() {
+            rm -f "$response_body"
+          }
+          trap cleanup EXIT
+
+          http_code="$(curl -sS -o "$response_body" -w "%{http_code}" -X POST \
+            "$dokploy_webhook_url" \
+            -H 'Content-Type: application/json' \
+            -H 'X-GitHub-Event: push' \
+            -d "$payload")"
+
+          if [ "$http_code" -lt 200 ] || [ "$http_code" -ge 300 ]; then
+            echo "Dokploy deployment failed with HTTP status $http_code"
+            cat "$response_body"
+            exit 1
+          fi
+
+          echo "Dokploy deployment triggered successfully"
