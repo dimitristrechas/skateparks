@@ -307,10 +307,7 @@ jobs:
             '{ref: $ref, head_commit: {id: $id, message: $msg}}')"
 
           response_body="$(mktemp)"
-          cleanup() {
-            rm -f "$response_body"
-          }
-          trap cleanup EXIT
+          trap 'rm -f "$response_body"' EXIT
 
           http_code="$(curl -sS -o "$response_body" -w "%{http_code}" -X POST \
             "$dokploy_webhook_url" \
