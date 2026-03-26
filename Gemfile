@@ -2,8 +2,8 @@ source 'https://rubygems.org'
 
 ruby '3.3.6'
 
-# Use the main development branch of Rails
-gem 'rails', '~> 8.0'
+# Pin Rails to the current 8.1 bugfix release, which includes the latest security fixes.
+gem 'rails', '8.1.3'
 
 # Use Propshaft, the new asset pipeline for Rails 8 [https://github.com/rails/propshaft]
 gem 'propshaft'
@@ -87,7 +87,7 @@ end
 
 gem 'tailwindcss-rails', '~> 4.0'
 
-gem 'view_component'
+gem 'view_component', '~> 4.5.0'
 
 gem 'dockerfile-rails', '~> 1.6', '>= 1.6.24'
 

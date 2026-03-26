@@ -1,6 +1,6 @@
 class ButtonComponent < ViewComponent::Base
   def initialize(title:, type:, form: nil, ghost: false, large: false)
-    super
+    super()
     @title = title
     @form = form
     @type = type

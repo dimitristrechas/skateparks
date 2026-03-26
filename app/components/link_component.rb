@@ -1,6 +1,6 @@
 class LinkComponent < ViewComponent::Base
   def initialize(title:, url:, classnames: nil, target: '_self', current: false)
-    super
+    super()
     @title = title
     @url = url
     @classnames = classnames

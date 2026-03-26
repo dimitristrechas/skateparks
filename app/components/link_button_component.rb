@@ -10,7 +10,7 @@ class LinkButtonComponent < ViewComponent::Base
     styles = { ghost: @ghost, contained: @contained, current: @current }.select { |_, v| v }
     raise ArgumentError, 'only one of ghost, contained, current can be true' if styles.size > 1
 
-    super
+    super()
     @title = title
     @url = url
     @classnames = options[:classnames]

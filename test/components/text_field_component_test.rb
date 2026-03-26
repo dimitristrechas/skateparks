@@ -1,9 +1,8 @@
 require 'test_helper'
-require 'minitest/mock'
 
 class TextFieldComponentTest < ViewComponent::TestCase
   def setup
-    @form = Minitest::Mock.new
+    @form = FormBuilderDouble.new
     @name = :email
     @title = 'Email Address'
     @classnames = nil
@@ -18,7 +17,7 @@ class TextFieldComponentTest < ViewComponent::TestCase
     component = TextFieldComponent.new(form: @form, name: @name, title: @title, classnames: @classnames)
     render_inline(component)
 
-    assert @form.verify
+    assert_predicate @form, :verified?
   end
 
   def test_renders_text_field_with_name
@@ -30,7 +29,7 @@ class TextFieldComponentTest < ViewComponent::TestCase
     component = TextFieldComponent.new(form: @form, name: @name, title: @title, classnames: @classnames)
     render_inline(component)
 
-    assert @form.verify
+    assert_predicate @form, :verified?
   end
 
   def test_applies_label_classes
@@ -43,7 +42,7 @@ class TextFieldComponentTest < ViewComponent::TestCase
     component = TextFieldComponent.new(form: @form, name: @name, title: @title, classnames: @classnames)
     render_inline(component)
 
-    assert @form.verify
+    assert_predicate @form, :verified?
   end
 
   def test_applies_text_field_classes
@@ -56,7 +55,7 @@ class TextFieldComponentTest < ViewComponent::TestCase
     component = TextFieldComponent.new(form: @form, name: @name, title: @title, classnames: @classnames)
     render_inline(component)
 
-    assert @form.verify
+    assert_predicate @form, :verified?
   end
 
   def test_applies_custom_classnames_to_wrapper

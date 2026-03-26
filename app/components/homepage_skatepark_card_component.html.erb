@@ -1,6 +1,6 @@
 <%= link_to skatepark_path(@skatepark), class: "flex" do %>
   <div class="relative size-40 shrink-0 overflow-hidden rounded-full lg:size-48">
-    <%= cl_image_tag @skatepark.cover_image.key,
+    <%= helpers.cl_image_tag @skatepark.cover_image.key,
                      size: "160x160",
                      class: "size-40 lg:size-48 object-cover rounded-full transition-transform",
                      alt: "#{@skatepark.name} cover image",

@@ -1,5 +1,4 @@
 require 'test_helper'
-require 'minitest/mock'
 
 class ButtonComponentTest < ViewComponent::TestCase
   def setup
@@ -17,7 +16,7 @@ class ButtonComponentTest < ViewComponent::TestCase
   end
 
   def test_uses_form_button_with_form
-    form = Minitest::Mock.new
+    form = FormBuilderDouble.new
     form.expect(:button, '<button type="submit">Submit</button>'.html_safe) do |title, **opts|
       title == @title && opts[:type] == @type
     end
@@ -25,7 +24,7 @@ class ButtonComponentTest < ViewComponent::TestCase
     component = ButtonComponent.new(title: @title, type: @type, form: form, ghost: @ghost)
     render_inline(component)
 
-    assert form.verify
+    assert_predicate form, :verified?
   end
 
   def test_includes_base_hover_outline_classes

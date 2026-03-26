@@ -2,7 +2,7 @@ class IconButtonComponent < ViewComponent::Base
   renders_one :icon
 
   def initialize(aria_label:, **html_options)
-    super
+    super()
     @aria_label = aria_label
     @html_options = html_options
   end

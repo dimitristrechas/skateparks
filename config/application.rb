@@ -8,7 +8,7 @@ Bundler.require(*Rails.groups)
 module Skateparks
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
-    config.load_defaults 8.0
+    config.load_defaults 8.1
 
     # Please, add to the `ignore` list any other `lib` subdirectories that do
     # not contain `.rb` files, or that should not be reloaded or eager loaded.
@@ -26,8 +26,8 @@ module Skateparks
     config.i18n.available_locales = %i[en el]
     config.i18n.default_locale = :en
 
-    config.view_component.preview_paths << Rails.root.join('spec/components/previews')
-    config.view_component.default_preview_layout = 'component_preview'
+    config.view_component.previews.paths << Rails.root.join('spec/components/previews')
+    config.view_component.previews.default_layout = 'component_preview'
     config.lookbook.preview_layout = 'component_preview' if defined?(Lookbook)
   end
 end
