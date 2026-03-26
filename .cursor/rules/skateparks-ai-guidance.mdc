@@ -1,0 +1,12 @@
+---
+description: Shared AI project guidance and canonical agent locations
+alwaysApply: true
+---
+
+# Shared AI Project Guidance
+
+- Follow `AGENTS.md` as the canonical project instructions and read the linked files in `.agent-docs/` and `docs/` when they are relevant to the task.
+- Treat `.claude/agents/*.md` as the canonical project subagent prompts. Reuse them instead of creating duplicate tool-specific agent files unless a tool requires a thin wrapper.
+- Treat `.claude/skills/*/SKILL.md` as the canonical shared skill format for project-local skills.
+- When changing AI tooling, keep `opencode.json`, `.mcp.json`, and `.cursor/mcp.json` aligned for any shared MCP integration.
+- Do not add GitHub Copilot-specific instructions, agent files, or MCP endpoints back into this repository.

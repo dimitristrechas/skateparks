@@ -2,7 +2,7 @@
   "mcpServers": {
     "github": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-github", "--owner", "dimitristrechas", "--repo", "personal-site"],
+      "args": ["-y", "@modelcontextprotocol/server-github", "--owner", "dimitristrechas", "--repo", "skateparks"],
       "env": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "${env:GITHUB_MCP_TOKEN}"
       }
