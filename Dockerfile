@@ -99,6 +99,9 @@ USER 1000:1000
 # Entrypoint sets up the container.
 #ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 
+# Let the container runtime verify the app directly, without going through Cloudflare.
+HEALTHCHECK --interval=10s --timeout=5s --start-period=30s --retries=12 CMD ./bin/docker-healthcheck
+
 # Start the server by default, this can be overwritten at runtime
 EXPOSE 3000
 CMD ["foreman", "start"]

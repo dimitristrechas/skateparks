@@ -288,7 +288,6 @@ jobs:
           COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
           IMAGE_NAME: ${{ needs.docker-publish.outputs.image }}
           IMAGE_DIGEST: ${{ needs.docker-publish.outputs.digest }}
-          APP_HEALTHCHECK_URL: ${{ vars.APP_HEALTHCHECK_URL }}
         run: |
           if [ -z "$DOKPLOY_WEBHOOK_KEY" ]; then
             echo "DOKPLOY_WEBHOOK_KEY secret is not set"
@@ -296,7 +295,6 @@ jobs:
           fi
 
           dokploy_webhook_url="https://admin.dimitristrechas.com/api/deploy/$DOKPLOY_WEBHOOK_KEY"
-          app_healthcheck_url="${APP_HEALTHCHECK_URL:-https://www.skateparks.gr/healthcheck}"
           short_sha="${GITHUB_SHA::7}"
           echo "Triggering Dokploy deployment for ${IMAGE_NAME}:latest"
           echo "Published image digest: ${IMAGE_DIGEST}"
@@ -322,19 +320,4 @@ jobs:
           fi
 
           echo "Dokploy deployment triggered successfully"
-
-          for attempt in $(seq 1 30); do
-            http_code="$(curl -sS -L --max-time 10 -o "$response_body" -w "%{http_code}" "$app_healthcheck_url" || true)"
-
-            if [ "$http_code" = "200" ]; then
-              echo "Health check passed at $app_healthcheck_url on attempt $attempt"
-              exit 0
-            fi
-
-            echo "Health check attempt $attempt/30 returned HTTP $http_code"
-            sleep 10
-          done
-
-          echo "Health check never became ready at $app_healthcheck_url"
-          cat "$response_body"
-          exit 1
+          echo "Container health is now evaluated by the image HEALTHCHECK inside the app container."

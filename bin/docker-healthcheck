@@ -1,0 +1,19 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'net/http'
+require 'uri'
+
+begin
+  port = Integer(ENV.fetch('PORT', '3000'))
+  uri = URI::HTTP.build(host: '127.0.0.1', port:, path: '/healthcheck')
+
+  response = Net::HTTP.start(uri.host, uri.port, open_timeout: 2, read_timeout: 2) do |http|
+    http.get(uri.request_uri)
+  end
+
+  exit(response.is_a?(Net::HTTPSuccess) ? 0 : 1)
+rescue StandardError => e
+  warn "Docker healthcheck failed: #{e.class}: #{e.message}"
+  exit 1
+end
