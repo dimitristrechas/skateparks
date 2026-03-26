@@ -14,7 +14,7 @@ module Account
       if @user.update(profile_params)
         redirect_to account_profile_path, notice: t('account.profile_updated')
       else
-        render :edit, status: :unprocessable_entity
+        render :edit, status: :unprocessable_content
       end
     end
 

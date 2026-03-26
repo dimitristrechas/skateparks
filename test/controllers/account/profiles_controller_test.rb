@@ -55,7 +55,7 @@ module Account
       sign_in_as(user)
       patch account_profile_url, params: { user: { email_address: '' } }
 
-      assert_response :unprocessable_entity
+      assert_response :unprocessable_content
       assert_equal 'valid@example.com', user.reload.email_address
     end
 

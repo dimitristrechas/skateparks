@@ -14,7 +14,7 @@ module Account
 
       unless @user.authenticate(password_params[:current_password])
         @user.errors.add(:current_password, t('authentication.password_change_failed'))
-        return render :edit, status: :unprocessable_entity
+        return render :edit, status: :unprocessable_content
       end
 
       update_password
@@ -29,7 +29,7 @@ module Account
         cookies.delete(:session_token)
         redirect_to new_session_path, notice: t('authentication.password_changed')
       else
-        render :edit, status: :unprocessable_entity
+        render :edit, status: :unprocessable_content
       end
     end
 

@@ -11,8 +11,8 @@ production:
   enhance_image_tag: true
   static_file_support: true
 test:
-  cloud_name: <%= Rails.application.credentials.dig(:cloudinary, :cloud_name) %>
-  api_key: <%= Rails.application.credentials.dig(:cloudinary, :api_key) %>
-  api_secret: <%= Rails.application.credentials.dig(:cloudinary, :api_secret) %>
+  cloud_name: <%= ENV['CLOUDINARY_CLOUD_NAME'].presence || Rails.application.credentials.dig(:cloudinary, :cloud_name).presence || 'test' %>
+  api_key: <%= ENV['CLOUDINARY_API_KEY'].presence || Rails.application.credentials.dig(:cloudinary, :api_key) %>
+  api_secret: <%= ENV['CLOUDINARY_API_SECRET'].presence || Rails.application.credentials.dig(:cloudinary, :api_secret) %>
   enhance_image_tag: true
   static_file_support: false

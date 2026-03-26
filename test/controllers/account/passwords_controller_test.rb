@@ -53,7 +53,7 @@ module Account
         },
       }
 
-      assert_response :unprocessable_entity
+      assert_response :unprocessable_content
       assert_not user.reload.authenticate('newpassword12345')
       assert_match(/incorrect/, response.body)
     end
@@ -69,7 +69,7 @@ module Account
         },
       }
 
-      assert_response :unprocessable_entity
+      assert_response :unprocessable_content
       assert_not user.reload.authenticate('newpassword12345')
     end
 
@@ -84,7 +84,7 @@ module Account
         },
       }
 
-      assert_response :unprocessable_entity
+      assert_response :unprocessable_content
     end
 
     private

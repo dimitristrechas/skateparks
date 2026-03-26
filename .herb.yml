@@ -1,13 +1,13 @@
-version: 0.8.6
+version: 0.8.10
 
 files:
   exclude:
-    - 'public/**/*'
-    - 'tmp/**/*'
-    - 'coverage/**/*'
-    - 'vendor/**/*'
-    - 'node_modules/**/*'
-    - 'app/views/active_storage/**/*'
+    - "public/**/*"
+    - "tmp/**/*"
+    - "coverage/**/*"
+    - "vendor/**/*"
+    - "node_modules/**/*"
+    - "app/views/active_storage/**/*"
 
 linter:
   enabled: true
