@@ -68,17 +68,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - name: components
-            test_dirs: test/components
-          - name: core
-            test_dirs: test/controllers test/models test/helpers test/jobs test/workers test/mailers test/channels
-
-    name: test (${{ matrix.name }})
-
     services:
       postgres:
         image: postgres:17-alpine
@@ -126,19 +115,6 @@ jobs:
           ruby-version: ${{ env.RUBY_VERSION }}
           bundler-cache: true
 
-      - name: Set up Node
-        uses: actions/setup-node@v6
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: yarn
-          cache-dependency-path: yarn.lock
-
-      - name: Enable Corepack
-        run: corepack enable
-
-      - name: Install JS dependencies
-        run: yarn install --frozen-lockfile
-
       - name: Cache compiled assets
         id: cache-assets
         uses: actions/cache@v5
@@ -150,6 +126,22 @@ jobs:
           restore-keys: |
             assets-${{ runner.os }}-
 
+      - name: Set up Node
+        if: steps.cache-assets.outputs.cache-hit != 'true'
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: yarn
+          cache-dependency-path: yarn.lock
+
+      - name: Enable Corepack
+        if: steps.cache-assets.outputs.cache-hit != 'true'
+        run: corepack enable
+
+      - name: Install JS dependencies
+        if: steps.cache-assets.outputs.cache-hit != 'true'
+        run: yarn install --frozen-lockfile
+
       - name: Setup database
         run: bundle exec rails db:create db:schema:load
 
@@ -157,8 +149,8 @@ jobs:
         if: steps.cache-assets.outputs.cache-hit != 'true'
         run: bundle exec rails assets:precompile
 
-      - name: Run tests (${{ matrix.name }})
-        run: bundle exec rails test ${{ matrix.test_dirs }}
+      - name: Run tests
+        run: bundle exec rails test test/components test/controllers test/models test/helpers test/jobs test/workers test/mailers test/channels
 
   rubocop-brakeman:
     runs-on: ubuntu-latest
