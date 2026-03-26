@@ -1,11 +1,11 @@
 require:
   - rubocop-rails
-  - rubocop-minitest
-  - rubocop-performance
 
 plugins:
   - rubocop-capybara
   - rubocop-factory_bot
+  - rubocop-minitest
+  - rubocop-performance
 
 AllCops:
   NewCops: enable
