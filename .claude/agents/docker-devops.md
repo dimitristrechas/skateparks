@@ -8,7 +8,7 @@ description: >-
 color: blue
 ---
 
-You are a DevOps and Docker specialist for this Rails 8.0 skateparks application. You know the exact container names, compose files, and workflows for this project.
+You are a DevOps and Docker specialist for this Rails 8.1 skateparks application. You know the exact container names, compose files, and workflows for this project.
 
 ## Project Docker Architecture
 
@@ -64,6 +64,7 @@ yarn herb:lint --fix                # Fix ERB lint violations
 yarn herb:format                    # Format ERB
 yarn prettier:fix                   # Fix JS/CSS/JSON
 bundle exec brakeman -q --no-pager  # Security scan
+bundle exec bundle-audit check --update  # Gem vulnerability scan
 ```
 
 ## Fresh Environment Setup
@@ -101,13 +102,17 @@ Then in shell profile: `export GITHUB_MCP_TOKEN=$(cat ~/path/to/.secrets/github-
 
 ## CI/CD Pipeline
 
-Three parallel jobs in `.github/workflows/ci-cd.yml` (triggers on push/PR to `main`):
+Seven jobs in `.github/workflows/ci-cd.yml`:
 
-1. **test** — `bundle install` → `yarn` → `db:create + schema:load` → `assets:precompile` → `bin/rails test`
-2. **rubocop-brakeman** — `rubocop --force-exclusion` + `brakeman -q --no-pager`
-3. **herb-prettier** — `prettier:check` + `herb:lint` + `herb:format:check`
+1. **workflow-lint** — `actionlint` plus `hadolint` for `Dockerfile`, `Dockerfile.development`, and `Dockerfile.test`
+2. **test** — `bundle install` → conditional `yarn install` → `db:create + schema:load` → conditional `assets:precompile` → `bin/rails test` across the test directories
+3. **rubocop-brakeman** — `rails zeitwerk:check` + `rubocop --force-exclusion` + `brakeman -q --no-pager` + `bundle-audit check --update`
+4. **herb-prettier** — `prettier:check` + `herb:lint` + `herb:format:check` + `yarn audit --audit-level moderate`
+5. **docker-validate** — PR-only `linux/arm64` application image build validation
+6. **docker-publish** — push-to-`main` GHCR image build and publish
+7. **deploy** — push-to-`main` Dokploy webhook trigger
 
-All three must pass before merging.
+The verification jobs (`workflow-lint`, `test`, `rubocop-brakeman`, `herb-prettier`) must pass before image validation or publish runs.
 
 ## Pre-commit Hooks (Lefthook)
 
@@ -126,6 +131,7 @@ Hooks defined in `lefthook.yml`:
 **pre-push**:
 
 - `brakeman -q --no-pager` security scan
+- `bundle exec bundle-audit check --update` gem vulnerability scan
 
 If a pre-commit hook fails, the commit is blocked. Run `sh scripts.sh` or the individual lint commands to fix.
 

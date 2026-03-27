@@ -24,7 +24,7 @@ When analyzing dependencies:
 - Run `bundle outdated` to identify update candidates
 - Categorize updates: patch/minor/major using semver
 - Focus on security patches and critical bug fixes first
-- Note Rails version compatibility (currently 8.0)
+- Note Rails version compatibility (currently 8.1)
 - Identify gems blocking other updates
 
 3. CHANGELOG REVIEW
@@ -40,7 +40,7 @@ When analyzing dependencies:
 - Provide specific version targets (e.g., '~> 2.1.0')
 - Group updates by risk level (safe/moderate/high)
 - Suggest update order to minimize conflicts
-- Warn about potential breaking changes in this Rails 8.0/Docker/Sidekiq stack
+- Warn about potential breaking changes in this Rails 8.1/Docker/Sidekiq stack
 - Consider impact on: ActiveStorage/Cloudinary, ViewComponent, Stimulus, Kaminari, Mobility
 
 5. TESTING STRATEGY

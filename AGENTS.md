@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Rails 8.0 skatepark directory app (Ruby 3.3.6, PostgreSQL 17, Hotwire, Tailwind 4.0).
+Rails 8.1 skatepark directory app (Ruby 3.3.6, PostgreSQL 17, Hotwire, Tailwind 4.0).
 
 ## Rules
 

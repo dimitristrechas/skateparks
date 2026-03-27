@@ -1,6 +1,6 @@
 # Minitest Testing Guide
 
-Rails 8.0 — Minitest (Rails default). Assert-style. **All tests must run via Docker.**
+Rails 8.1 — Minitest (Rails default). Assert-style. **All tests must run via Docker.**
 
 ---
 
@@ -22,7 +22,10 @@ Rails 8.0 — Minitest (Rails default). Assert-style. **All tests must run via D
 
 ```
 test/
-├── channels/           # ActionCable (no tests written yet)
+├── channels/           # ActionCable tests
+│   └── application_cable/
+│       ├── channel_test.rb
+│       └── connection_test.rb
 ├── components/         # ViewComponent tests
 ├── controllers/        # Controller integration tests
 ├── factories/          # FactoryBot factory definitions
@@ -35,7 +38,8 @@ test/
 ├── jobs/               # ActiveJob tests
 ├── mailers/            # ActionMailer tests
 ├── models/             # Model unit tests
-├── support/            # Support helpers (currently empty — autoloaded if added)
+├── support/            # Support helpers autoloaded from test/support/**/*.rb
+│   └── form_builder_double.rb
 ├── system/             # Capybara system tests (no tests written yet)
 ├── workers/            # Sidekiq worker tests
 └── test_helper.rb
@@ -444,8 +448,8 @@ Or use the interactive menu:
 
 Already configured. If this surfaces:
 
-1. Check `config/environments/test.rb` has the `ActiveStorage::Current.url_options` middleware
-2. Check `test_helper.rb` has the `before_setup` block setting `ActiveStorage::Current.url_options` for `ActionDispatch::IntegrationTest`
+1. Check `config/environments/test.rb` has the middleware that sets `ActiveStorage::Current.url_options`
+2. Confirm the request or test path is running through the test environment middleware stack
 
 ### `fixture_file_upload` undefined in factory
 

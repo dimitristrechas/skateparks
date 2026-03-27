@@ -11,6 +11,7 @@ yarn herb:format                    # Format ERB
 yarn prettier:check                 # Check JS/CSS/JSON
 yarn prettier:fix                   # Fix JS/CSS/JSON
 bundle exec brakeman -q --no-pager  # Security scan
+bundle exec bundle-audit check --update  # Gem vulnerability scan
 ```
 
 ## Development
