@@ -28,7 +28,10 @@ class SkateparksController < ApplicationController
   private
 
   def set_skatepark
-    @skatepark = Skatepark.published.find(params[:id])
+    @skatepark = Skatepark.published.includes(
+      cover_image_attachment: :blob,
+      skatepark_images: { image_attachment: :blob }
+    ).find(params[:id])
   end
 
   def skatepark_params
@@ -36,7 +39,7 @@ class SkateparksController < ApplicationController
   end
 
   def filtered_skateparks
-    skateparks = Skatepark.published
+    skateparks = Skatepark.published.includes(:skatepark_images, cover_image_attachment: :blob)
     skateparks = skateparks.where(country_code: params[:country_code]) if params[:country_code].present?
     skateparks = skateparks.where(state: params[:state]) if params[:state].present? && params[:country_code].present?
     skateparks.i18n.order(:name)

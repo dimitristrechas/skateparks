@@ -13,6 +13,8 @@
   data-skatepark-lat-value="<%= @skatepark.lat %>"
   data-skatepark-lng-value="<%= @skatepark.lng %>"
 >
+  <% skatepark_images = @skatepark.skatepark_images %>
+
   <h1 class="mb-8 text-3xl font-bold"><%= @skatepark.name %></h1>
 
   <div class="mb-6 flex sm:mb-8"><span><%= @location_friendly_name %></span></div>
@@ -48,7 +50,7 @@
   </div>
 
   <div class="mb-6 grid auto-rows-[8rem] grid-cols-3 gap-1 sm:mb-8 md:auto-rows-[14rem] lg:grid-cols-4 xl:auto-rows-[20rem]">
-    <% @skatepark.images.each_with_index do |image, index| %>
+    <% skatepark_images.each_with_index do |skatepark_image, index| %>
       <button
         type="button"
         id="previewImage-<%= index %>"
@@ -62,15 +64,15 @@
         data-action="click->skatepark#onImageClick"
         aria-label="<%= t('view_image_in_gallery', number: index + 1) %>"
       >
-        <%= cl_image_tag image.key,
+        <%= cl_image_tag skatepark_image.image.key,
         width: 400,
         height: 400,
         class: "h-full w-full object-cover",
         loading: index < 5 ? "eager" : "lazy",
         srcset:
-          "#{cloudinary_url(image.key, width: 245, height: 245, **CLOUDINARY_DEFAULT_SETTINGS)} 320w, " \
-            "#{cloudinary_url(image.key, width: 400, height: 400, **CLOUDINARY_DEFAULT_SETTINGS)} 640w, " \
-            "#{cloudinary_url(image.key, width: 600, height: 600, **CLOUDINARY_DEFAULT_SETTINGS)} 1600w",
+          "#{cloudinary_url(skatepark_image.image.key, width: 245, height: 245, **CLOUDINARY_DEFAULT_SETTINGS)} 320w, " \
+            "#{cloudinary_url(skatepark_image.image.key, width: 400, height: 400, **CLOUDINARY_DEFAULT_SETTINGS)} 640w, " \
+            "#{cloudinary_url(skatepark_image.image.key, width: 600, height: 600, **CLOUDINARY_DEFAULT_SETTINGS)} 1600w",
         sizes: "(max-width: 640px) 320px, 100vw",
         alt: "" %>
       </button>
@@ -147,14 +149,14 @@
         data-skatepark-target="announcer"
       ></div>
 
-      <% @skatepark.images.each_with_index do |image, index| %>
-        <%= cl_image_tag image.key,
+      <% skatepark_images.each_with_index do |skatepark_image, index| %>
+        <%= cl_image_tag skatepark_image.image.key,
         id: "galleryImage-#{index}",
         quality: :auto,
         fetch_format: :auto,
         class: "hidden object-contain w-full h-full",
         loading: "lazy",
-        alt: "#{@skatepark.name} - Image #{index + 1} of #{@skatepark.images.length}",
+        alt: "#{@skatepark.name} - Image #{index + 1} of #{skatepark_images.length}",
         data: {
           "skatepark-target": "galleryImage",
         } %>
@@ -167,7 +169,7 @@
         role="group"
         aria-label="Image indicators"
       >
-        <% @skatepark.images.each_with_index do |_, index| %>
+        <% skatepark_images.each_with_index do |_, index| %>
           <button
             type="button"
             class="
