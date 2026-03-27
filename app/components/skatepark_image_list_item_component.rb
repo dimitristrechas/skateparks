@@ -23,18 +23,34 @@ class SkateparkImageListItemComponent < ViewComponent::Base
   end
 
   def handle_label
-    position_label ? "Reorder image #{position_label}" : 'Reorder image'
+    if position_label
+      I18n.t('admin.skateparks.form.reorder_image', position: position_label)
+    else
+      I18n.t('admin.skateparks.form.reorder_image_default')
+    end
   end
 
   def move_up_label
-    position_label ? "Move image #{position_label} up" : 'Move image up'
+    if position_label
+      I18n.t('admin.skateparks.form.move_image_up', position: position_label)
+    else
+      I18n.t('admin.skateparks.form.move_image_up_default')
+    end
   end
 
   def move_down_label
-    position_label ? "Move image #{position_label} down" : 'Move image down'
+    if position_label
+      I18n.t('admin.skateparks.form.move_image_down', position: position_label)
+    else
+      I18n.t('admin.skateparks.form.move_image_down_default')
+    end
   end
 
   def delete_label
-    position_label ? "Delete image #{position_label}" : 'Delete image'
+    if position_label
+      I18n.t('admin.skateparks.form.delete_image', position: position_label)
+    else
+      I18n.t('admin.skateparks.form.delete_image_default')
+    end
   end
 end

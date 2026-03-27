@@ -15,6 +15,20 @@ export default class extends Controller {
     "stateSelect",
   ];
 
+  static values = {
+    confirmDelete: String,
+    imageAltPattern: String,
+    reorderPattern: String,
+    deletePattern: String,
+    moveUpPattern: String,
+    moveDownPattern: String,
+    imageMovedPattern: String,
+    imageRemoved: String,
+    newImageRemoved: String,
+    imagesAddedOne: String,
+    imagesAddedOther: String,
+  };
+
   connect() {
     this.pendingUploads = new Map();
 
@@ -90,14 +104,16 @@ export default class extends Controller {
 
     files.forEach((file) => this.appendNewImage(file));
     this.syncPositions();
-    this.announce(`${files.length} image${files.length === 1 ? " was" : "s were"} added to the list`);
+    const message =
+      files.length === 1 ? this.imagesAddedOneValue : this.imagesAddedOtherValue.replace("{count}", files.length);
+    this.announce(message);
   }
 
   removeImage(event) {
     const item = event.currentTarget.closest("[data-sortable-item]");
     if (!item) return;
 
-    if (!window.confirm("Do you really want to delete this image?")) return;
+    if (!window.confirm(this.confirmDeleteValue)) return;
 
     if (item.dataset.newUploadId) {
       this.removeNewUpload(item);
@@ -110,7 +126,7 @@ export default class extends Controller {
     item.dataset.destroyed = "true";
     item.classList.add("hidden");
     this.syncPositions();
-    this.announce("Image removed from the list");
+    this.announce(this.imageRemovedValue);
   }
 
   moveItem(trigger, direction) {
@@ -128,7 +144,9 @@ export default class extends Controller {
     }
 
     this.syncPositions();
-    this.announce(`Image moved to position ${nextIndex + 1} of ${this.visibleItems.length}`);
+    this.announce(
+      this.imageMovedPatternValue.replace("{position}", nextIndex + 1).replace("{total}", this.visibleItems.length)
+    );
     trigger.focus();
   }
 
@@ -147,11 +165,14 @@ export default class extends Controller {
 
       if (positionField) positionField.value = position;
       if (positionLabel) positionLabel.textContent = position;
-      if (preview) preview.alt = `Image ${position}`;
-      if (handle) handle.setAttribute("aria-label", `Reorder image ${position}`);
-      if (deleteButton) deleteButton.setAttribute("aria-label", `Delete image ${position}`);
-      if (moveUpButton) moveUpButton.setAttribute("aria-label", `Move image ${position} up`);
-      if (moveDownButton) moveDownButton.setAttribute("aria-label", `Move image ${position} down`);
+      if (preview) preview.alt = this.imageAltPatternValue.replace("{position}", position);
+      if (handle) handle.setAttribute("aria-label", this.reorderPatternValue.replace("{position}", position));
+      if (deleteButton)
+        deleteButton.setAttribute("aria-label", this.deletePatternValue.replace("{position}", position));
+      if (moveUpButton)
+        moveUpButton.setAttribute("aria-label", this.moveUpPatternValue.replace("{position}", position));
+      if (moveDownButton)
+        moveDownButton.setAttribute("aria-label", this.moveDownPatternValue.replace("{position}", position));
 
       this.updateMoveButtonState(moveUpButton, position === 1);
       this.updateMoveButtonState(moveDownButton, position === visibleItems.length);
@@ -174,7 +195,9 @@ export default class extends Controller {
     const position = this.visibleItems.indexOf(item) + 1;
     if (position <= 0) return;
 
-    this.announce(`Image moved to position ${position} of ${this.visibleItems.length}`);
+    this.announce(
+      this.imageMovedPatternValue.replace("{position}", position).replace("{total}", this.visibleItems.length)
+    );
   }
 
   announce(message) {
@@ -222,7 +245,7 @@ export default class extends Controller {
 
     item.remove();
     this.syncPositions();
-    this.announce("New image removed from the list");
+    this.announce(this.newImageRemovedValue);
   }
 
   syncNewImagesInput(visibleItems = this.visibleItems) {

@@ -156,7 +156,7 @@
         fetch_format: :auto,
         class: "hidden object-contain w-full h-full",
         loading: "lazy",
-        alt: "#{@skatepark.name} - Image #{index + 1} of #{skatepark_images.length}",
+        alt: t("skatepark.gallery_image_alt", name: @skatepark.name, current: index + 1, total: skatepark_images.length),
         data: {
           "skatepark-target": "galleryImage",
         } %>
@@ -167,7 +167,7 @@
       <div
         class="absolute inset-x-0 bottom-6 flex flex-wrap items-center justify-center gap-3"
         role="group"
-        aria-label="Image indicators"
+        aria-label="<%= t("skatepark.image_indicators") %>"
       >
         <% skatepark_images.each_with_index do |_, index| %>
           <button

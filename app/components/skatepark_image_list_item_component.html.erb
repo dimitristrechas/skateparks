@@ -19,7 +19,7 @@
       aria-label="<%= handle_label %>"
       aria-roledescription="sortable"
     >
-      <span class="sr-only">Drag to reorder</span>
+      <span class="sr-only"><%= t("admin.skateparks.form.drag_to_reorder") %></span>
 
       <svg
         aria-hidden="true"
@@ -39,7 +39,8 @@
 
   <div class="min-w-0 flex-1">
     <p class="font-medium text-neutral-700 dark:text-neutral-200">
-      Image <span data-position-label><%= position_label %></span>
+      <%= t("admin.skateparks.form.image_label") %>
+      <span data-position-label><%= position_label %></span>
     </p>
 
     <%= subtitle if subtitle? %>
@@ -115,7 +116,7 @@
       data-delete-button
       aria-label="<%= delete_label %>"
     >
-      Delete
+      <%= t("admin.skateparks.form.delete_button") %>
     </button>
   </div>
 </div>

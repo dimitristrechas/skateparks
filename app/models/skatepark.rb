@@ -57,12 +57,12 @@ class Skatepark < ApplicationRecord
 
     return if valid_images_count >= 2
 
-    errors.add(:images, '2 is the minimum allowed')
+    errors.add(:images, :minimum_images)
   end
 
   def unique_uploaded_image_filenames
     duplicate_uploaded_image_filenames.each do |filename|
-      errors.add(:images, "#{filename} has already been uploaded")
+      errors.add(:images, :duplicate_image, filename: filename)
     end
   end
 

@@ -26,6 +26,12 @@ en:
     name_en: "Name in English"
     latitude: "latitude"
     longitude: "longitude"
+    description_el: "Description in Greek"
+    description_en: "Description in English"
+    cover_image: "Cover image"
+    cover_image_alt: "%{name} cover image"
+    gallery_image_alt: "%{name} - Image %{current} of %{total}"
+    image_indicators: "Image indicators"
   edit: "Edit"
   create: "Create"
   about: "About skateparks.gr"
@@ -139,6 +145,38 @@ en:
       audit_actor: "Actor"
       audit_details: "Details"
       audit_date: "Date"
+    skateparks:
+      index_title: "List of skateparks"
+      new_skatepark: "New skatepark"
+      destroy: "destroy"
+      created_notice: "Skatepark: %{name} was successfully created."
+      updated_notice: "Skatepark: %{name} was successfully updated."
+      destroyed_notice: "Skatepark: %{name} was successfully destroyed."
+      form:
+        errors_title: "Errors"
+        images_upload_hint: "Upload images and reorder them in the list before you save."
+        images_aria_label: "Skatepark images"
+        images_empty_state: "Upload images to build the list, then drag or use the arrow buttons to place them before saving."
+        image_alt: "Image %{position}"
+        new_image_preview_alt: "New image preview"
+        drag_to_reorder: "Drag to reorder"
+        drag_to_reorder_hint: "Drag with the handle or use the buttons to reorder."
+        image_label: "Image"
+        delete_button: "Delete"
+        reorder_image: "Reorder image %{position}"
+        reorder_image_default: "Reorder image"
+        move_image_up: "Move image %{position} up"
+        move_image_up_default: "Move image up"
+        move_image_down: "Move image %{position} down"
+        move_image_down_default: "Move image down"
+        delete_image: "Delete image %{position}"
+        delete_image_default: "Delete image"
+        confirm_delete: "Do you really want to delete this image?"
+        image_removed: "Image removed from the list"
+        new_image_removed: "New image removed from the list"
+        image_moved: "Image moved to position %{position} of %{total}"
+        images_added_one: "1 image was added to the list"
+        images_added_other: "%{count} images were added to the list"
     popular_skateparks:
       title: "Popular Skateparks"
       add_section_title: "Add Popular Skatepark"
@@ -153,3 +191,11 @@ en:
       added_notice: "Skatepark added to popular list."
       updated_notice: "Position updated successfully."
       removed_notice: "Skatepark removed from popular list."
+  activerecord:
+    errors:
+      models:
+        skatepark:
+          attributes:
+            images:
+              minimum_images: "2 is the minimum allowed"
+              duplicate_image: "%{filename} has already been uploaded"

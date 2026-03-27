@@ -29,7 +29,7 @@ module Admin
         if @skatepark.save
           format.html do
             redirect_to admin_skateparks_url,
-                        notice: "Skatepark: #{@skatepark.name} was successfully created."
+                        notice: t('admin.skateparks.created_notice', name: @skatepark.name)
           end
           format.json { render :show, status: :created, location: @skatepark }
         else
@@ -48,7 +48,7 @@ module Admin
         if @skatepark.save
           format.html do
             redirect_to admin_skateparks_url,
-                        notice: "Skatepark: #{@skatepark.name} was successfully updated."
+                        notice: t('admin.skateparks.updated_notice', name: @skatepark.name)
           end
           format.json { render :show, status: :ok, location: @skatepark }
         else
@@ -64,7 +64,7 @@ module Admin
 
       respond_to do |format|
         format.html do
-          redirect_to admin_skateparks_url, notice: "Skatepark: #{@skatepark.name} was successfully destroyed."
+          redirect_to admin_skateparks_url, notice: t('admin.skateparks.destroyed_notice', name: @skatepark.name)
         end
         format.json { head :no_content }
       end

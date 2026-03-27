@@ -1,9 +1,9 @@
 <p style="color: green"><%= notice %></p>
 
-<h1 class="mb-8 text-3xl font-bold">List of skateparks</h1>
+<h1 class="mb-8 text-3xl font-bold"><%= t("admin.skateparks.index_title") %></h1>
 
 <div class="my-4 flex flex-row-reverse">
-  <%= render(LinkButtonComponent.new(title: "New skatepark", url: new_admin_skatepark_path, contained: true)) %>
+  <%= render(LinkButtonComponent.new(title: t("admin.skateparks.new_skatepark"), url: new_admin_skatepark_path, contained: true)) %>
 </div>
 
 <%= render(TableComponent.new) do |table| %>
@@ -26,11 +26,11 @@
       <td class="px-6 py-4"><%= skatepark.google_id.present? %></td>
 
       <td class="flex gap-4 px-6 py-4">
-        <%= render(LinkButtonComponent.new(title: "edit", url: edit_admin_skatepark_path(skatepark), ghost: true)) %>
+        <%= render(LinkButtonComponent.new(title: t("edit"), url: edit_admin_skatepark_path(skatepark), ghost: true)) %>
 
         <% if Rails.env.development? %>
           <%= form_with url: admin_skatepark_path(skatepark), method: :delete, data: { turbo_confirm: t("delete_confirm") } do |form| %>
-            <%= render(ButtonComponent.new(title: "destroy", type: :submit, form: form, ghost: true)) %>
+            <%= render(ButtonComponent.new(title: t("admin.skateparks.destroy"), type: :submit, form: form, ghost: true)) %>
           <% end %>
         <% end %>
       </td>
