@@ -54,7 +54,7 @@ class SkateparkTest < ActiveSupport::TestCase
     )
 
     assert_not skatepark.valid?
-    assert_includes skatepark.errors[:images], 'sample_image1.jpg has already been uploaded'
+    assert_includes skatepark.errors[:skatepark_images], 'sample_image1.jpg has already been uploaded'
   end
 
   def test_requires_status_to_be_present_and_valid

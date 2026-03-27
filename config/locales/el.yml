@@ -192,10 +192,13 @@ el:
       updated_notice: "Η θέση ενημερώθηκε επιτυχώς."
       removed_notice: "Το skatepark αφαιρέθηκε από τη λίστα δημοφιλών."
   activerecord:
+    attributes:
+      skatepark:
+        skatepark_images: "Φωτογραφίες"
     errors:
       models:
         skatepark:
           attributes:
-            images:
+            skatepark_images:
               minimum_images: "Τουλάχιστον 2 απαιτούνται"
               duplicate_image: "Το %{filename} έχει ήδη ανεβεί"

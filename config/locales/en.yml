@@ -192,10 +192,13 @@ en:
       updated_notice: "Position updated successfully."
       removed_notice: "Skatepark removed from popular list."
   activerecord:
+    attributes:
+      skatepark:
+        skatepark_images: "Images"
     errors:
       models:
         skatepark:
           attributes:
-            images:
+            skatepark_images:
               minimum_images: "2 is the minimum allowed"
               duplicate_image: "%{filename} has already been uploaded"

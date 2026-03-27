@@ -204,7 +204,7 @@ module Admin
       end
 
       assert_template 'edit'
-      assert_includes assigns(:skatepark).errors[:images], 'sample_image1.jpg has already been uploaded'
+      assert_includes assigns(:skatepark).errors[:skatepark_images], 'sample_image1.jpg has already been uploaded'
     end
 
     def test_delete_destroy_destroys_skatepark
