@@ -26,6 +26,12 @@ el:
     name_en: "Όνομα στα Αγγλικά"
     latitude: "γεωγραφικό πλάτος"
     longitude: "γεωγραφικό μήκος"
+    description_el: "Περιγραφή στα Ελληνικά"
+    description_en: "Περιγραφή στα Αγγλικά"
+    cover_image: "Εικόνα εξωφύλλου"
+    cover_image_alt: "Εικόνα εξωφύλλου %{name}"
+    gallery_image_alt: "%{name} - Φωτογραφία %{current} από %{total}"
+    image_indicators: "Δείκτες φωτογραφιών"
   edit: "Επεξεργασία"
   create: "Δημιουργία"
   about: "Σχετικά με το skateparks.gr"
@@ -139,6 +145,38 @@ el:
       audit_actor: "Εκτελεστής"
       audit_details: "Λεπτομέρειες"
       audit_date: "Ημερομηνία"
+    skateparks:
+      index_title: "Λίστα skateparks"
+      new_skatepark: "Νέο skatepark"
+      destroy: "διαγραφή"
+      created_notice: "Skatepark: %{name} δημιουργήθηκε επιτυχώς."
+      updated_notice: "Skatepark: %{name} ενημερώθηκε επιτυχώς."
+      destroyed_notice: "Skatepark: %{name} διαγράφηκε επιτυχώς."
+      form:
+        errors_title: "Σφάλματα"
+        images_upload_hint: "Ανεβάστε φωτογραφίες και αλλάξτε τη σειρά τους πριν αποθηκεύσετε."
+        images_aria_label: "Φωτογραφίες skatepark"
+        images_empty_state: "Ανεβάστε φωτογραφίες και σύρετε ή χρησιμοποιήστε τα βέλη για να τις τοποθετήσετε πριν αποθηκεύσετε."
+        image_alt: "Φωτογραφία %{position}"
+        new_image_preview_alt: "Προεπισκόπηση νέας φωτογραφίας"
+        drag_to_reorder: "Σύρετε για αλλαγή σειράς"
+        drag_to_reorder_hint: "Σύρετε με τη λαβή ή χρησιμοποιήστε τα κουμπιά για αλλαγή σειράς."
+        image_label: "Φωτογραφία"
+        delete_button: "Διαγραφή"
+        reorder_image: "Αλλαγή σειράς φωτογραφίας %{position}"
+        reorder_image_default: "Αλλαγή σειράς φωτογραφίας"
+        move_image_up: "Μετακίνηση φωτογραφίας %{position} πάνω"
+        move_image_up_default: "Μετακίνηση φωτογραφίας πάνω"
+        move_image_down: "Μετακίνηση φωτογραφίας %{position} κάτω"
+        move_image_down_default: "Μετακίνηση φωτογραφίας κάτω"
+        delete_image: "Διαγραφή φωτογραφίας %{position}"
+        delete_image_default: "Διαγραφή φωτογραφίας"
+        confirm_delete: "Θέλετε σίγουρα να διαγράψετε αυτή τη φωτογραφία;"
+        image_removed: "Η φωτογραφία αφαιρέθηκε από τη λίστα"
+        new_image_removed: "Η νέα φωτογραφία αφαιρέθηκε από τη λίστα"
+        image_moved: "Η φωτογραφία μετακινήθηκε στη θέση %{position} από %{total}"
+        images_added_one: "1 φωτογραφία προστέθηκε στη λίστα"
+        images_added_other: "%{count} φωτογραφίες προστέθηκαν στη λίστα"
     popular_skateparks:
       title: "Δημοφιλή Skateparks"
       add_section_title: "Προσθήκη Δημοφιλούς Skatepark"
@@ -153,3 +191,14 @@ el:
       added_notice: "Το skatepark προστέθηκε στη λίστα δημοφιλών."
       updated_notice: "Η θέση ενημερώθηκε επιτυχώς."
       removed_notice: "Το skatepark αφαιρέθηκε από τη λίστα δημοφιλών."
+  activerecord:
+    attributes:
+      skatepark:
+        skatepark_images: "Φωτογραφίες"
+    errors:
+      models:
+        skatepark:
+          attributes:
+            skatepark_images:
+              minimum_images: "Τουλάχιστον 2 απαιτούνται"
+              duplicate_image: "Το %{filename} έχει ήδη ανεβεί"

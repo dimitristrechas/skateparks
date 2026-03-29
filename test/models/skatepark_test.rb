@@ -37,9 +37,24 @@ class SkateparkTest < ActiveSupport::TestCase
   end
 
   def test_requires_at_least_2_images_to_be_present
-    skatepark = build(:skatepark, images: [fixture_file_upload('sample_image1.jpg')])
+    skatepark = build(:skatepark, skatepark_images_count: 1)
 
     assert_not skatepark.save
+  end
+
+  def test_rejects_duplicate_new_image_filenames
+    skatepark = create(:skatepark)
+    duplicate_image = skatepark.skatepark_images.build(position: 3)
+
+    duplicate_image.image.attach(
+      Rack::Test::UploadedFile.new(
+        Rails.root.join('test/fixtures/files/sample_image1.jpg'),
+        'image/jpeg'
+      )
+    )
+
+    assert_not skatepark.valid?
+    assert_includes skatepark.errors[:skatepark_images], 'sample_image1.jpg has already been uploaded'
   end
 
   def test_requires_status_to_be_present_and_valid

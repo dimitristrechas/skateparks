@@ -85,7 +85,9 @@ module SchemaHelper
 
   def skatepark_schema_images(skatepark)
     images = [skatepark.cover_image&.url].compact
-    images += skatepark.images.map(&:url) if skatepark.images.attached?
+    images += skatepark.skatepark_images.filter_map do |skatepark_image|
+      skatepark_image.image.url if skatepark_image.image.attached?
+    end
     images.first(5)
   end
 

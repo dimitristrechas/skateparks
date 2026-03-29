@@ -9,3 +9,4 @@ pin 'flowbite', to: 'https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowb
 pin 'trix'
 pin '@rails/actiontext', to: 'actiontext.esm.js'
 pin 'leaflet', to: 'https://unpkg.com/leaflet@2.0.0-alpha.1/dist/leaflet.js'
+pin 'sortablejs', to: 'https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/modular/sortable.esm.js'

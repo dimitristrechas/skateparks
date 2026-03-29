@@ -34,7 +34,7 @@ class HomepageSkateparkCardComponentTest < ViewComponent::TestCase
     with_request_url '/' do
       rendered = render_inline(component)
 
-      assert_match "#{@skatepark.images.size} #{I18n.t('photos')}", rendered.to_html
+      assert_match "#{@skatepark.skatepark_images.size} #{I18n.t('photos')}", rendered.to_html
     end
   end
 

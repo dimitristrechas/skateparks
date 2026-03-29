@@ -2,11 +2,22 @@
               model: skatepark,
               class: "my-8",
               data: {
-                controller: 'admin--skateparks--form'
+                controller: 'admin--skateparks--form',
+                admin__skateparks__form_confirm_delete_value: t('admin.skateparks.form.confirm_delete'),
+                admin__skateparks__form_image_alt_pattern_value: t('admin.skateparks.form.image_alt', position: '{position}'),
+                admin__skateparks__form_reorder_pattern_value: t('admin.skateparks.form.reorder_image', position: '{position}'),
+                admin__skateparks__form_delete_pattern_value: t('admin.skateparks.form.delete_image', position: '{position}'),
+                admin__skateparks__form_move_up_pattern_value: t('admin.skateparks.form.move_image_up', position: '{position}'),
+                admin__skateparks__form_move_down_pattern_value: t('admin.skateparks.form.move_image_down', position: '{position}'),
+                admin__skateparks__form_image_moved_pattern_value: t('admin.skateparks.form.image_moved', position: '{position}', total: '{total}'),
+                admin__skateparks__form_image_removed_value: t('admin.skateparks.form.image_removed'),
+                admin__skateparks__form_new_image_removed_value: t('admin.skateparks.form.new_image_removed'),
+                admin__skateparks__form_images_added_one_value: t('admin.skateparks.form.images_added_one'),
+                admin__skateparks__form_images_added_other_value: t('admin.skateparks.form.images_added_other', count: '{count}'),
               }) do |form| %>
   <% if skatepark.errors.any? %>
     <div class="mb-4">
-      <h2 class="mb-1 text-xl font-semibold">Errors</h2>
+      <h2 class="mb-1 text-xl font-semibold"><%= t("admin.skateparks.form.errors_title") %></h2>
 
       <ul class="list-inside list-disc text-red-600">
         <% skatepark.errors.each do |error| %>
@@ -38,7 +49,7 @@
     <%= render(
       TextFieldComponent.new(
         name: "google_id",
-        title: "Google maps id",
+        title: t("skatepark.google_id"),
         form: form,
       ),
     ) %>
@@ -55,7 +66,7 @@
     <div class="flex flex-col gap-2">
       <%= form.label :country_code,
                  t("country"),
-                 class: "block text-neutral-600 dark:text-neutral-300  mb-1" %>
+                 class: "block text-neutral-600 dark:text-neutral-300 mb-1" %>
 
       <%= form.select :country_code,
                   [["", ""]] +
@@ -91,7 +102,7 @@
 
     <div class="col-start-1">
       <%= form.label :description_el,
-                 "Description el",
+                 t("skatepark.description_el"),
                  class: "block text-neutral-600 dark:text-neutral-300 mb-1" %>
 
       <%= form.rich_text_area(:description_el, class: "bg-white text-neutral-600") %>
@@ -99,7 +110,7 @@
 
     <div>
       <%= form.label :description_en,
-                 "Description en",
+                 t("skatepark.description_en"),
                  class: "block text-neutral-600 dark:text-neutral-300 mb-1" %>
 
       <%= form.rich_text_area(:description_en, class: "bg-white text-neutral-600") %>
@@ -107,8 +118,8 @@
 
     <div class="col-start-1">
       <%= form.label :cover_image,
-                 "Cover image",
-                 class: "block text-neutral-600 dark:text-neutral-300  mb-1" %>
+                 t("skatepark.cover_image"),
+                 class: "block text-neutral-600 dark:text-neutral-300 mb-1" %>
 
       <%= form.file_field :cover_image,
                       multiple: false,
@@ -123,28 +134,115 @@
     </div>
 
     <div class="col-start-1">
-      <%= form.label :images,
-                 "Images",
-                 class: "block text-neutral-600 dark:text-neutral-300  mb-1" %>
+      <%= form.label :new_images,
+                 t("skatepark.images"),
+                 class: "block text-neutral-600 dark:text-neutral-300 mb-1" %>
 
-      <%= form.file_field :images,
+      <%= form.file_field :new_images,
                       multiple: true,
                       accept: "image/*",
-                      class: "p-1 text-neutral-600 dark:text-neutral-300" %>
+                      class: "p-1 text-neutral-600 dark:text-neutral-300",
+                      data: {
+                        admin__skateparks__form_target: "newImagesInput",
+                        action: "change->admin--skateparks--form#onNewImagesChange",
+                      } %>
+
+      <p class="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
+        <%= t("admin.skateparks.form.images_upload_hint") %>
+      </p>
     </div>
 
-    <div class="col-span-2 flex flex-wrap place-items-center gap-4">
-      <% if skatepark&.id %>
-        <% skatepark.images.each do |image| %>
-          <div
-            data-action="click->admin--skateparks--form#onImageClick"
-            class="cursor-pointer rounded hover:outline hover:outline-4 hover:outline-offset-2 hover:outline-red-500"
-          >
-            <%= form.hidden_field :images, multiple: true, value: image.signed_id %>
-            <%= image_tag image, size: "200x150", class: "rounded" %>
-          </div>
+    <div class="col-span-2 space-y-4">
+      <div
+        class="sr-only"
+        aria-live="polite"
+        aria-atomic="true"
+        data-admin--skateparks--form-target="announcement"
+      ></div>
+
+      <div
+        class="
+          overflow-hidden rounded-lg border border-neutral-300 divide-y divide-neutral-200 dark:border-neutral-600
+          dark:divide-gray-700
+        "
+        data-admin--skateparks--form-target="sortableList"
+        role="list"
+        aria-label="<%= t("admin.skateparks.form.images_aria_label") %>"
+      >
+        <% persisted_skatepark_images =
+             skatepark.skatepark_images.select(&:persisted?).sort_by do |image_record|
+               [image_record.position || Float::INFINITY, image_record.id || Float::INFINITY]
+             end %>
+
+        <p
+          class="
+            <%= class_names('bg-white p-4 text-sm text-neutral-500 dark:bg-gray-900 dark:text-neutral-400',
+            'hidden' => persisted_skatepark_images.any?) %>
+          "
+          data-admin--skateparks--form-target="emptyState"
+        >
+          <%= t("admin.skateparks.form.images_empty_state") %>
+        </p>
+
+        <% persisted_skatepark_images.each_with_index do |skatepark_image, index| %>
+          <%= form.fields_for :skatepark_images, skatepark_image do |image_fields| %>
+            <% marked_for_destruction = image_fields.object.marked_for_destruction? %>
+
+            <%= render(SkateparkImageListItemComponent.new(index: index, destroyed: marked_for_destruction)) do |item| %>
+              <% item.with_fields do %>
+                <%= image_fields.hidden_field :id %>
+
+                <%= image_fields.hidden_field :position,
+                                          value: image_fields.object.position,
+                                          data: { position_field: true } %>
+
+                <%= image_fields.hidden_field :_destroy,
+                                          value: (marked_for_destruction ? 1 : 0),
+                                          data: { destroy_field: true } %>
+              <% end %>
+
+              <% item.with_preview do %>
+                <%= image_tag skatepark_image.image,
+                            size: "80x60",
+                            alt: t("admin.skateparks.form.image_alt", position: index + 1),
+                            class: "h-[60px] w-[80px] rounded object-cover",
+                            data: { image_preview: true } %>
+              <% end %>
+
+              <% item.with_subtitle do %>
+                <p class="text-sm text-neutral-500 dark:text-neutral-400">
+                  <%= t("admin.skateparks.form.drag_to_reorder_hint") %>
+                </p>
+              <% end %>
+            <% end %>
+          <% end %>
         <% end %>
-      <% end %>
+      </div>
+
+      <template data-admin--skateparks--form-target="newImageTemplate">
+        <%= render(SkateparkImageListItemComponent.new) do |item| %>
+          <% item.with_fields do %>
+            <input
+              type="hidden"
+              name="skatepark[new_image_positions][]"
+              value=""
+              data-position-field
+            >
+          <% end %>
+
+          <% item.with_preview do %>
+            <img
+              alt="<%= t("admin.skateparks.form.new_image_preview_alt") %>"
+              class="h-[60px] w-[80px] rounded object-cover"
+              data-image-preview
+            >
+          <% end %>
+
+          <% item.with_subtitle do %>
+            <p class="truncate text-sm text-neutral-500 dark:text-neutral-400" data-file-name></p>
+          <% end %>
+        <% end %>
+      </template>
     </div>
 
     <div class="col-span-2 justify-self-end">

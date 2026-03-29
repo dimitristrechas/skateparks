@@ -67,9 +67,6 @@ RUN chmod +x bin/* && \
       fi; \
     done
 
-# Precompile assets for development without requiring secret RAILS_MASTER_KEY
-RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
-
 # Keep node_modules in the development image because the dev stack runs
 # Tailwind watch at runtime.
 RUN rm -rf .yarn

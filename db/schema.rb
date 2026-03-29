@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_02_123837) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_27_120100) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -119,6 +119,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_02_123837) do
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
+  create_table "skatepark_images", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "position", null: false
+    t.bigint "skatepark_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["skatepark_id", "position"], name: "index_skatepark_images_on_skatepark_id_and_position"
+    t.index ["skatepark_id"], name: "index_skatepark_images_on_skatepark_id"
+  end
+
   create_table "skateparks", force: :cascade do |t|
     t.string "country_code"
     t.datetime "created_at", null: false
@@ -151,4 +160,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_02_123837) do
   add_foreign_key "audit_logs", "users", column: "actor_id", on_delete: :restrict
   add_foreign_key "popular_skateparks", "skateparks"
   add_foreign_key "sessions", "users"
+  add_foreign_key "skatepark_images", "skateparks"
 end

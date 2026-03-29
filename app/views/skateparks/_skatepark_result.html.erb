@@ -6,7 +6,7 @@
   fetchpriority: "high",
   class:
     "object-cover w-full h-80 md:w-3/5 -skew-y-1 origin-bottom-left rounded-lg shadow-lg",
-  alt: "#{skatepark.name} cover image",
+  alt: t("skatepark.cover_image_alt", name: skatepark.name),
   **CLOUDINARY_DEFAULT_SETTINGS %>
 
   <div
@@ -17,6 +17,6 @@
   >
     <h5 class="text-2xl font-bold tracking-tight sm:mb-3"><%= skatepark.name %></h5>
 
-    <p class="font-normal sm:mb-1"><%= "#{skatepark.images.size} #{t("photos")}" %></p>
+    <p class="font-normal sm:mb-1"><%= "#{skatepark.skatepark_images.size} #{t("photos")}" %></p>
   </div>
 <% end %>

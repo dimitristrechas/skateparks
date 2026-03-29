@@ -59,7 +59,8 @@ def attach_images(skatepark, index)
 
   rand(3..5).times do |j|
     image = uri.open(**options)
-    skatepark.images.attach(io: image, filename: "skatepark#{index}_image#{j}.jpg", content_type: 'image/jpeg')
+    skatepark_image = skatepark.skatepark_images.build(position: j + 1)
+    skatepark_image.image.attach(io: image, filename: "skatepark#{index}_image#{j}.jpg", content_type: 'image/jpeg')
   rescue OpenURI::HTTPError, Net::OpenTimeout, Net::ReadTimeout => e
     Rails.logger.error { "Failed to download image #{j}: #{e.message}" }
   end
