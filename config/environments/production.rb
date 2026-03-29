@@ -31,7 +31,7 @@ Rails.application.configure do
   config.force_ssl = true
 
   # Skip http-to-https redirect for the health check endpoint.
-  # config.ssl_options = { redirect: { exclude: ->(request) { request.path == "/healthcheck" } } }
+  config.ssl_options = { redirect: { exclude: ->(request) { request.path == '/healthcheck' } } }
 
   # Log to STDOUT with the current request id as a default log tag.
   config.log_tags = [:request_id]
@@ -79,8 +79,8 @@ Rails.application.configure do
   config.active_record.attributes_for_inspect = [:id]
 
   # Enable DNS rebinding protection and other `Host` header attacks.
-  config.hosts = %w[skateparks.gr www.skateparks.gr]
+  config.hosts = %w[skateparks.gr www.skateparks.gr 127.0.0.1]
   #
   # Skip DNS rebinding protection for the health check endpoint.
-  # config.host_authorization = { exclude: ->(request) { request.path == "/healthcheck" } }
+  config.host_authorization = { exclude: ->(request) { request.path == '/healthcheck' } }
 end
