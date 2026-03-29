@@ -3,6 +3,8 @@ import { Controller } from "@hotwired/stimulus";
 
 const ACTIVE_SORT_CLASSES = ["bg-neutral-50", "dark:bg-gray-800", "shadow-md"];
 const DISABLED_BUTTON_CLASSES = ["cursor-not-allowed", "opacity-50"];
+const SORTABLE_ITEM_SELECTOR = "[data-sortable-item]";
+const VISIBLE_SORTABLE_ITEM_SELECTOR = `${SORTABLE_ITEM_SELECTOR}:not([data-destroyed='true'])`;
 
 export default class extends Controller {
   static targets = [
@@ -30,6 +32,7 @@ export default class extends Controller {
   };
 
   connect() {
+    this.itemElementCache = new WeakMap();
     this.pendingUploads = new Map();
 
     if (this.countrySelectTarget.value) {
@@ -41,17 +44,18 @@ export default class extends Controller {
     this.sortable = Sortable.create(this.sortableListTarget, {
       animation: 150,
       chosenClass: "shadow-md",
-      draggable: "[data-sortable-item]:not([data-destroyed='true'])",
+      draggable: VISIBLE_SORTABLE_ITEM_SELECTOR,
       forceFallback: true,
       ghostClass: "bg-neutral-50",
       handle: "[data-sort-handle]",
       onChoose: ({ item }) => this.toggleActiveSortClasses(item, true),
       onEnd: ({ item }) => {
         this.toggleActiveSortClasses(item, false);
-        this.syncPositions();
-        this.announceMove(item);
       },
       onUnchoose: ({ item }) => this.toggleActiveSortClasses(item, false),
+      onUpdate: ({ item, oldDraggableIndex, newDraggableIndex, oldIndex, newIndex }) => {
+        this.syncReorderedItems(item, oldDraggableIndex ?? oldIndex, newDraggableIndex ?? newIndex);
+      },
     });
 
     this.syncPositions();
@@ -102,8 +106,10 @@ export default class extends Controller {
     const files = [...event.target.files];
     if (files.length === 0) return;
 
+    const startIndex = Math.max(0, this.visibleItems.length - 1);
+
     files.forEach((file) => this.appendNewImage(file));
-    this.syncPositions();
+    this.syncPositions({ startIndex });
     const message =
       files.length === 1 ? this.imagesAddedOneValue : this.imagesAddedOtherValue.replace("{count}", files.length);
     this.announce(message);
@@ -115,8 +121,10 @@ export default class extends Controller {
 
     if (!window.confirm(this.confirmDeleteValue)) return;
 
+    const currentIndex = this.visibleItems.indexOf(item);
+
     if (item.dataset.newUploadId) {
-      this.removeNewUpload(item);
+      this.removeNewUpload(item, currentIndex);
       return;
     }
 
@@ -125,7 +133,7 @@ export default class extends Controller {
 
     item.dataset.destroyed = "true";
     item.classList.add("hidden");
-    this.syncPositions();
+    this.syncPositions({ startIndex: currentIndex, syncNewImages: false });
     this.announce(this.imageRemovedValue);
   }
 
@@ -143,47 +151,42 @@ export default class extends Controller {
       items[nextIndex].after(item);
     }
 
-    this.syncPositions();
-    this.announce(
-      this.imageMovedPatternValue.replace("{position}", nextIndex + 1).replace("{total}", this.visibleItems.length)
-    );
+    const visibleItems = this.visibleItems;
+
+    this.syncPositions({
+      visibleItems,
+      startIndex: Math.min(currentIndex, nextIndex),
+      endIndex: Math.max(currentIndex, nextIndex),
+      syncNewImages: this.isNewUpload(item),
+      syncEmptyState: false,
+    });
+    this.announceMove(nextIndex + 1, visibleItems.length);
     trigger.focus();
   }
 
-  syncPositions() {
-    const visibleItems = this.visibleItems;
+  syncPositions({
+    visibleItems = this.visibleItems,
+    startIndex = 0,
+    endIndex = visibleItems.length - 1,
+    syncNewImages = true,
+    syncEmptyState = true,
+  } = {}) {
+    if (visibleItems.length > 0) {
+      const normalizedStartIndex = Math.max(0, Math.min(startIndex, visibleItems.length - 1));
+      const normalizedEndIndex = Math.max(normalizedStartIndex, Math.min(endIndex, visibleItems.length - 1));
 
-    visibleItems.forEach((item, index) => {
-      const position = index + 1;
-      const positionField = item.querySelector("[data-position-field]");
-      const positionLabel = item.querySelector("[data-position-label]");
-      const preview = item.querySelector("[data-image-preview]");
-      const handle = item.querySelector("[data-sort-handle]");
-      const deleteButton = item.querySelector("[data-delete-button]");
-      const moveUpButton = item.querySelector("[data-move-up-button]");
-      const moveDownButton = item.querySelector("[data-move-down-button]");
+      visibleItems.slice(normalizedStartIndex, normalizedEndIndex + 1).forEach((item, offset) => {
+        this.syncItemPosition(item, normalizedStartIndex + offset, visibleItems.length);
+      });
+    }
 
-      if (positionField) positionField.value = position;
-      if (positionLabel) positionLabel.textContent = position;
-      if (preview) preview.alt = this.imageAltPatternValue.replace("{position}", position);
-      if (handle) handle.setAttribute("aria-label", this.reorderPatternValue.replace("{position}", position));
-      if (deleteButton)
-        deleteButton.setAttribute("aria-label", this.deletePatternValue.replace("{position}", position));
-      if (moveUpButton)
-        moveUpButton.setAttribute("aria-label", this.moveUpPatternValue.replace("{position}", position));
-      if (moveDownButton)
-        moveDownButton.setAttribute("aria-label", this.moveDownPatternValue.replace("{position}", position));
-
-      this.updateMoveButtonState(moveUpButton, position === 1);
-      this.updateMoveButtonState(moveDownButton, position === visibleItems.length);
-    });
-
-    this.syncNewImagesInput(visibleItems);
-    this.syncEmptyState(visibleItems);
+    if (syncNewImages) this.syncNewImagesInput(visibleItems);
+    if (syncEmptyState) this.syncEmptyState(visibleItems);
   }
 
   updateMoveButtonState(button, disabled) {
     if (!button) return;
+    if (button.disabled === disabled) return;
 
     button.disabled = disabled;
     DISABLED_BUTTON_CLASSES.forEach((className) => {
@@ -191,13 +194,9 @@ export default class extends Controller {
     });
   }
 
-  announceMove(item) {
-    const position = this.visibleItems.indexOf(item) + 1;
-    if (position <= 0) return;
-
-    this.announce(
-      this.imageMovedPatternValue.replace("{position}", position).replace("{total}", this.visibleItems.length)
-    );
+  announceMove(position, total) {
+    if (!position || position <= 0) return;
+    this.announce(this.imageMovedPatternValue.replace("{position}", position).replace("{total}", total));
   }
 
   announce(message) {
@@ -214,6 +213,78 @@ export default class extends Controller {
     ACTIVE_SORT_CLASSES.forEach((className) => {
       item.classList.toggle(className, enabled);
     });
+  }
+
+  syncReorderedItems(item, oldIndex, newIndex) {
+    if (oldIndex == null || newIndex == null || oldIndex === newIndex) return;
+
+    const visibleItems = this.visibleItems;
+
+    this.syncPositions({
+      visibleItems,
+      startIndex: Math.min(oldIndex, newIndex),
+      endIndex: Math.max(oldIndex, newIndex),
+      syncNewImages: this.isNewUpload(item),
+      syncEmptyState: false,
+    });
+    this.announceMove(newIndex + 1, visibleItems.length);
+  }
+
+  syncItemPosition(item, index, total) {
+    const position = index + 1;
+    const { positionField, positionLabel, preview, handle, deleteButton, moveUpButton, moveDownButton } =
+      this.itemElements(item);
+
+    this.updateValue(positionField, position);
+    this.updateText(positionLabel, position);
+    this.updateAttribute(preview, "alt", this.imageAltPatternValue.replace("{position}", position));
+    this.updateAttribute(handle, "aria-label", this.reorderPatternValue.replace("{position}", position));
+    this.updateAttribute(deleteButton, "aria-label", this.deletePatternValue.replace("{position}", position));
+    this.updateAttribute(moveUpButton, "aria-label", this.moveUpPatternValue.replace("{position}", position));
+    this.updateAttribute(moveDownButton, "aria-label", this.moveDownPatternValue.replace("{position}", position));
+
+    this.updateMoveButtonState(moveUpButton, position === 1);
+    this.updateMoveButtonState(moveDownButton, position === total);
+  }
+
+  itemElements(item) {
+    const cachedElements = this.itemElementCache.get(item);
+    if (cachedElements) return cachedElements;
+
+    const elements = {
+      positionField: item.querySelector("[data-position-field]"),
+      positionLabel: item.querySelector("[data-position-label]"),
+      preview: item.querySelector("[data-image-preview]"),
+      handle: item.querySelector("[data-sort-handle]"),
+      deleteButton: item.querySelector("[data-delete-button]"),
+      moveUpButton: item.querySelector("[data-move-up-button]"),
+      moveDownButton: item.querySelector("[data-move-down-button]"),
+    };
+
+    this.itemElementCache.set(item, elements);
+
+    return elements;
+  }
+
+  updateValue(element, value) {
+    if (!element) return;
+
+    const nextValue = String(value);
+    if (element.value !== nextValue) element.value = nextValue;
+  }
+
+  updateText(element, value) {
+    if (!element) return;
+
+    const nextValue = String(value);
+    if (element.textContent !== nextValue) element.textContent = nextValue;
+  }
+
+  updateAttribute(element, attributeName, value) {
+    if (!element) return;
+    if (element.getAttribute(attributeName) === value) return;
+
+    element.setAttribute(attributeName, value);
   }
 
   appendNewImage(file) {
@@ -235,7 +306,7 @@ export default class extends Controller {
     this.sortableListTarget.append(fragment);
   }
 
-  removeNewUpload(item) {
+  removeNewUpload(item, currentIndex = this.visibleItems.indexOf(item)) {
     const upload = this.pendingUploads.get(item.dataset.newUploadId);
 
     if (upload) {
@@ -244,7 +315,7 @@ export default class extends Controller {
     }
 
     item.remove();
-    this.syncPositions();
+    this.syncPositions({ startIndex: currentIndex });
     this.announce(this.newImageRemovedValue);
   }
 
@@ -272,8 +343,10 @@ export default class extends Controller {
   get visibleItems() {
     if (!this.hasSortableListTarget) return [];
 
-    return [...this.sortableListTarget.querySelectorAll("[data-sortable-item]")].filter(
-      (item) => item.dataset.destroyed !== "true"
-    );
+    return [...this.sortableListTarget.querySelectorAll(VISIBLE_SORTABLE_ITEM_SELECTOR)];
+  }
+
+  isNewUpload(item) {
+    return Boolean(item?.dataset.newUploadId);
   }
 }
