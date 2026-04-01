@@ -112,3 +112,5 @@ gem 'countries', '~> 8.0'
 gem 'kaminari'
 
 gem 'strong_migrations'
+
+gem "geocoder", "~> 1.8"

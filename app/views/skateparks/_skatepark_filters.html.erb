@@ -1,4 +1,14 @@
-<details open class="mb-12 group" data-controller="skateparks--filters">
+<details
+  open
+  class="mb-12 group"
+  data-controller="skateparks--filters skateparks--geolocation"
+  data-skateparks--geolocation-default-distance-value="<%= default_distance_filter %>"
+  data-skateparks--geolocation-denied-message-value="<%= t("geolocation_denied") %>"
+  data-skateparks--geolocation-unavailable-message-value="<%= t("geolocation_unavailable") %>"
+>
+  <% selected_distance = location_params_present? ? params[:distance].to_s : "" %>
+  <% distance_option_classes = "relative z-10 flex w-full min-w-0 cursor-pointer items-center justify-center whitespace-nowrap rounded-lg px-2 py-2 text-center text-sm font-medium text-neutral-500 transition-colors duration-200 hover:bg-white/70 hover:text-neutral-800 peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-neutral-700 peer-checked:text-neutral-800 peer-checked:hover:bg-transparent peer-checked:hover:text-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-600/35 dark:hover:text-neutral-100 dark:peer-focus-visible:outline-neutral-200 dark:peer-checked:text-neutral-900 dark:peer-checked:hover:bg-transparent dark:peer-checked:hover:text-neutral-900 sm:px-4" %>
+
   <summary
     class="
       w-fit cursor-pointer list-none flex items-center gap-2 mb-2 sm:mb-4 font-medium select-none
@@ -20,12 +30,80 @@
     <%= t("filters") %>
   </summary>
 
-  <%= form_with url: skateparks_path, method: :get, class: "flex flex-col md:flex-row md:items-end gap-6" do |form| %>
+  <%= form_with url: skateparks_path,
+                method: :get,
+                class: "flex flex-col gap-6 md:grid md:grid-cols-2 md:items-start lg:grid-cols-[14rem_14rem_minmax(0,1fr)_auto] lg:items-end lg:gap-x-6 lg:gap-y-2" do |form| %>
     <%= form.hidden_field :locale, value: I18n.locale %>
-    <%= render "country_select", countries: @countries %>
-    <%= render "state_select", states: @states %>
+    <%= render "country_select", countries: countries %>
+    <%= render "state_select", states: states %>
 
-    <div class="flex items-center gap-4 ms-auto md:ms-0">
+    <fieldset class="flex min-w-0 flex-col items-start gap-1 border-0 p-0 md:col-span-2 lg:col-span-1 lg:justify-self-start">
+      <legend class="mb-1"><%= t("distance") %></legend>
+
+      <div
+        class="
+          distance-filter relative grid w-full max-w-full grid-cols-4 items-stretch gap-1 overflow-hidden rounded-lg
+          lg:w-auto border border-neutral-300/90 p-1 dark:border-neutral-600
+        "
+      >
+        <div aria-hidden="true" class="distance-filter__indicator"></div>
+
+        <% distance_filter_options.each do |distance| %>
+          <% distance_value = distance.to_s %>
+          <% distance_id = "distance_#{distance_value}" %>
+
+          <div class="distance-filter__option">
+            <%= radio_button_tag :distance,
+                                 distance_value,
+                                 selected_distance == distance_value,
+                                 id: distance_id,
+                                 class: "peer sr-only",
+                                 data: {
+                                   action: "change->skateparks--geolocation#selectDistance",
+                                   "skateparks--geolocation-target": "distanceRadio"
+                                 } %>
+
+            <%= label_tag distance_id, t("within_distance", distance: distance), class: distance_option_classes %>
+          </div>
+        <% end %>
+
+        <div class="distance-filter__option">
+          <%= radio_button_tag :distance,
+                               "",
+                               selected_distance.blank?,
+                               id: "distance_all",
+                               class: "peer sr-only",
+                               data: {
+                                 action: "change->skateparks--geolocation#selectDistance",
+                                 "skateparks--geolocation-target": "distanceRadio"
+                               } %>
+
+          <%= label_tag "distance_all", t("all_distances"), class: distance_option_classes %>
+        </div>
+      </div>
+
+      <%= form.hidden_field :lat,
+                            value: params[:lat],
+                            disabled: selected_distance.blank?,
+                            data: { "skateparks--geolocation-target": "latitude" } %>
+
+      <%= form.hidden_field :lng,
+                            value: params[:lng],
+                            disabled: selected_distance.blank?,
+                            data: { "skateparks--geolocation-target": "longitude" } %>
+    </fieldset>
+
+    <p
+      class="
+        w-full text-sm text-neutral-600 dark:text-neutral-300 md:col-span-2 lg:col-span-1 lg:col-start-3
+        lg:row-start-2
+      "
+      data-skateparks--geolocation-target="message"
+      aria-live="polite"
+      hidden
+    ></p>
+
+    <div class="flex flex-wrap items-center gap-4 md:col-span-2 md:justify-end lg:col-span-1 lg:col-start-4 lg:row-start-1">
       <%= render LinkButtonComponent.new(title: t("reset_filters"), url: skateparks_path) %>
       <%= render ButtonComponent.new(title: t("search"), type: :submit, form:, large: true) %>
     </div>

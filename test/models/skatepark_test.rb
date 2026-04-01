@@ -91,4 +91,18 @@ class SkateparkTest < ActiveSupport::TestCase
 
     assert_equal "#{skatepark.id}-chicago-skate-park", skatepark.to_param
   end
+
+  def test_supports_near_scope_from_geocoder
+    assert_respond_to Skatepark, :near
+  end
+
+  def test_near_scope_returns_skateparks_within_radius
+    nearby = create(:skatepark, lat: 37.98, lng: 23.73)
+    faraway = create(:skatepark, lat: 40.63, lng: 22.94)
+
+    results = Skatepark.near([37.97, 23.72], 5, units: :km)
+
+    assert_includes results, nearby
+    assert_not_includes results, faraway
+  end
 end

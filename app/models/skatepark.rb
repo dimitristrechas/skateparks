@@ -7,6 +7,7 @@ class Skatepark < ApplicationRecord
   accepts_nested_attributes_for :skatepark_images, allow_destroy: true
   has_one :popular_skatepark, dependent: :destroy
   has_one_attached :cover_image
+  reverse_geocoded_by :lat, :lng
   # has_one_attached :cover_image do |attachable|
   #   attachable.variant(:thumb,
   #                      resize_and_pad: [1200, 900],

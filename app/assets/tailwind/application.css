@@ -23,3 +23,44 @@
     @apply rounded-lg outline outline-offset-2 outline-neutral-700 dark:outline-neutral-200;
   }
 }
+
+@layer components {
+  .distance-filter {
+    --distance-filter-gap: 0.25rem;
+    --distance-filter-padding: 0.25rem;
+    --distance-filter-count: 4;
+    --distance-filter-index: 0;
+  }
+
+  .distance-filter__option {
+    @apply min-w-0;
+  }
+
+  .distance-filter__indicator {
+    @apply pointer-events-none absolute inset-y-1 left-1 rounded-lg bg-white shadow-[0_1px_2px_rgba(15,23,42,0.08),0_0_0_1px_rgba(212,212,212,0.9)] transition-transform duration-200 ease-out dark:bg-neutral-100;
+    width: calc(
+      (
+          100% - (var(--distance-filter-padding) * 2) -
+            (var(--distance-filter-gap) * (var(--distance-filter-count) - 1))
+        ) /
+        var(--distance-filter-count)
+    );
+    transform: translateX(calc(var(--distance-filter-index) * (100% + var(--distance-filter-gap))));
+  }
+
+  .distance-filter:has(> :nth-child(2) input:checked) {
+    --distance-filter-index: 0;
+  }
+
+  .distance-filter:has(> :nth-child(3) input:checked) {
+    --distance-filter-index: 1;
+  }
+
+  .distance-filter:has(> :nth-child(4) input:checked) {
+    --distance-filter-index: 2;
+  }
+
+  .distance-filter:has(> :nth-child(5) input:checked) {
+    --distance-filter-index: 3;
+  }
+}

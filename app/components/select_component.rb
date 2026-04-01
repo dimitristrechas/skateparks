@@ -36,6 +36,17 @@ class SelectComponent < ViewComponent::Base
     class_names(base_classes, size_classes)
   end
 
+  def select_tag_options
+    options = {
+      disabled: @disabled,
+      required: @required,
+      class: select_classes,
+    }.merge(aria_attributes).merge(@html_options)
+
+    options[:id] = @id if @id.present?
+    options
+  end
+
   def aria_attributes
     {}.tap do |attrs|
       attrs['aria-label'] = @aria[:label] if @aria[:label]

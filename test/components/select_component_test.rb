@@ -161,4 +161,12 @@ class SelectComponentTest < ViewComponent::TestCase
 
     assert_selector 'select[aria-invalid="true"]'
   end
+
+  def test_auto_generates_id_from_name_when_no_id_given
+    component = SelectComponent.new(name: @name, options: @options)
+    render_inline(component)
+
+    assert_selector 'select[name="country"][id]'
+    assert_no_selector 'select[id="custom-select"]'
+  end
 end

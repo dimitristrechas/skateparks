@@ -1,4 +1,6 @@
 class SkateparksController < ApplicationController
+  include SkateparkDistanceFiltering
+
   before_action :set_skatepark, only: %i[show]
 
   def index
@@ -39,10 +41,7 @@ class SkateparksController < ApplicationController
   end
 
   def filtered_skateparks
-    skateparks = Skatepark.published.includes(:skatepark_images, cover_image_attachment: :blob)
-    skateparks = skateparks.where(country_code: params[:country_code]) if params[:country_code].present?
-    skateparks = skateparks.where(state: params[:state]) if params[:state].present? && params[:country_code].present?
-    skateparks.i18n.order(:name)
+    apply_distance_filter(skateparks_for_filters)
   end
 
   def cached_countries
@@ -85,5 +84,12 @@ class SkateparksController < ApplicationController
     @country_emoji = ISO3166::Country[@skatepark.country_code]&.emoji_flag || ''
 
     "#{@state_friendly_name}, #{@country_friendly_name} #{@country_emoji}"
+  end
+
+  def skateparks_for_filters
+    skateparks = Skatepark.published.includes(:string_translations, :skatepark_images, cover_image_attachment: :blob)
+    skateparks = skateparks.where(country_code: params[:country_code]) if params[:country_code].present?
+    skateparks = skateparks.where(state: params[:state]) if params[:state].present? && params[:country_code].present?
+    skateparks
   end
 end

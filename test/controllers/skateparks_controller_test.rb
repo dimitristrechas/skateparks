@@ -89,6 +89,141 @@ class SkateparksControllerTest < ActionDispatch::IntegrationTest
     assert_equal names.sort, names
   end
 
+  def test_get_index_filters_by_distance
+    nearby_skatepark = create_us_skatepark(name: 'Nearby Park', lat: 0.0, lng: 0.05)
+    faraway_skatepark = create_us_skatepark(name: 'Faraway Park', lat: 0.0, lng: 0.5)
+
+    get skateparks_path(country_code: 'US', lat: 0, lng: 0, distance: 10)
+
+    assert_includes assigns(:skateparks), nearby_skatepark
+    assert_not_includes assigns(:skateparks), faraway_skatepark
+  end
+
+  def test_get_index_orders_distance_results_by_nearest_first
+    nearest_skatepark = create_us_skatepark(name: 'Nearest Park', lat: 0.0, lng: 0.05)
+    middle_skatepark = create_us_skatepark(name: 'Middle Park', lat: 0.0, lng: 0.1)
+    farthest_skatepark = create_us_skatepark(name: 'Farthest Park', lat: 0.0, lng: 0.2)
+
+    get skateparks_path(country_code: 'US', lat: 0, lng: 0, distance: 25)
+
+    assert_equal [nearest_skatepark.id, middle_skatepark.id, farthest_skatepark.id], assigns(:skateparks).map(&:id)
+  end
+
+  def test_get_index_combines_distance_country_and_state_filters
+    california_skatepark = create_us_skatepark(name: 'California Park', lat: 0.0, lng: 0.05, state: 'CA')
+    texas_skatepark = create_us_skatepark(name: 'Texas Park', lat: 0.0, lng: 0.05, state: 'TX')
+    greece_skatepark = create(:skatepark, name_en: 'Greece Park', name_el: 'Greece Park', lat: 0.0, lng: 0.05)
+
+    get skateparks_path(country_code: 'US', state: 'CA', lat: 0, lng: 0, distance: 25)
+
+    assert_includes assigns(:skateparks), california_skatepark
+    assert_not_includes assigns(:skateparks), texas_skatepark
+    assert_not_includes assigns(:skateparks), greece_skatepark
+  end
+
+  def test_get_index_falls_back_to_alphabetical_order_when_distance_params_are_invalid
+    create_us_skatepark(name: 'Zebra Park', lat: 0.0, lng: 0.05)
+    create_us_skatepark(name: 'Alpha Park', lat: 0.0, lng: 0.15)
+    create_us_skatepark(name: 'Middle Park', lat: 0.0, lng: 0.3)
+
+    get skateparks_path(country_code: 'US', lat: 0, lng: 0, distance: 15)
+    names = assigns(:skateparks).map(&:name)
+
+    assert_equal names.sort, names
+  end
+
+  def test_get_index_falls_back_to_alphabetical_when_lat_missing
+    create_us_skatepark(name: 'Zebra Park', lat: 0.0, lng: 0.05)
+    create_us_skatepark(name: 'Alpha Park', lat: 0.0, lng: 0.15)
+
+    get skateparks_path(country_code: 'US', lng: 0, distance: 10)
+    names = assigns(:skateparks).map(&:name)
+
+    assert_response :success
+    assert_equal names.sort, names
+  end
+
+  def test_get_index_falls_back_to_alphabetical_when_lng_missing
+    create_us_skatepark(name: 'Zebra Park', lat: 0.0, lng: 0.05)
+    create_us_skatepark(name: 'Alpha Park', lat: 0.0, lng: 0.15)
+
+    get skateparks_path(country_code: 'US', lat: 0, distance: 10)
+    names = assigns(:skateparks).map(&:name)
+
+    assert_response :success
+    assert_equal names.sort, names
+  end
+
+  def test_get_index_falls_back_to_alphabetical_when_distance_missing
+    create_us_skatepark(name: 'Zebra Park', lat: 0.0, lng: 0.05)
+    create_us_skatepark(name: 'Alpha Park', lat: 0.0, lng: 0.15)
+
+    get skateparks_path(country_code: 'US', lat: 0, lng: 0)
+    names = assigns(:skateparks).map(&:name)
+
+    assert_response :success
+    assert_equal names.sort, names
+  end
+
+  def test_get_index_falls_back_to_alphabetical_with_non_numeric_coordinates
+    create_us_skatepark(name: 'Zebra Park', lat: 0.0, lng: 0.05)
+    create_us_skatepark(name: 'Alpha Park', lat: 0.0, lng: 0.15)
+
+    get skateparks_path(country_code: 'US', lat: 'abc', lng: 'xyz', distance: 10)
+    names = assigns(:skateparks).map(&:name)
+
+    assert_response :success
+    assert_equal names.sort, names
+  end
+
+  def test_get_index_falls_back_to_alphabetical_with_out_of_range_lat
+    create_us_skatepark(name: 'Zebra Park', lat: 0.0, lng: 0.05)
+    create_us_skatepark(name: 'Alpha Park', lat: 0.0, lng: 0.15)
+
+    get skateparks_path(country_code: 'US', lat: 100, lng: 0, distance: 10)
+    names = assigns(:skateparks).map(&:name)
+
+    assert_response :success
+    assert_equal names.sort, names
+  end
+
+  def test_get_index_falls_back_to_alphabetical_with_out_of_range_lng
+    create_us_skatepark(name: 'Zebra Park', lat: 0.0, lng: 0.05)
+    create_us_skatepark(name: 'Alpha Park', lat: 0.0, lng: 0.15)
+
+    get skateparks_path(country_code: 'US', lat: 0, lng: 200, distance: 10)
+    names = assigns(:skateparks).map(&:name)
+
+    assert_response :success
+    assert_equal names.sort, names
+  end
+
+  def test_get_index_assigns_distance_attribute_when_distance_filter_is_active
+    nearby_skatepark = create_us_skatepark(name: 'Nearby Park', lat: 0.0, lng: 0.05)
+
+    get skateparks_path(country_code: 'US', lat: 0, lng: 0, distance: 10)
+
+    filtered_skatepark = assigns(:skateparks).find { |skatepark| skatepark.id == nearby_skatepark.id }
+
+    assert_respond_to filtered_skatepark, :distance
+    assert_not_nil filtered_skatepark.distance
+  end
+
+  def test_get_index_with_distance_avoids_n_plus_one_queries_for_listing_fields
+    create_us_skatepark(name: 'Nearby Park', lat: 0.0, lng: 0.05)
+    create_us_skatepark(name: 'Middle Park', lat: 0.0, lng: 0.1)
+    create_us_skatepark(name: 'Far Park', lat: 0.0, lng: 0.2)
+
+    queries = capture_sql_queries do
+      get skateparks_path(country_code: 'US', lat: 0, lng: 0, distance: 25)
+    end
+
+    assert_operator count_matching_queries(queries, /mobility_string_translations/), :<=, 1
+    assert_operator count_matching_queries(queries, /active_storage_attachments/), :<=, 1
+    assert_operator count_matching_queries(queries, /active_storage_blobs/), :<=, 1
+    assert_operator count_matching_queries(queries, /FROM "skatepark_images"/), :<=, 1
+  end
+
   def test_get_index_assigns_countries_from_cache
     Rails.cache.clear
     create(:skatepark, country_code: 'GR')
@@ -228,5 +363,38 @@ class SkateparksControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_equal [], assigns(:states)
+  end
+
+  private
+
+  def create_us_skatepark(name:, lat:, lng:, state: 'CA')
+    create(
+      :skatepark,
+      name_en: name,
+      name_el: name,
+      country_code: 'US',
+      state: state,
+      lat: lat,
+      lng: lng
+    )
+  end
+
+  def capture_sql_queries(&)
+    queries = []
+    callback = lambda do |_name, _started, _finished, _unique_id, payload|
+      sql = payload[:sql]
+      next if payload[:name] == 'SCHEMA' || payload[:cached]
+      next if sql.match?(/\A(?:BEGIN|COMMIT|ROLLBACK|SAVEPOINT|RELEASE SAVEPOINT)/)
+
+      queries << sql.squish
+    end
+
+    ActiveSupport::Notifications.subscribed(callback, 'sql.active_record', &)
+
+    queries
+  end
+
+  def count_matching_queries(queries, pattern)
+    queries.count { |query| query.match?(pattern) }
   end
 end

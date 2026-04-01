@@ -17,6 +17,12 @@
   >
     <h5 class="text-2xl font-bold tracking-tight sm:mb-3"><%= skatepark.name %></h5>
 
-    <p class="font-normal sm:mb-1"><%= "#{skatepark.skatepark_images.size} #{t("photos")}" %></p>
+    <% skatepark_details = ["#{skatepark.skatepark_images.size} #{t("photos")}"] %>
+
+    <% if (distance = skatepark.try(:distance)).present? %>
+      <% skatepark_details << t("km_away", distance: number_with_precision(distance, precision: 1, strip_insignificant_zeros: true)) %>
+    <% end %>
+
+    <p class="font-normal sm:mb-1"><%= skatepark_details.join(" / ") %></p>
   </div>
 <% end %>
