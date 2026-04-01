@@ -113,4 +113,4 @@ gem 'kaminari'
 
 gem 'strong_migrations'
 
-gem "geocoder", "~> 1.8"
+gem 'geocoder', '~> 1.8'
