@@ -13,6 +13,7 @@ export default class extends Controller {
     "previewVideo",
     "videoIframe",
     "videoModal",
+    "videoModalIndicator",
   ];
 
   static values = {
@@ -60,6 +61,18 @@ export default class extends Controller {
       }
     });
     this.showGalleryImage(this.imageIndexOpened);
+  }
+
+  onVideoModalIndicatorClick(event) {
+    if (!this.hasVideoModalIndicatorTarget) return;
+
+    this.stopVideoPlayback();
+    this.videoModalIndicatorTargets.forEach((el, idx) => {
+      if (el.id === event.currentTarget.id) {
+        this.videoIndexOpened = idx;
+      }
+    });
+    this.playCurrentVideo();
   }
 
   onImageClick(event) {
@@ -212,7 +225,7 @@ export default class extends Controller {
   };
 
   galleryTouchStartHandler = (event) => {
-    if (!this.isImageModalOpen()) return;
+    if (!this.isImageModalOpen() && !this.isVideoModalOpen()) return;
 
     if (event.touches.length > 1) {
       this.isMultiTouchGesture = true;
@@ -224,7 +237,7 @@ export default class extends Controller {
   };
 
   galleryTouchEndHandler = (event) => {
-    if (!this.isImageModalOpen()) return;
+    if (!this.isImageModalOpen() && !this.isVideoModalOpen()) return;
 
     if (this.isMultiTouchGesture) {
       if (event.touches.length === 0) {
@@ -240,11 +253,21 @@ export default class extends Controller {
     const swipeX = touchendX - this.touchstartX;
     const swipeY = touchendY - this.touchstartY;
 
-    if (Math.abs(swipeX) > Math.abs(swipeY) && Math.abs(swipeX) > swipeThreshold) {
+    if (Math.abs(swipeX) <= Math.abs(swipeY) || Math.abs(swipeX) <= swipeThreshold) {
+      return;
+    }
+
+    if (this.isImageModalOpen()) {
       if (swipeX > 0) {
         this.onPreviousGalleryImage();
       } else {
         this.onNextGalleryImage();
+      }
+    } else if (this.isVideoModalOpen() && this.previewVideoTargets.length > 1) {
+      if (swipeX > 0) {
+        this.onPreviousVideo();
+      } else {
+        this.onNextVideo();
       }
     }
   };
@@ -316,6 +339,21 @@ export default class extends Controller {
     if (!embedUrl) return;
 
     this.videoIframeTarget.src = embedUrl;
+    this.syncVideoModalIndicators();
+  }
+
+  syncVideoModalIndicators() {
+    if (!this.hasVideoModalIndicatorTarget) return;
+
+    this.videoModalIndicatorTargets.forEach((el, idx) => {
+      if (idx === this.videoIndexOpened) {
+        el.classList.remove("opacity-50");
+        el.classList.add("opacity-100", "scale-125");
+      } else {
+        el.classList.add("opacity-50");
+        el.classList.remove("opacity-100", "scale-125");
+      }
+    });
   }
 
   stopVideoPlayback() {

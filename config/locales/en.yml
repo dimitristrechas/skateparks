@@ -22,6 +22,7 @@ en:
   video_player: "Video player"
   close_video_player: "Close video player"
   go_to_image: "Go to image %{number}"
+  go_to_video: "Go to video %{number}"
   photos_tab: "Photos (%{count})"
   videos_tab: "Videos (%{count})"
   skatepark:
@@ -42,6 +43,7 @@ en:
     gallery_image_alt: "%{name} - Image %{current} of %{total}"
     video_thumbnail_alt: "%{name} - Video %{current} of %{total}"
     image_indicators: "Image indicators"
+    video_indicators: "Video indicators"
   edit: "Edit"
   create: "Create"
   about: "About skateparks.gr"
@@ -58,6 +60,7 @@ en:
   within_distance: "%{distance} km"
   geolocation_denied: "Location access was denied. Enable it to filter by distance."
   geolocation_unavailable: "We couldn't get your location. Check your browser settings and try again."
+  geolocation_wait: "Still fetching your location. Allow the prompt if your browser asks, then tap Search again."
   km_away: "%{distance} km away"
   explore_all_skateparks: "Explore Skateparks in Greece & Worldwide"
   view_all_skateparks: "View all"

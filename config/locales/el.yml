@@ -22,6 +22,7 @@ el:
   video_player: "Video player"
   close_video_player: "Κλείσιμο video player"
   go_to_image: "Πήγαινε στη φωτογραφία %{number}"
+  go_to_video: "Πήγαινε στο βίντεο %{number}"
   photos_tab: "Φωτογραφίες (%{count})"
   videos_tab: "Βίντεο (%{count})"
   skatepark:
@@ -42,6 +43,7 @@ el:
     gallery_image_alt: "%{name} - Φωτογραφία %{current} από %{total}"
     video_thumbnail_alt: "%{name} - Βίντεο %{current} από %{total}"
     image_indicators: "Δείκτες φωτογραφιών"
+    video_indicators: "Δείκτες βίντεο"
   edit: "Επεξεργασία"
   create: "Δημιουργία"
   about: "Σχετικά με το skateparks.gr"
@@ -58,6 +60,7 @@ el:
   within_distance: "%{distance} χλμ"
   geolocation_denied: "Η πρόσβαση στην τοποθεσία απορρίφθηκε. Ενεργοποιήστε την για φιλτράρισμα με απόσταση."
   geolocation_unavailable: "Δεν μπορέσαμε να βρούμε την τοποθεσία σας. Ελέγξτε τις ρυθμίσεις του browser και δοκιμάστε ξανά."
+  geolocation_wait: "Ακόμα λαμβάνουμε την τοποθεσία σου. Επίτρεψε το αίτημα αν εμφανιστεί και πάτησε ξανά Αναζήτηση."
   km_away: "%{distance} χλμ μακριά"
   explore_all_skateparks: "Εξερεύνησε Skateparks στην Ελλάδα & τον Κόσμο"
   view_all_skateparks: "Δες τα όλα"

@@ -7,6 +7,7 @@ export default class extends Controller {
     defaultDistance: Number,
     deniedMessage: String,
     unavailableMessage: String,
+    waitForLocationMessage: String,
   };
 
   connect() {
@@ -27,6 +28,24 @@ export default class extends Controller {
       timeout: 10000,
     });
   }
+
+  handleSubmit = (event) => {
+    if (this.selectedDistanceValue === "" || this.hasCoordinates) return;
+
+    event.preventDefault();
+
+    if (!navigator.geolocation) {
+      this.showMessage(this.unavailableMessageValue);
+      return;
+    }
+
+    this.showMessage(this.waitForLocationMessageValue);
+
+    if (this.pendingDistanceValue == null) {
+      this.pendingDistanceValue = this.selectedDistanceValue;
+      this.requestLocation();
+    }
+  };
 
   selectDistance = (event) => {
     const value = event.target.value || "";

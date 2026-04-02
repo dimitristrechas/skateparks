@@ -404,6 +404,28 @@
           allowfullscreen
           referrerpolicy="strict-origin-when-cross-origin"
         ></iframe>
+
+        <% if skatepark_videos.many? %>
+          <div
+            class="mt-6 flex flex-wrap items-center justify-center gap-3"
+            role="group"
+            aria-label="<%= t("skatepark.video_indicators") %>"
+          >
+            <% skatepark_videos.each_with_index do |_, index| %>
+              <button
+                type="button"
+                class="
+                  h-3 w-3 sm:h-2 sm:w-2 cursor-pointer rounded-full bg-white opacity-50 transition-all
+                  focus-visible:outline focus-visible:outline-2 focus-visible:outline-white
+                "
+                id="indicatorVideo-<%= index %>"
+                data-action="click->skatepark#onVideoModalIndicatorClick focus->skatepark#onVideoModalIndicatorClick"
+                data-skatepark-target="videoModalIndicator"
+                aria-label="<%= t('go_to_video', number: index + 1) %>"
+              ></button>
+            <% end %>
+          </div>
+        <% end %>
       </div>
     </div>
 
