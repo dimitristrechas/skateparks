@@ -209,7 +209,7 @@ module Admin
         popular_skatepark: { position: 10 },
       }
 
-      Rails.cache.expects(:delete).with('skateparks_popular')
+      Rails.cache.expects(:delete).with(Skatepark.homepage_popular_cache_key)
       patch admin_popular_skatepark_path(@first_popular_skatepark), params: { popular_skatepark: { position: 10 } }
     end
 
@@ -295,7 +295,7 @@ module Admin
     end
 
     def test_delete_destroy_clears_cache
-      Rails.cache.expects(:delete).with('skateparks_popular')
+      Rails.cache.expects(:delete).with(Skatepark.homepage_popular_cache_key)
       delete admin_popular_skatepark_path(@first_popular_skatepark)
     end
 

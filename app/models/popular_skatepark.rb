@@ -12,6 +12,6 @@ class PopularSkatepark < ApplicationRecord
   private
 
   def clear_skateparks_popular_cache
-    Rails.cache.delete('skateparks_popular')
+    Rails.cache.delete(Skatepark.homepage_popular_cache_key)
   end
 end

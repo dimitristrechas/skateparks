@@ -98,8 +98,8 @@ class SkateparkVideo < ApplicationRecord
   end
 
   def clear_homepage_caches
-    Rails.cache.delete('skateparks_latest')
-    Rails.cache.delete('skateparks_popular')
+    Rails.cache.delete(Skatepark.homepage_latest_cache_key)
+    Rails.cache.delete(Skatepark.homepage_popular_cache_key)
   end
 
   def normalized_youtube_url

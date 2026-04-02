@@ -118,12 +118,12 @@ class SkateparkVideoTest < ActiveSupport::TestCase
   private
 
   def write_homepage_caches
-    Rails.cache.write('skateparks_latest', ['latest'])
-    Rails.cache.write('skateparks_popular', ['popular'])
+    Rails.cache.write(Skatepark.homepage_latest_cache_key, ['latest'])
+    Rails.cache.write(Skatepark.homepage_popular_cache_key, ['popular'])
   end
 
   def assert_homepage_caches_cleared
-    assert_nil Rails.cache.read('skateparks_latest')
-    assert_nil Rails.cache.read('skateparks_popular')
+    assert_nil Rails.cache.read(Skatepark.homepage_latest_cache_key)
+    assert_nil Rails.cache.read(Skatepark.homepage_popular_cache_key)
   end
 end

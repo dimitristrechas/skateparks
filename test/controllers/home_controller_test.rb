@@ -60,7 +60,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
   def test_get_index_caches_skateparks_latest
     get root_path
 
-    cached_value = Rails.cache.read('skateparks_latest')
+    cached_value = Rails.cache.read(Skatepark.homepage_latest_cache_key)
 
     assert_equal assigns(:skateparks_latest), cached_value
   end
@@ -88,7 +88,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
 
     get root_path
 
-    cached_value = Rails.cache.read('skateparks_popular')
+    cached_value = Rails.cache.read(Skatepark.homepage_popular_cache_key)
 
     assert_equal assigns(:skateparks_popular), cached_value
   end

@@ -25,6 +25,18 @@ class Skatepark < ApplicationRecord
   scope :latest, -> { published.order(created_at: :desc).limit(3) }
   scope :popular, -> { joins(:popular_skatepark).merge(PopularSkatepark.all) }
 
+  def self.homepage_cache_version
+    connection_pool.migration_context.current_version
+  end
+
+  def self.homepage_latest_cache_key
+    [:skateparks_latest, homepage_cache_version]
+  end
+
+  def self.homepage_popular_cache_key
+    [:skateparks_popular, homepage_cache_version]
+  end
+
   validates :name, presence: true
   validates :cover_image, presence: true
   validates :lat, presence: true
@@ -110,6 +122,7 @@ class Skatepark < ApplicationRecord
   def clear_skateparks_latest_cache
     return unless saved_change_to_country_code? || saved_change_to_status?
 
-    Rails.cache.delete('skateparks_latest')
+    Rails.cache.delete(Skatepark.homepage_latest_cache_key)
+    Rails.cache.delete(Skatepark.homepage_popular_cache_key)
   end
 end
