@@ -3,6 +3,7 @@ en:
   made_with: "Made with"
   city_of_origin: "Kavala, Greece"
   photos: "photos"
+  videos: "videos"
   country: "Country"
   country_state: "State/Region"
   back_to_skateparks: "Back to all skateparks"
@@ -12,13 +13,21 @@ en:
   image_gallery: "Image gallery"
   gallery_image_announcement: "Image %{current} of %{total}"
   view_image_in_gallery: "View image %{number} in gallery"
+  view_video_in_player: "View video %{number}"
   previous_image: "Previous image"
   next_image: "Next image"
+  previous_video: "Previous video"
+  next_video: "Next video"
   close_gallery: "Close gallery"
+  video_player: "Video player"
+  close_video_player: "Close video player"
   go_to_image: "Go to image %{number}"
+  photos_tab: "Photos (%{count})"
+  videos_tab: "Videos (%{count})"
   skatepark:
     name: "Name"
     images: "Images"
+    media_tabs: "Skatepark media"
     google_id: "Google ID"
     status: "status"
     position: "Position"
@@ -31,6 +40,7 @@ en:
     cover_image: "Cover image"
     cover_image_alt: "%{name} cover image"
     gallery_image_alt: "%{name} - Image %{current} of %{total}"
+    video_thumbnail_alt: "%{name} - Video %{current} of %{total}"
     image_indicators: "Image indicators"
   edit: "Edit"
   create: "Create"
@@ -183,6 +193,30 @@ en:
         image_moved: "Image moved to position %{position} of %{total}"
         images_added_one: "1 image was added to the list"
         images_added_other: "%{count} images were added to the list"
+        video_url: "YouTube URL"
+        video_url_placeholder: "Paste a YouTube URL"
+        add_video: "Add video"
+        videos_hint: "Paste a YouTube URL, add it to the list, then drag or use the arrow buttons to reorder."
+        videos_aria_label: "Skatepark videos"
+        videos_empty_state: "Add videos to build the list, then drag or use the arrow buttons to place them before saving."
+        video_label: "Video"
+        video_thumbnail_alt: "Video thumbnail %{position}"
+        new_video_thumbnail_alt: "New video thumbnail preview"
+        reorder_video: "Reorder video %{position}"
+        reorder_video_default: "Reorder video"
+        move_video_up: "Move video %{position} up"
+        move_video_up_default: "Move video up"
+        move_video_down: "Move video %{position} down"
+        move_video_down_default: "Move video down"
+        delete_video: "Delete video %{position}"
+        delete_video_default: "Delete video"
+        confirm_delete_video: "Do you really want to delete this video?"
+        video_removed: "Video removed from the list"
+        new_video_removed: "New video removed from the list"
+        video_moved: "Video moved to position %{position} of %{total}"
+        video_added: "Video added to the list"
+        invalid_video_url: "Enter a valid YouTube URL."
+        duplicate_video_url: "This YouTube URL has already been added."
     popular_skateparks:
       title: "Popular Skateparks"
       add_section_title: "Add Popular Skatepark"
@@ -201,6 +235,9 @@ en:
     attributes:
       skatepark:
         skatepark_images: "Images"
+        skatepark_videos: "Videos"
+      skatepark_video:
+        youtube_url: "YouTube URL"
     errors:
       models:
         skatepark:
@@ -208,3 +245,12 @@ en:
             skatepark_images:
               minimum_images: "2 is the minimum allowed"
               duplicate_image: "%{filename} has already been uploaded"
+            skatepark_videos:
+              duplicate_video: "%{youtube_url} has already been added"
+        skatepark_video:
+          attributes:
+            youtube_url:
+              invalid_format: "must be a valid YouTube URL"
+  errors:
+    messages:
+      taken: "has already been taken"

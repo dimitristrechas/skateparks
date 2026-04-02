@@ -3,7 +3,17 @@ import { Controller } from "@hotwired/stimulus";
 const swipeThreshold = 50;
 
 export default class extends Controller {
-  static targets = ["container", "previewImage", "gallery", "galleryImage", "galleryImageIndicator", "announcer"];
+  static targets = [
+    "announcer",
+    "container",
+    "gallery",
+    "galleryImage",
+    "galleryImageIndicator",
+    "previewImage",
+    "previewVideo",
+    "videoIframe",
+    "videoModal",
+  ];
 
   static values = {
     lat: String,
@@ -13,11 +23,20 @@ export default class extends Controller {
 
   connect() {
     this.imageIndexOpened = 0;
+    this.videoIndexOpened = 0;
     this.touchstartX = 0;
     this.touchstartY = 0;
     this.isMultiTouchGesture = false;
     this.lastFocusedElement = null;
     this.focusableElements = null;
+    this.activeModal = null;
+
+    document.addEventListener("keydown", this.modalKeysHandler);
+    document.addEventListener("keydown", this.focusTrapHandler);
+    document.addEventListener("touchstart", this.galleryTouchStartHandler);
+    document.addEventListener("touchend", this.galleryTouchEndHandler);
+
+    if (!this.hasContainerTarget) return;
 
     import("leaflet").then(({ Map, TileLayer, Marker }) => {
       this.map = new Map(this.containerTarget, {
@@ -33,20 +52,6 @@ export default class extends Controller {
     });
   }
 
-  galleryTargetConnected() {
-    document.addEventListener("keydown", this.modalKeysHandler);
-    document.addEventListener("keydown", this.focusTrapHandler);
-    document.addEventListener("touchstart", this.galleryTouchStartHandler);
-    document.addEventListener("touchend", this.galleryTouchEndHandler);
-  }
-
-  galleryTargetDisconnected() {
-    document.removeEventListener("keydown", this.modalKeysHandler);
-    document.removeEventListener("keydown", this.focusTrapHandler);
-    document.removeEventListener("touchstart", this.galleryTouchStartHandler);
-    document.removeEventListener("touchend", this.galleryTouchEndHandler);
-  }
-
   onGalleryImageIndicatorClick(event) {
     this.hideGalleryImage(this.imageIndexOpened);
     this.galleryImageIndicatorTargets.forEach((img, idx) => {
@@ -59,28 +64,24 @@ export default class extends Controller {
 
   onImageClick(event) {
     this.lastFocusedElement = event.currentTarget;
-
-    this.previewImageTargets.forEach((img, idx) => {
-      if (img.id === event.currentTarget.id) {
-        this.imageIndexOpened = idx;
-      }
-    });
-
-    this.galleryTarget.classList.remove("hidden");
-    this.galleryTarget.classList.add("flex");
-
+    this.imageIndexOpened = this.previewImageTargets.indexOf(event.currentTarget);
+    this.openModal(this.galleryTarget);
     this.showGalleryImage(this.imageIndexOpened);
-    window.document.body.classList.add("overflow-hidden");
-
-    requestAnimationFrame(() => {
-      this.setupFocusTrap();
-      this.focusFirstModalElement();
-    });
   }
 
-  setupFocusTrap() {
+  onVideoClick(event) {
+    if (!this.hasVideoModalTarget || !this.hasVideoIframeTarget) return;
+
+    this.lastFocusedElement = event.currentTarget;
+    this.videoIndexOpened = this.previewVideoTargets.indexOf(event.currentTarget);
+
+    this.openModal(this.videoModalTarget);
+    this.playCurrentVideo();
+  }
+
+  setupFocusTrap(modalElement) {
     const focusableSelectors = 'button:not([disabled]), [tabindex]:not([tabindex="-1"])';
-    this.focusableElements = Array.from(this.galleryTarget.querySelectorAll(focusableSelectors)).filter(
+    this.focusableElements = Array.from(modalElement.querySelectorAll(focusableSelectors)).filter(
       (element) => element.getClientRects().length > 0
     );
   }
@@ -92,7 +93,7 @@ export default class extends Controller {
   }
 
   focusTrapHandler = (event) => {
-    if (event.key !== "Tab" || !this.focusableElements || this.focusableElements.length === 0) {
+    if (!this.activeModal || event.key !== "Tab" || !this.focusableElements || this.focusableElements.length === 0) {
       return;
     }
 
@@ -109,6 +110,8 @@ export default class extends Controller {
   };
 
   onPreviousGalleryImage() {
+    if (!this.isImageModalOpen()) return;
+
     this.hideGalleryImage(this.imageIndexOpened);
     if (this.imageIndexOpened === 0) {
       this.imageIndexOpened = this.galleryImageTargets.length - 1;
@@ -119,6 +122,8 @@ export default class extends Controller {
   }
 
   onNextGalleryImage() {
+    if (!this.isImageModalOpen()) return;
+
     this.hideGalleryImage(this.imageIndexOpened);
     if (this.imageIndexOpened === this.galleryImageTargets.length - 1) {
       this.imageIndexOpened = 0;
@@ -147,20 +152,68 @@ export default class extends Controller {
   }
 
   onModalClose() {
-    this.hideModalElements();
+    this.closeImageModal();
+  }
+
+  onPreviousVideo() {
+    if (!this.hasPreviewVideoTarget || this.previewVideoTargets.length <= 1) return;
+
+    this.stopVideoPlayback();
+
+    if (this.videoIndexOpened === 0) {
+      this.videoIndexOpened = this.previewVideoTargets.length - 1;
+    } else {
+      this.videoIndexOpened--;
+    }
+
+    this.playCurrentVideo();
+  }
+
+  onNextVideo() {
+    if (!this.hasPreviewVideoTarget || this.previewVideoTargets.length <= 1) return;
+
+    this.stopVideoPlayback();
+
+    if (this.videoIndexOpened === this.previewVideoTargets.length - 1) {
+      this.videoIndexOpened = 0;
+    } else {
+      this.videoIndexOpened++;
+    }
+
+    this.playCurrentVideo();
+  }
+
+  onVideoModalClose() {
+    this.closeVideoModal();
   }
 
   modalKeysHandler = (event) => {
-    if (event.keyCode === 27) {
-      this.onModalClose();
+    if (!this.isImageModalOpen() && !this.isVideoModalOpen()) return;
+
+    if (event.key === "Escape") {
+      if (this.isVideoModalOpen()) {
+        this.closeVideoModal();
+      } else {
+        this.closeImageModal();
+      }
     } else if (event.code === "ArrowRight") {
-      this.onNextGalleryImage();
+      if (this.isVideoModalOpen()) {
+        this.onNextVideo();
+      } else {
+        this.onNextGalleryImage();
+      }
     } else if (event.code === "ArrowLeft") {
-      this.onPreviousGalleryImage();
+      if (this.isVideoModalOpen()) {
+        this.onPreviousVideo();
+      } else {
+        this.onPreviousGalleryImage();
+      }
     }
   };
 
   galleryTouchStartHandler = (event) => {
+    if (!this.isImageModalOpen()) return;
+
     if (event.touches.length > 1) {
       this.isMultiTouchGesture = true;
       return;
@@ -171,6 +224,8 @@ export default class extends Controller {
   };
 
   galleryTouchEndHandler = (event) => {
+    if (!this.isImageModalOpen()) return;
+
     if (this.isMultiTouchGesture) {
       if (event.touches.length === 0) {
         this.isMultiTouchGesture = false;
@@ -195,27 +250,85 @@ export default class extends Controller {
   };
 
   disconnect() {
-    this.map.remove();
+    this.map?.remove();
     document.removeEventListener("keydown", this.modalKeysHandler);
     document.removeEventListener("keydown", this.focusTrapHandler);
     document.removeEventListener("touchstart", this.galleryTouchStartHandler);
     document.removeEventListener("touchend", this.galleryTouchEndHandler);
-    this.hideModalElements();
+    this.closeImageModal({ restoreFocus: false });
+    this.closeVideoModal({ restoreFocus: false });
   }
 
-  hideModalElements() {
+  openModal(modalTarget) {
+    modalTarget.classList.remove("hidden");
+    modalTarget.classList.add("flex");
+    this.activeModal = modalTarget;
+    window.document.body.classList.add("overflow-hidden");
+
+    requestAnimationFrame(() => {
+      this.setupFocusTrap(modalTarget);
+      this.focusFirstModalElement();
+    });
+  }
+
+  closeImageModal({ restoreFocus = true } = {}) {
+    if (!this.hasGalleryTarget) return;
+
     this.galleryTarget.classList.add("hidden");
     this.galleryTarget.classList.remove("flex");
     this.galleryImageTargets.forEach((img) => img.classList.add("hidden"));
     this.galleryImageIndicatorTargets.forEach((img) => img.classList.add("opacity-50"));
     this.galleryImageIndicatorTargets.forEach((img) => img.classList.remove("opacity-100", "scale-125"));
-    window.document.body.classList.remove("overflow-hidden");
+    this.finishModalClose(restoreFocus);
+  }
 
-    if (this.lastFocusedElement) {
-      this.lastFocusedElement.focus();
-      this.lastFocusedElement = null;
+  closeVideoModal({ restoreFocus = true } = {}) {
+    if (!this.hasVideoModalTarget) return;
+
+    this.videoModalTarget.classList.add("hidden");
+    this.videoModalTarget.classList.remove("flex");
+    this.stopVideoPlayback();
+    this.finishModalClose(restoreFocus);
+  }
+
+  finishModalClose(restoreFocus) {
+    this.activeModal = null;
+    this.focusableElements = null;
+
+    if (!this.isImageModalOpen() && !this.isVideoModalOpen()) {
+      window.document.body.classList.remove("overflow-hidden");
     }
 
-    this.focusableElements = null;
+    if (restoreFocus && this.lastFocusedElement) {
+      this.lastFocusedElement.focus();
+    }
+
+    this.lastFocusedElement = null;
+  }
+
+  playCurrentVideo() {
+    if (!this.hasVideoIframeTarget) return;
+
+    const currentVideo = this.previewVideoTargets[this.videoIndexOpened];
+    if (!currentVideo) return;
+
+    const embedUrl = currentVideo.dataset.embedUrl;
+    if (!embedUrl) return;
+
+    this.videoIframeTarget.src = embedUrl;
+  }
+
+  stopVideoPlayback() {
+    if (!this.hasVideoIframeTarget) return;
+
+    this.videoIframeTarget.removeAttribute("src");
+  }
+
+  isImageModalOpen() {
+    return this.hasGalleryTarget && !this.galleryTarget.classList.contains("hidden");
+  }
+
+  isVideoModalOpen() {
+    return this.hasVideoModalTarget && !this.videoModalTarget.classList.contains("hidden");
   }
 }

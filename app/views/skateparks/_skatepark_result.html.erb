@@ -19,10 +19,19 @@
 
     <% skatepark_details = ["#{skatepark.skatepark_images.size} #{t("photos")}"] %>
 
-    <% if (distance = skatepark.try(:distance)).present? %>
-      <% skatepark_details << t("km_away", distance: number_with_precision(distance, precision: 1, strip_insignificant_zeros: true)) %>
+    <% if skatepark.skatepark_videos_count.positive? %>
+      <% skatepark_details << "#{skatepark.skatepark_videos_count} #{t("videos")}" %>
     <% end %>
 
-    <p class="font-normal sm:mb-1"><%= skatepark_details.join(" / ") %></p>
+    <% distance_label =
+       if (distance = skatepark.try(:distance)).present?
+         t("km_away", distance: number_with_precision(distance, precision: 1, strip_insignificant_zeros: true))
+       end %>
+
+    <p class="font-normal sm:mb-1"><%= skatepark_details.join(" · ") %></p>
+
+    <% if distance_label.present? %>
+      <p class="mt-1 font-normal"><%= distance_label %></p>
+    <% end %>
   </div>
 <% end %>

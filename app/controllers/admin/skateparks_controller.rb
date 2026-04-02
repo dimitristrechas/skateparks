@@ -1,6 +1,7 @@
 module Admin
   class SkateparksController < BaseController
     include SkateparkImageAttachment
+    include SkateparkVideoManagement
 
     before_action :set_skatepark, only: %i[show edit update destroy]
 
@@ -24,6 +25,7 @@ module Admin
     def create
       @skatepark = Skatepark.new(skatepark_attributes)
       attach_new_images(@skatepark)
+      attach_new_videos(@skatepark)
 
       respond_to do |format|
         if @skatepark.save
@@ -41,11 +43,8 @@ module Admin
 
     # PATCH/PUT /skateparks/1 or /skateparks/1.json
     def update
-      @skatepark.assign_attributes(skatepark_attributes)
-      attach_new_images(@skatepark)
-
       respond_to do |format|
-        if @skatepark.save
+        if save_skatepark_update
           format.html do
             redirect_to admin_skateparks_url,
                         notice: t('admin.skateparks.updated_notice', name: @skatepark.name)
@@ -80,6 +79,7 @@ module Admin
     # Use callbacks to share common setup or constraints between actions.
     def set_skatepark
       @skatepark = Skatepark.includes(
+        :skatepark_videos,
         cover_image_attachment: :blob,
         skatepark_images: { image_attachment: :blob }
       ).find(params[:id])
@@ -91,11 +91,31 @@ module Admin
                                                       :description_en, :google_id, :status, :country_code, :state,
                                                       { new_images: [] },
                                                       { new_image_positions: [] },
-                                                      { skatepark_images_attributes: [%i[id position _destroy]] },])
+                                                      { new_video_urls: [] },
+                                                      { new_video_positions: [] },
+                                                      { skatepark_images_attributes: [%i[id position _destroy]] },
+                                                      { skatepark_videos_attributes: [%i[id position _destroy]] },])
     end
 
     def skatepark_attributes
-      skatepark_params.except(:new_images, :new_image_positions)
+      skatepark_params.except(:new_images, :new_image_positions, :new_video_urls, :new_video_positions)
+    end
+
+    def save_skatepark_update
+      save_succeeded = false
+
+      ActiveRecord::Base.transaction do
+        reserve_existing_image_positions!(@skatepark)
+        reserve_existing_video_positions!(@skatepark)
+        @skatepark.assign_attributes(skatepark_attributes)
+        attach_new_images(@skatepark)
+        attach_new_videos(@skatepark)
+        save_succeeded = @skatepark.save
+
+        raise ActiveRecord::Rollback unless save_succeeded
+      end
+
+      save_succeeded
     end
   end
 end

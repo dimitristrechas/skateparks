@@ -32,6 +32,13 @@ class SkateparkImageTest < ActiveSupport::TestCase
     assert_predicate skatepark_image, :valid?
   end
 
+  def test_allows_negative_position_when_reserved_for_reordering
+    skatepark_image = build(:skatepark_image, position: -1)
+    skatepark_image.allow_negative_position = true
+
+    assert_predicate skatepark_image, :valid?
+  end
+
   def test_orders_images_by_position
     skatepark = create(:skatepark)
     first_image, second_image = skatepark.skatepark_images.to_a

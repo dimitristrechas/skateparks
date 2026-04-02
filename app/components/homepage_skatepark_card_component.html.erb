@@ -14,6 +14,12 @@
 
   <div class="min-w-40 py-2 ps-6">
     <h2 class="text-lg"><%= @skatepark.name %></h2>
-    <p><%= "#{@skatepark.skatepark_images.size} #{t("photos")}" %></p>
+    <% media_counts = ["#{@skatepark.skatepark_images.size} #{t("photos")}"] %>
+
+    <% if @skatepark.skatepark_videos_count.positive? %>
+      <% media_counts << "#{@skatepark.skatepark_videos_count} #{t("videos")}" %>
+    <% end %>
+
+    <p><%= media_counts.join(" · ") %></p>
   </div>
 <% end %>

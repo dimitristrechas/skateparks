@@ -1,6 +1,7 @@
 <div
   class="<%= item_classes %>"
   data-sortable-item
+  data-resource-type="<%= @resource_type %>"
   data-destroyed="<%= @destroyed %>"
   role="listitem"
 >
@@ -39,7 +40,7 @@
 
   <div class="min-w-0 flex-1">
     <p class="font-medium text-neutral-700 dark:text-neutral-200">
-      <%= t("admin.skateparks.form.image_label") %>
+      <%= resource_label %>
       <span data-position-label><%= position_label %></span>
     </p>
 
@@ -112,7 +113,7 @@
         hover:outline hover:outline-offset-1 hover:outline-red-500 focus-visible:outline
         focus-visible:outline-offset-1 focus-visible:outline-red-500 dark:text-red-400
       "
-      data-action="click->admin--skateparks--form#removeImage"
+      data-action="<%= delete_action %>"
       data-delete-button
       aria-label="<%= delete_label %>"
     >

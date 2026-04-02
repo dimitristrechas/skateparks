@@ -28,13 +28,26 @@ class HomepageSkateparkCardComponentTest < ViewComponent::TestCase
     end
   end
 
-  def test_renders_photo_count
+  def test_renders_photo_count_without_video_count_when_no_videos
     component = HomepageSkateparkCardComponent.new(skatepark: @skatepark, badge_type: @badge_type)
 
     with_request_url '/' do
       rendered = render_inline(component)
 
       assert_match "#{@skatepark.skatepark_images.size} #{I18n.t('photos')}", rendered.to_html
+      assert_no_match(/#{I18n.t('videos')}/, rendered.to_html)
+    end
+  end
+
+  def test_renders_photo_and_video_count_when_videos_exist
+    create(:skatepark_video, skatepark: @skatepark)
+    @skatepark.reload
+    component = HomepageSkateparkCardComponent.new(skatepark: @skatepark, badge_type: @badge_type)
+
+    with_request_url '/' do
+      rendered = render_inline(component)
+
+      assert_match "#{@skatepark.skatepark_images.size} #{I18n.t('photos')} · 1 #{I18n.t('videos')}", rendered.to_html
     end
   end
 

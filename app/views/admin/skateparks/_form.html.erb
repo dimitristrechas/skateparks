@@ -4,6 +4,7 @@
               data: {
                 controller: 'admin--skateparks--form',
                 admin__skateparks__form_confirm_delete_value: t('admin.skateparks.form.confirm_delete'),
+                admin__skateparks__form_confirm_delete_video_value: t('admin.skateparks.form.confirm_delete_video'),
                 admin__skateparks__form_image_alt_pattern_value: t('admin.skateparks.form.image_alt', position: '{position}'),
                 admin__skateparks__form_reorder_pattern_value: t('admin.skateparks.form.reorder_image', position: '{position}'),
                 admin__skateparks__form_delete_pattern_value: t('admin.skateparks.form.delete_image', position: '{position}'),
@@ -14,6 +15,23 @@
                 admin__skateparks__form_new_image_removed_value: t('admin.skateparks.form.new_image_removed'),
                 admin__skateparks__form_images_added_one_value: t('admin.skateparks.form.images_added_one'),
                 admin__skateparks__form_images_added_other_value: t('admin.skateparks.form.images_added_other', count: '{count}'),
+                admin__skateparks__form_video_alt_pattern_value: t('admin.skateparks.form.video_thumbnail_alt',
+                                                                   position: '{position}'),
+                admin__skateparks__form_reorder_video_pattern_value: t('admin.skateparks.form.reorder_video',
+                                                                       position: '{position}'),
+                admin__skateparks__form_delete_video_pattern_value: t('admin.skateparks.form.delete_video',
+                                                                      position: '{position}'),
+                admin__skateparks__form_move_video_up_pattern_value: t('admin.skateparks.form.move_video_up',
+                                                                       position: '{position}'),
+                admin__skateparks__form_move_video_down_pattern_value: t('admin.skateparks.form.move_video_down',
+                                                                         position: '{position}'),
+                admin__skateparks__form_video_moved_pattern_value: t('admin.skateparks.form.video_moved',
+                                                                     position: '{position}', total: '{total}'),
+                admin__skateparks__form_video_removed_value: t('admin.skateparks.form.video_removed'),
+                admin__skateparks__form_new_video_removed_value: t('admin.skateparks.form.new_video_removed'),
+                admin__skateparks__form_video_added_value: t('admin.skateparks.form.video_added'),
+                admin__skateparks__form_invalid_video_url_value: t('admin.skateparks.form.invalid_video_url'),
+                admin__skateparks__form_duplicate_video_url_value: t('admin.skateparks.form.duplicate_video_url'),
               }) do |form| %>
   <% if skatepark.errors.any? %>
     <div class="mb-4">
@@ -129,7 +147,10 @@
 
     <div class="col-span-2 flex flex-wrap place-items-center gap-4">
       <% if skatepark&.id && skatepark.cover_image.attached? %>
-        <%= image_tag skatepark.cover_image, size: "600x450", class: "rounded" %>
+        <%= image_tag skatepark.cover_image,
+                  size: "600x450",
+                  class: "rounded",
+                  alt: t("skatepark.cover_image_alt", name: skatepark.name) %>
       <% end %>
     </div>
 
@@ -188,7 +209,9 @@
           <%= form.fields_for :skatepark_images, skatepark_image do |image_fields| %>
             <% marked_for_destruction = image_fields.object.marked_for_destruction? %>
 
-            <%= render(SkateparkImageListItemComponent.new(index: index, destroyed: marked_for_destruction)) do |item| %>
+            <%= render(Admin::SortableListItemComponent.new(resource_type: :image,
+                                                            index: index,
+                                                            destroyed: marked_for_destruction)) do |item| %>
               <% item.with_fields do %>
                 <%= image_fields.hidden_field :id %>
 
@@ -206,7 +229,7 @@
                             size: "80x60",
                             alt: t("admin.skateparks.form.image_alt", position: index + 1),
                             class: "h-[60px] w-[80px] rounded object-cover",
-                            data: { image_preview: true } %>
+                            data: { item_preview: true } %>
               <% end %>
 
               <% item.with_subtitle do %>
@@ -220,7 +243,7 @@
       </div>
 
       <template data-admin--skateparks--form-target="newImageTemplate">
-        <%= render(SkateparkImageListItemComponent.new) do |item| %>
+        <%= render(Admin::SortableListItemComponent.new(resource_type: :image)) do |item| %>
           <% item.with_fields do %>
             <input
               type="hidden"
@@ -234,12 +257,156 @@
             <img
               alt="<%= t("admin.skateparks.form.new_image_preview_alt") %>"
               class="h-[60px] w-[80px] rounded object-cover"
-              data-image-preview
+              data-item-preview
             >
           <% end %>
 
           <% item.with_subtitle do %>
             <p class="truncate text-sm text-neutral-500 dark:text-neutral-400" data-file-name></p>
+          <% end %>
+        <% end %>
+      </template>
+    </div>
+
+    <div class="col-start-1">
+      <label for="new-video-url-input" class="block text-neutral-600 dark:text-neutral-300 mb-1">
+        <%= t("admin.skateparks.form.video_url") %>
+      </label>
+
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-end">
+        <input
+          id="new-video-url-input"
+          type="text"
+          inputmode="url"
+          placeholder="<%= t("admin.skateparks.form.video_url_placeholder") %>"
+          class="w-full rounded p-2 text-neutral-600 sm:flex-1"
+          autocomplete="url"
+          data-admin--skateparks--form-target="newVideoUrlInput"
+          data-action="keydown.enter->admin--skateparks--form#addVideo input->admin--skateparks--form#clearVideoUrlError"
+        >
+
+        <button
+          type="button"
+          class="
+            inline-flex min-h-11 cursor-pointer items-center rounded-lg bg-pink-600/85 px-4 py-2 text-white
+            transition hover:outline hover:outline-offset-1 hover:outline-neutral-700 focus-visible:outline
+            focus-visible:outline-offset-1 focus-visible:outline-neutral-700 dark:bg-pink-600/65
+            dark:hover:outline-neutral-200 dark:focus-visible:outline-neutral-200
+          "
+          data-action="click->admin--skateparks--form#addVideo"
+        >
+          <%= t("admin.skateparks.form.add_video") %>
+        </button>
+      </div>
+
+      <p
+        id="new-video-url-error"
+        class="mt-2 hidden text-sm text-red-600 dark:text-red-400"
+        aria-live="polite"
+        aria-atomic="true"
+        data-admin--skateparks--form-target="newVideoUrlError"
+      ></p>
+
+      <p class="mt-2 text-sm text-neutral-500 dark:text-neutral-400"><%= t("admin.skateparks.form.videos_hint") %></p>
+    </div>
+
+    <div class="col-span-2 space-y-4">
+      <% persisted_skatepark_videos =
+           skatepark.skatepark_videos.select(&:persisted?).sort_by do |video_record|
+             [video_record.position || Float::INFINITY, video_record.id || Float::INFINITY]
+           end %>
+
+      <div
+        class="
+          overflow-hidden rounded-lg border border-neutral-300 divide-y divide-neutral-200 dark:border-neutral-600
+          dark:divide-gray-700
+        "
+        data-admin--skateparks--form-target="sortableVideoList"
+        role="list"
+        aria-label="<%= t("admin.skateparks.form.videos_aria_label") %>"
+      >
+        <p
+          class="
+            <%= class_names('bg-white p-4 text-sm text-neutral-500 dark:bg-gray-900 dark:text-neutral-400',
+            'hidden' => persisted_skatepark_videos.any?) %>
+          "
+          data-admin--skateparks--form-target="emptyVideoState"
+        >
+          <%= t("admin.skateparks.form.videos_empty_state") %>
+        </p>
+
+        <% persisted_skatepark_videos.each_with_index do |skatepark_video, index| %>
+          <%= form.fields_for :skatepark_videos, skatepark_video do |video_fields| %>
+            <% marked_for_destruction = video_fields.object.marked_for_destruction? %>
+
+            <%= render(Admin::SortableListItemComponent.new(resource_type: :video,
+                                                            index: index,
+                                                            destroyed: marked_for_destruction)) do |item| %>
+              <% item.with_fields do %>
+                <%= video_fields.hidden_field :id %>
+
+                <%= video_fields.hidden_field :position,
+                                         value: video_fields.object.position,
+                                         data: { position_field: true } %>
+
+                <%= video_fields.hidden_field :_destroy,
+                                         value: (marked_for_destruction ? 1 : 0),
+                                         data: { destroy_field: true } %>
+              <% end %>
+
+              <% item.with_preview do %>
+                <%= image_tag skatepark_video.thumbnail_url,
+                          alt: t("admin.skateparks.form.video_thumbnail_alt", position: index + 1),
+                          class: "h-[60px] w-[80px] rounded object-cover",
+                          data: { item_preview: true } %>
+              <% end %>
+
+              <% item.with_subtitle do %>
+                <p class="truncate text-sm text-neutral-500 dark:text-neutral-400" data-video-url-label>
+                  <%= skatepark_video.youtube_url %>
+                </p>
+
+                <p class="text-sm text-neutral-500 dark:text-neutral-400">
+                  <%= t("admin.skateparks.form.drag_to_reorder_hint") %>
+                </p>
+              <% end %>
+            <% end %>
+          <% end %>
+        <% end %>
+      </div>
+
+      <template data-admin--skateparks--form-target="newVideoTemplate">
+        <%= render(Admin::SortableListItemComponent.new(resource_type: :video)) do |item| %>
+          <% item.with_fields do %>
+            <input
+              type="hidden"
+              name="skatepark[new_video_urls][]"
+              value=""
+              data-video-url-field
+            >
+
+            <input
+              type="hidden"
+              name="skatepark[new_video_positions][]"
+              value=""
+              data-position-field
+            >
+          <% end %>
+
+          <% item.with_preview do %>
+            <img
+              alt="<%= t("admin.skateparks.form.new_video_thumbnail_alt") %>"
+              class="h-[60px] w-[80px] rounded object-cover"
+              data-item-preview
+            >
+          <% end %>
+
+          <% item.with_subtitle do %>
+            <p class="truncate text-sm text-neutral-500 dark:text-neutral-400" data-video-url-label></p>
+
+            <p class="text-sm text-neutral-500 dark:text-neutral-400">
+              <%= t("admin.skateparks.form.drag_to_reorder_hint") %>
+            </p>
           <% end %>
         <% end %>
       </template>

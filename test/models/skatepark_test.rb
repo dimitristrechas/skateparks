@@ -57,6 +57,15 @@ class SkateparkTest < ActiveSupport::TestCase
     assert_includes skatepark.errors[:skatepark_images], 'sample_image1.jpg has already been uploaded'
   end
 
+  def test_rejects_duplicate_video_urls
+    skatepark = create(:skatepark)
+    create(:skatepark_video, skatepark: skatepark, youtube_url: 'https://youtu.be/dQw4w9WgXcQ')
+    skatepark.skatepark_videos.build(position: 2, youtube_url: 'https://youtu.be/dQw4w9WgXcQ')
+
+    assert_not skatepark.valid?
+    assert_includes skatepark.errors[:skatepark_videos], 'https://youtu.be/dQw4w9WgXcQ has already been added'
+  end
+
   def test_requires_status_to_be_present_and_valid
     skatepark = build(:skatepark, status: nil)
 
@@ -104,5 +113,29 @@ class SkateparkTest < ActiveSupport::TestCase
 
     assert_includes results, nearby
     assert_not_includes results, faraway
+  end
+
+  def test_orders_skatepark_videos_by_position
+    skatepark = create(:skatepark)
+
+    create(:skatepark_video, skatepark: skatepark, position: 2, youtube_url: 'https://youtu.be/dQw4w9WgXcQ')
+    create(:skatepark_video, skatepark: skatepark, position: 1, youtube_url: 'https://youtu.be/9bZkp7q19f0')
+
+    assert_equal [1, 2], skatepark.reload.skatepark_videos.pluck(:position)
+  end
+
+  def test_accepts_nested_skatepark_video_attributes_for_destruction
+    skatepark = create(:skatepark)
+    skatepark_video = create(:skatepark_video, skatepark: skatepark)
+
+    skatepark.assign_attributes(
+      skatepark_videos_attributes: {
+        '0' => { id: skatepark_video.id, _destroy: '1' },
+      }
+    )
+
+    assert_predicate skatepark.skatepark_videos.find { |video|
+      video.id == skatepark_video.id
+    }, :marked_for_destruction?
   end
 end

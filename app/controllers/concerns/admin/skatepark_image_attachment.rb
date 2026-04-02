@@ -1,6 +1,7 @@
 module Admin
   module SkateparkImageAttachment
     extend ActiveSupport::Concern
+    include SkateparkPositionManagement
 
     private
 
@@ -29,30 +30,11 @@ module Admin
     end
 
     def existing_image_positions(skatepark)
-      positions =
-        existing_image_attributes.filter_map do |attributes|
-          next if ActiveModel::Type::Boolean.new.cast(attributes[:_destroy])
-
-          attributes[:position]
-        end
-
-      positions.map(&:to_i).presence ||
-        skatepark.skatepark_images.reject(&:marked_for_destruction?).filter_map(&:position)
+      requested_positions(existing_image_attributes, skatepark.skatepark_images)
     end
 
     def existing_image_attributes
-      attributes = skatepark_attributes[:skatepark_images_attributes]
-
-      case attributes
-      when ActionController::Parameters
-        attributes.values
-      when Array
-        attributes
-      else
-        []
-      end.map do |attributes_hash|
-        attributes_hash.to_h.symbolize_keys
-      end
+      reorder_attributes(skatepark_attributes[:skatepark_images_attributes])
     end
 
     def new_images
@@ -61,6 +43,10 @@ module Admin
 
     def new_image_positions
       Array(skatepark_params[:new_image_positions]).compact_blank.map(&:to_i)
+    end
+
+    def reserve_existing_image_positions!(skatepark)
+      reserve_existing_positions!(skatepark.skatepark_images, existing_image_attributes)
     end
   end
 end

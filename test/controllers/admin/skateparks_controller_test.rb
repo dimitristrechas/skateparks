@@ -50,6 +50,16 @@ module Admin
       assert_equal @skatepark, assigns(:skatepark)
     end
 
+    def test_get_edit_renders_video_staging_input_without_native_url_validation
+      get edit_admin_skatepark_path(@skatepark)
+
+      assert_response :success
+      assert_includes response.body, 'id="new-video-url-input"'
+      assert_includes response.body, 'type="text"'
+      assert_includes response.body, 'inputmode="url"'
+      assert_includes response.body, 'data-admin--skateparks--form-target="newVideoUrlError"'
+    end
+
     def test_post_create_with_valid_params_creates_skatepark
       assert_difference('Skatepark.count', 1) do
         assert_difference('SkateparkImage.count', 2) do
@@ -71,6 +81,30 @@ module Admin
       ordered_filenames = skatepark.skatepark_images.map { |image| image.image.filename.to_s }
 
       assert_equal %w[sample_image3.jpg sample_image1.jpg], ordered_filenames
+    end
+
+    def test_post_create_with_video_urls_creates_skatepark_videos_in_requested_order
+      skatepark = nil
+
+      assert_difference('SkateparkVideo.count', 2) do
+        skatepark = post_create_skatepark_with_videos(new_video_positions: %w[2 1])
+      end
+
+      assert_created_videos_follow_requested_order(skatepark)
+    end
+
+    def test_post_create_rejects_duplicate_new_video_urls
+      assert_no_difference('SkateparkVideo.count') do
+        post admin_skateparks_path, params: {
+          skatepark: valid_skatepark_params.merge(
+            new_video_urls: [valid_video_urls.first, valid_video_urls.first],
+            new_video_positions: %w[1 2]
+          ),
+        }
+      end
+
+      assert_template 'new'
+      assert_includes assigns(:skatepark).errors[:skatepark_videos], "#{valid_video_urls.first} has already been added"
     end
 
     def test_post_create_with_valid_params_redirects_to_skateparks_list
@@ -189,6 +223,71 @@ module Admin
 
       assert_includes remaining_ids, first_image.id
       assert_not_includes remaining_ids, second_image.id
+    end
+
+    def test_patch_update_reorders_skatepark_videos
+      first_video = create(:skatepark_video, skatepark: @skatepark, position: 1, youtube_url: valid_video_urls.first)
+      second_video = create(:skatepark_video, skatepark: @skatepark, position: 2, youtube_url: valid_video_urls.second)
+
+      patch admin_skatepark_path(@skatepark), params: {
+        skatepark: {
+          skatepark_videos_attributes: {
+            '0' => { id: first_video.id, position: 2 },
+            '1' => { id: second_video.id, position: 1 },
+          },
+        },
+      }
+
+      assert_redirected_to admin_skateparks_url
+      assert_equal [second_video.id, first_video.id], @skatepark.reload.skatepark_videos.pluck(:id)
+    end
+
+    def test_patch_update_appends_new_videos_after_existing_videos
+      create(:skatepark_video, skatepark: @skatepark, position: 1, youtube_url: valid_video_urls.first)
+      create(:skatepark_video, skatepark: @skatepark, position: 2, youtube_url: valid_video_urls.second)
+
+      patch admin_skatepark_path(@skatepark), params: {
+        skatepark: {
+          new_video_urls: appended_video_urls,
+        },
+      }
+
+      assert_redirected_to admin_skateparks_url
+      assert_equal [1, 2, 3, 4], @skatepark.reload.skatepark_videos.pluck(:position)
+    end
+
+    def test_patch_update_can_insert_new_video_between_existing_videos
+      first_video, second_video = create_existing_videos
+
+      patch_inserted_video_between_existing(first_video, second_video)
+
+      ordered_videos = @skatepark.reload.skatepark_videos.to_a
+
+      assert_inserted_video_order(ordered_videos, first_video, second_video)
+    end
+
+    def test_patch_update_destroys_video_marked_with_destroy
+      first_video, second_video = create_existing_videos
+
+      patch_with_destroyed_video(first_video, second_video)
+
+      assert_redirected_to admin_skateparks_url
+
+      remaining_ids = @skatepark.reload.skatepark_videos.pluck(:id)
+
+      assert_includes remaining_ids, first_video.id
+      assert_not_includes remaining_ids, second_video.id
+      assert_includes @skatepark.skatepark_videos.pluck(:youtube_url), replacement_video_url
+    end
+
+    def test_patch_update_rejects_duplicate_video_url_with_single_localized_error
+      duplicate_video_url = valid_video_urls.first
+
+      create(:skatepark_video, skatepark: @skatepark, position: 1, youtube_url: duplicate_video_url)
+      patch_duplicate_video_in_greek(duplicate_video_url)
+
+      assert_template 'edit'
+      assert_duplicate_video_error_messages_in_greek(duplicate_video_url)
     end
 
     def test_patch_update_rejects_duplicate_new_image_filename
@@ -312,6 +411,103 @@ module Admin
         true,
         original_filename: original_filename
       )
+    end
+
+    def post_create_skatepark_with_videos(new_video_positions:)
+      post admin_skateparks_path, params: {
+        skatepark: valid_skatepark_params.merge(
+          new_video_urls: valid_video_urls,
+          new_video_positions: new_video_positions
+        ),
+      }
+
+      Skatepark.order(:id).last
+    end
+
+    def assert_created_videos_follow_requested_order(skatepark)
+      assert_equal [1, 2], skatepark.skatepark_videos.pluck(:position)
+      assert_equal [valid_video_urls.second, valid_video_urls.first], skatepark.skatepark_videos.pluck(:youtube_url)
+      assert_equal 2, skatepark.reload.skatepark_videos_count
+    end
+
+    def create_existing_videos
+      [
+        create(:skatepark_video, skatepark: @skatepark, position: 1, youtube_url: valid_video_urls.first),
+        create(:skatepark_video, skatepark: @skatepark, position: 2, youtube_url: valid_video_urls.second),
+      ]
+    end
+
+    def patch_inserted_video_between_existing(first_video, second_video)
+      patch admin_skatepark_path(@skatepark), params: {
+        skatepark: {
+          skatepark_videos_attributes: {
+            '0' => { id: first_video.id, position: 1 },
+            '1' => { id: second_video.id, position: 3 },
+          },
+          new_video_urls: [inserted_video_url],
+          new_video_positions: ['2'],
+        },
+      }
+    end
+
+    def assert_inserted_video_order(ordered_videos, first_video, second_video)
+      assert_redirected_to admin_skateparks_url
+      assert_equal [1, 2, 3], ordered_videos.map(&:position)
+      assert_equal first_video.id, ordered_videos.first.id
+      assert_equal inserted_video_url, ordered_videos.second.youtube_url
+      assert_equal second_video.id, ordered_videos.third.id
+    end
+
+    def patch_with_destroyed_video(first_video, second_video)
+      patch admin_skatepark_path(@skatepark), params: {
+        skatepark: {
+          skatepark_videos_attributes: {
+            '0' => { id: first_video.id, position: 1 },
+            '1' => { id: second_video.id, position: 2, _destroy: '1' },
+          },
+          new_video_urls: [replacement_video_url],
+          new_video_positions: ['2'],
+        },
+      }
+    end
+
+    def patch_duplicate_video_in_greek(youtube_url)
+      patch admin_skatepark_path(@skatepark, locale: :el), params: {
+        skatepark: {
+          new_video_urls: [youtube_url],
+          new_video_positions: ['2'],
+        },
+      }
+    end
+
+    def assert_duplicate_video_error_messages_in_greek(youtube_url)
+      full_messages = I18n.with_locale(:el) { assigns(:skatepark).errors.map(&:full_message) }
+      matching_messages = full_messages.select { |message| message.include?(youtube_url) }
+
+      assert_equal ["Βίντεο Το #{youtube_url} έχει ήδη προστεθεί"], matching_messages
+      assert(full_messages.none? { |message| message.include?('Translation missing') })
+    end
+
+    def valid_video_urls
+      [
+        'https://youtu.be/dQw4w9WgXcQ',
+        'https://www.youtube.com/watch?v=9bZkp7q19f0',
+      ]
+    end
+
+    def appended_video_urls
+      [
+        'https://www.youtube.com/shorts/J---aiyznGQ',
+        'https://www.youtube.com/embed/M7lc1UVf-VE',
+      ]
+    end
+
+    def inserted_video_url
+      'https://www.youtube.com/v/FTQbiNvZqaY'
+    end
+
+    def replacement_video_url
+      'https://www.youtube-nocookie.com/embed/e-ORhEE9VVg'
     end
   end
 end

@@ -14,6 +14,7 @@
   data-skatepark-lng-value="<%= @skatepark.lng %>"
 >
   <% skatepark_images = @skatepark.skatepark_images %>
+  <% skatepark_videos = @skatepark.skatepark_videos %>
 
   <h1 class="mb-8 text-3xl font-bold"><%= @skatepark.name %></h1>
 
@@ -49,35 +50,152 @@
     <% end %>
   </div>
 
-  <div class="mb-6 grid auto-rows-[8rem] grid-cols-3 gap-1 sm:mb-8 md:auto-rows-[14rem] lg:grid-cols-4 xl:auto-rows-[20rem]">
-    <% skatepark_images.each_with_index do |skatepark_image, index| %>
-      <button
-        type="button"
-        id="previewImage-<%= index %>"
-        role="img"
-        class="
-          overflow-hidden cursor-pointer transition-opacity hover:opacity-50 focus-visible:outline
-          focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-neutral-700
-          dark:focus-visible:outline-neutral-200
-        "
-        data-skatepark-target="previewImage"
-        data-action="click->skatepark#onImageClick"
-        aria-label="<%= t('view_image_in_gallery', number: index + 1) %>"
+  <% photos_grid = capture do %>
+    <div class="mb-6 grid auto-rows-[8rem] grid-cols-3 gap-1 sm:mb-8 md:auto-rows-[14rem] lg:grid-cols-4 xl:auto-rows-[20rem]">
+      <% skatepark_images.each_with_index do |skatepark_image, index| %>
+        <button
+          type="button"
+          id="previewImage-<%= index %>"
+          role="img"
+          class="
+            overflow-hidden cursor-pointer transition-opacity hover:opacity-50 focus-visible:outline
+            focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-neutral-700
+            dark:focus-visible:outline-neutral-200
+          "
+          data-skatepark-target="previewImage"
+          data-action="click->skatepark#onImageClick"
+          aria-label="<%= t('view_image_in_gallery', number: index + 1) %>"
+        >
+          <%= cl_image_tag skatepark_image.image.key,
+          width: 400,
+          height: 400,
+          class: "h-full w-full object-cover",
+          loading: index < 5 ? "eager" : "lazy",
+          srcset:
+            "#{cloudinary_url(skatepark_image.image.key, width: 245, height: 245, **CLOUDINARY_DEFAULT_SETTINGS)} 320w, " \
+              "#{cloudinary_url(skatepark_image.image.key, width: 400, height: 400, **CLOUDINARY_DEFAULT_SETTINGS)} 640w, " \
+              "#{cloudinary_url(skatepark_image.image.key, width: 600, height: 600, **CLOUDINARY_DEFAULT_SETTINGS)} 1600w",
+          sizes: "(max-width: 640px) 320px, 100vw",
+          alt: "" %>
+        </button>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% videos_grid = capture do %>
+    <div class="mb-6 grid auto-rows-[8rem] grid-cols-3 gap-1 sm:mb-8 md:auto-rows-[14rem] lg:grid-cols-4 xl:auto-rows-[20rem]">
+      <% skatepark_videos.each_with_index do |skatepark_video, index| %>
+        <button
+          type="button"
+          id="previewVideo-<%= index %>"
+          class="
+            group relative overflow-hidden cursor-pointer transition-opacity hover:opacity-90 focus-visible:outline
+            focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-neutral-700
+            dark:focus-visible:outline-neutral-200
+          "
+          data-skatepark-target="previewVideo"
+          data-action="click->skatepark#onVideoClick"
+          data-embed-url="<%= skatepark_video.embed_url %>"
+          aria-label="<%= t('view_video_in_player', number: index + 1) %>"
+        >
+          <%= image_tag skatepark_video.thumbnail_url,
+                    class: "h-full w-full object-cover",
+                    loading: index < 5 ? "eager" : "lazy",
+                    alt: t("skatepark.video_thumbnail_alt",
+                           name: @skatepark.name,
+                           current: index + 1,
+                           total: skatepark_videos.length) %>
+
+          <span class="pointer-events-none absolute inset-0 bg-neutral-950/20"></span>
+
+          <span class="pointer-events-none absolute inset-0 flex items-center justify-center">
+            <span class="rounded-full bg-white/90 p-3 text-neutral-900 shadow-md">
+              <svg
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                class="size-6"
+              >
+                <path d="M8 6.82v10.36a1 1 0 0 0 1.53.85l8.14-5.18a1 1 0 0 0 0-1.7L9.53 5.97A1 1 0 0 0 8 6.82Z" />
+              </svg>
+            </span>
+          </span>
+        </button>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% if skatepark_videos.any? %>
+    <div class="mb-6 sm:mb-8" data-controller="skatepark-tabs" data-skatepark-tabs-default-tab-value="photos">
+      <div
+        class="mb-4 flex items-center gap-6 border-b border-neutral-200 dark:border-neutral-700"
+        role="tablist"
+        aria-label="<%= t("skatepark.media_tabs") %>"
       >
-        <%= cl_image_tag skatepark_image.image.key,
-        width: 400,
-        height: 400,
-        class: "h-full w-full object-cover",
-        loading: index < 5 ? "eager" : "lazy",
-        srcset:
-          "#{cloudinary_url(skatepark_image.image.key, width: 245, height: 245, **CLOUDINARY_DEFAULT_SETTINGS)} 320w, " \
-            "#{cloudinary_url(skatepark_image.image.key, width: 400, height: 400, **CLOUDINARY_DEFAULT_SETTINGS)} 640w, " \
-            "#{cloudinary_url(skatepark_image.image.key, width: 600, height: 600, **CLOUDINARY_DEFAULT_SETTINGS)} 1600w",
-        sizes: "(max-width: 640px) 320px, 100vw",
-        alt: "" %>
-      </button>
-    <% end %>
-  </div>
+        <button
+          id="photos-tab"
+          type="button"
+          role="tab"
+          aria-controls="photos-panel"
+          aria-selected="false"
+          tabindex="-1"
+          class="
+            rounded-t-lg rounded-b-none border-b-2 border-transparent px-1 py-3 text-sm font-medium transition
+            sm:px-4 sm:text-base cursor-pointer focus-visible:rounded-lg focus-visible:outline
+            focus-visible:outline-offset-1 focus-visible:outline-neutral-700 dark:focus-visible:outline-neutral-200
+          "
+          data-skatepark-tabs-target="tab"
+          data-tab="photos"
+          data-action="click->skatepark-tabs#switchTab keydown->skatepark-tabs#onKeydown"
+        >
+          <%= t("photos_tab", count: skatepark_images.size) %>
+        </button>
+
+        <button
+          id="videos-tab"
+          type="button"
+          role="tab"
+          aria-controls="videos-panel"
+          aria-selected="false"
+          tabindex="-1"
+          class="
+            rounded-t-lg rounded-b-none border-b-2 border-transparent px-1 py-3 text-sm font-medium transition
+            sm:px-4 sm:text-base cursor-pointer focus-visible:rounded-lg focus-visible:outline
+            focus-visible:outline-offset-1 focus-visible:outline-neutral-700 dark:focus-visible:outline-neutral-200
+          "
+          data-skatepark-tabs-target="tab"
+          data-tab="videos"
+          data-action="click->skatepark-tabs#switchTab keydown->skatepark-tabs#onKeydown"
+        >
+          <%= t("videos_tab", count: skatepark_videos.size) %>
+        </button>
+      </div>
+
+      <div
+        id="photos-panel"
+        role="tabpanel"
+        aria-labelledby="photos-tab"
+        data-skatepark-tabs-target="panel"
+        data-tab="photos"
+      >
+        <%= photos_grid %>
+      </div>
+
+      <div
+        id="videos-panel"
+        role="tabpanel"
+        aria-labelledby="videos-tab"
+        class="hidden"
+        data-skatepark-tabs-target="panel"
+        data-tab="videos"
+      >
+        <%= videos_grid %>
+      </div>
+    </div>
+  <% else %>
+    <%= photos_grid %>
+  <% end %>
 
   <div
     class="fixed inset-0 z-10 hidden bg-neutral-700/95 px-4 py-16 md:px-16 md:py-16 lg:px-24 lg:py-24"
@@ -176,7 +294,7 @@
               h-3 w-3 sm:h-2 sm:w-2 cursor-pointer rounded-full bg-white opacity-50 transition-all
               focus-visible:outline focus-visible:outline-2 focus-visible:outline-white
             "
-            id="<%= "indicatorImage-#{index}" %>"
+            id="indicatorImage-<%= index %>"
             data-action="click->skatepark#onGalleryImageIndicatorClick focus->skatepark#onGalleryImageIndicatorClick"
             data-skatepark-target="galleryImageIndicator"
             aria-label="<%= t('go_to_image', number: index + 1) %>"
@@ -211,6 +329,112 @@
         />
       </svg>
     </button>
+  </div>
+
+  <div
+    class="fixed inset-0 z-10 hidden bg-neutral-700/95 px-4 py-16 md:px-16 md:py-16 lg:px-24 lg:py-24"
+    data-skatepark-target="videoModal"
+    role="dialog"
+    aria-modal="true"
+    aria-label="<%= t('video_player') %>"
+  >
+    <button
+      type="button"
+      class="
+        absolute top-4 right-2 size-8 cursor-pointer text-white transition-opacity hover:opacity-75
+        focus-visible:outline focus-visible:outline-2 focus-visible:outline-white md:top-8 md:right-8 lg:top-12
+        lg:right-12 lg:size-12
+      "
+      data-action="click->skatepark#onVideoModalClose"
+      aria-label="<%= t('close_video_player') %>"
+    >
+      <svg
+        aria-hidden="true"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        class="h-full w-full"
+      >
+        <path
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M6 18 18 6m0 12L6 6"
+        />
+      </svg>
+    </button>
+
+    <% if skatepark_videos.many? %>
+      <button
+        type="button"
+        class="
+          absolute top-1/2 left-2 hidden h-14 w-14 -translate-y-1/2 cursor-pointer text-white transition-opacity
+          hover:opacity-75 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white sm:block
+          lg:left-6
+        "
+        data-action="click->skatepark#onPreviousVideo"
+        aria-label="<%= t('previous_video') %>"
+      >
+        <svg
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          class="h-full w-full"
+        >
+          <path
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="m15 19-7-7 7-7"
+          />
+        </svg>
+      </button>
+    <% end %>
+
+    <div class="relative flex h-full w-full items-center justify-center">
+      <div class="w-full max-w-4xl">
+        <iframe
+          class="aspect-video w-full rounded-lg"
+          data-skatepark-target="videoIframe"
+          title="<%= t('video_player') %>"
+          allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+          allowfullscreen
+          referrerpolicy="strict-origin-when-cross-origin"
+        ></iframe>
+      </div>
+    </div>
+
+    <% if skatepark_videos.many? %>
+      <button
+        type="button"
+        class="
+          absolute top-1/2 right-2 hidden h-14 w-14 -translate-y-1/2 cursor-pointer text-white transition-opacity
+          hover:opacity-75 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white sm:block
+          lg:right-6
+        "
+        data-action="click->skatepark#onNextVideo"
+        aria-label="<%= t('next_video') %>"
+      >
+        <svg
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          class="h-full w-full"
+        >
+          <path
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="m9 5 7 7-7 7"
+          />
+        </svg>
+      </button>
+    <% end %>
   </div>
 
   <div class="hidden sm:block">

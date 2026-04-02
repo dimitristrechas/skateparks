@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_27_120100) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_02_143000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -124,8 +124,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_27_120100) do
     t.integer "position", null: false
     t.bigint "skatepark_id", null: false
     t.datetime "updated_at", null: false
-    t.index ["skatepark_id", "position"], name: "index_skatepark_images_on_skatepark_id_and_position"
+    t.index ["skatepark_id", "position"], name: "index_unique_skatepark_images_on_skatepark_id_and_position", unique: true
     t.index ["skatepark_id"], name: "index_skatepark_images_on_skatepark_id"
+  end
+
+  create_table "skatepark_videos", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "position", null: false
+    t.bigint "skatepark_id", null: false
+    t.datetime "updated_at", null: false
+    t.string "youtube_url", null: false
+    t.index ["skatepark_id", "position"], name: "index_skatepark_videos_on_skatepark_id_and_position", unique: true
+    t.index ["skatepark_id", "youtube_url"], name: "index_skatepark_videos_on_skatepark_id_and_youtube_url", unique: true
+    t.index ["skatepark_id"], name: "index_skatepark_videos_on_skatepark_id"
   end
 
   create_table "skateparks", force: :cascade do |t|
@@ -135,6 +146,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_27_120100) do
     t.decimal "lat", precision: 10, scale: 6
     t.decimal "lng", precision: 10, scale: 6
     t.string "name"
+    t.integer "skatepark_videos_count", default: 0, null: false
     t.string "slug"
     t.string "state"
     t.integer "status", null: false
@@ -161,4 +173,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_27_120100) do
   add_foreign_key "popular_skateparks", "skateparks"
   add_foreign_key "sessions", "users"
   add_foreign_key "skatepark_images", "skateparks"
+  add_foreign_key "skatepark_videos", "skateparks"
 end

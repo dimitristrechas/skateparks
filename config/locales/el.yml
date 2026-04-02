@@ -3,6 +3,7 @@ el:
   made_with: "Φτιαγμένο με"
   city_of_origin: "Καβάλα, Ελλάδα"
   photos: "φωτογραφίες"
+  videos: "βίντεο"
   country: "Χώρα"
   country_state: "Νομός/Περιφέρεια"
   back_to_skateparks: "Πίσω σε όλα τα skateparks"
@@ -12,13 +13,21 @@ el:
   image_gallery: "Γκαλερί φωτογραφιών"
   gallery_image_announcement: "Φωτογραφία %{current} από %{total}"
   view_image_in_gallery: "Δες την φωτογραφία %{number} στη γκαλερί"
+  view_video_in_player: "Δες το βίντεο %{number}"
   previous_image: "Προηγούμενη φωτογραφία"
   next_image: "Επόμενη φωτογραφία"
+  previous_video: "Προηγούμενο βίντεο"
+  next_video: "Επόμενο βίντεο"
   close_gallery: "Κλείσιμο γκαλερί"
+  video_player: "Video player"
+  close_video_player: "Κλείσιμο video player"
   go_to_image: "Πήγαινε στη φωτογραφία %{number}"
+  photos_tab: "Φωτογραφίες (%{count})"
+  videos_tab: "Βίντεο (%{count})"
   skatepark:
     name: "Όνομα"
     images: "Φωτογραφίες"
+    media_tabs: "Πολυμέσα skatepark"
     google_id: "Google ID"
     status: "Κατάσταση"
     position: "Θέση"
@@ -31,6 +40,7 @@ el:
     cover_image: "Εικόνα εξωφύλλου"
     cover_image_alt: "Εικόνα εξωφύλλου %{name}"
     gallery_image_alt: "%{name} - Φωτογραφία %{current} από %{total}"
+    video_thumbnail_alt: "%{name} - Βίντεο %{current} από %{total}"
     image_indicators: "Δείκτες φωτογραφιών"
   edit: "Επεξεργασία"
   create: "Δημιουργία"
@@ -183,6 +193,30 @@ el:
         image_moved: "Η φωτογραφία μετακινήθηκε στη θέση %{position} από %{total}"
         images_added_one: "1 φωτογραφία προστέθηκε στη λίστα"
         images_added_other: "%{count} φωτογραφίες προστέθηκαν στη λίστα"
+        video_url: "YouTube URL"
+        video_url_placeholder: "Επικόλλησε ένα YouTube URL"
+        add_video: "Προσθήκη βίντεο"
+        videos_hint: "Επικόλλησε ένα YouTube URL, πρόσθεσέ το στη λίστα και μετά σύρε ή χρησιμοποίησε τα βέλη για αλλαγή σειράς."
+        videos_aria_label: "Βίντεο skatepark"
+        videos_empty_state: "Πρόσθεσε βίντεο για να φτιάξεις τη λίστα και μετά σύρε ή χρησιμοποίησε τα βέλη για να τα τοποθετήσεις πριν αποθηκεύσεις."
+        video_label: "Βίντεο"
+        video_thumbnail_alt: "Μικρογραφία βίντεο %{position}"
+        new_video_thumbnail_alt: "Προεπισκόπηση μικρογραφίας νέου βίντεο"
+        reorder_video: "Αλλαγή σειράς βίντεο %{position}"
+        reorder_video_default: "Αλλαγή σειράς βίντεο"
+        move_video_up: "Μετακίνηση βίντεο %{position} πάνω"
+        move_video_up_default: "Μετακίνηση βίντεο πάνω"
+        move_video_down: "Μετακίνηση βίντεο %{position} κάτω"
+        move_video_down_default: "Μετακίνηση βίντεο κάτω"
+        delete_video: "Διαγραφή βίντεο %{position}"
+        delete_video_default: "Διαγραφή βίντεο"
+        confirm_delete_video: "Θέλετε σίγουρα να διαγράψετε αυτό το βίντεο;"
+        video_removed: "Το βίντεο αφαιρέθηκε από τη λίστα"
+        new_video_removed: "Το νέο βίντεο αφαιρέθηκε από τη λίστα"
+        video_moved: "Το βίντεο μετακινήθηκε στη θέση %{position} από %{total}"
+        video_added: "Το βίντεο προστέθηκε στη λίστα"
+        invalid_video_url: "Εισάγετε ένα έγκυρο YouTube URL."
+        duplicate_video_url: "Αυτό το YouTube URL έχει ήδη προστεθεί."
     popular_skateparks:
       title: "Δημοφιλή Skateparks"
       add_section_title: "Προσθήκη Δημοφιλούς Skatepark"
@@ -201,6 +235,9 @@ el:
     attributes:
       skatepark:
         skatepark_images: "Φωτογραφίες"
+        skatepark_videos: "Βίντεο"
+      skatepark_video:
+        youtube_url: "YouTube URL"
     errors:
       models:
         skatepark:
@@ -208,3 +245,12 @@ el:
             skatepark_images:
               minimum_images: "Τουλάχιστον 2 απαιτούνται"
               duplicate_image: "Το %{filename} έχει ήδη ανεβεί"
+            skatepark_videos:
+              duplicate_video: "Το %{youtube_url} έχει ήδη προστεθεί"
+        skatepark_video:
+          attributes:
+            youtube_url:
+              invalid_format: "πρέπει να είναι έγκυρο YouTube URL"
+  errors:
+    messages:
+      taken: "έχει ήδη χρησιμοποιηθεί"

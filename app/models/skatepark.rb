@@ -1,10 +1,13 @@
 class Skatepark < ApplicationRecord
   extend Mobility
+  include SkateparkVideoUrlUniqueness
 
   translates :name, type: :string
   translates :description, backend: :action_text
   has_many :skatepark_images, -> { order(:position, :id) }, dependent: :destroy, inverse_of: :skatepark
   accepts_nested_attributes_for :skatepark_images, allow_destroy: true
+  has_many :skatepark_videos, -> { order(:position, :id) }, dependent: :destroy, inverse_of: :skatepark
+  accepts_nested_attributes_for :skatepark_videos, allow_destroy: true
   has_one :popular_skatepark, dependent: :destroy
   has_one_attached :cover_image
   reverse_geocoded_by :lat, :lng

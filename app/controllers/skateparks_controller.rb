@@ -31,6 +31,7 @@ class SkateparksController < ApplicationController
 
   def set_skatepark
     @skatepark = Skatepark.published.includes(
+      :skatepark_videos,
       cover_image_attachment: :blob,
       skatepark_images: { image_attachment: :blob }
     ).find(params[:id])
