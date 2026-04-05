@@ -58,7 +58,7 @@ module SchemaHelper
       '@id': url_for(only_path: false, protocol: 'https'),
       name: title.presence || t('application.title', locale: :en),
       description: meta_description.presence || t('application.meta_description', locale: :en),
-      image: meta_image.presence || image_url('skateparks-logo-2.png'),
+      image: meta_image.presence || image_url('logo-og.png'),
       url: url_for(only_path: false, protocol: 'https'),
       isPartOf: {
         '@id': "#{root_url(protocol: 'https')}#website",
