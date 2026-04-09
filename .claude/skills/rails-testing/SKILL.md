@@ -15,8 +15,11 @@ This project uses **Minitest** (not RSpec). Tests **must** run via Docker.
 # All tests
 docker compose -f docker-compose.test.yml exec skateparks-web-test bin/rails test
 
-# With coverage
-docker compose -f docker-compose.test.yml exec skateparks-web-test bash -c "COVERAGE=true bin/rails test"
+# With coverage (default unless DISABLE_SIMPLECOV=1; clear `coverage/` for a clean merged report)
+docker compose -f docker-compose.test.yml exec skateparks-web-test bash -c "rm -rf coverage && bin/rails test"
+
+# Without coverage (faster)
+docker compose -f docker-compose.test.yml exec skateparks-web-test bash -c "DISABLE_SIMPLECOV=1 bin/rails test"
 
 # Single file
 docker compose -f docker-compose.test.yml exec skateparks-web-test bin/rails test test/models/skatepark_test.rb

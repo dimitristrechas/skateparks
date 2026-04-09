@@ -1,8 +1,16 @@
 unless ENV['DISABLE_SIMPLECOV']
   require 'simplecov'
+
+  # Rails parallel workers use `Kernel.fork`, not `Process.fork`, so SimpleCov's
+  # `enable_for_subprocesses` hook never runs. `parallelize_setup` runs inside each
+  # forked worker and restarts coverage with a unique command name so results merge
+  # instead of overwriting the coordinator's entry in `.resultset.json`.
+
   SimpleCov.start 'rails' do
     add_filter '/test/'
     minimum_coverage 80
+    # Parent process when using process parallelization; workers set their own names below.
+    command_name 'Minitest coordinator'
   end
 end
 
@@ -23,6 +31,16 @@ Rails.root.glob('test/support/**/*.rb').sort.each { |f| require f }
 
 module ActiveSupport
   class TestCase
+    unless ENV['DISABLE_SIMPLECOV']
+      parallelize_setup do |worker|
+        SimpleCov.command_name "Minitest worker #{worker}"
+        SimpleCov.print_error_status = false
+        SimpleCov.formatter SimpleCov::Formatter::SimpleFormatter
+        SimpleCov.minimum_coverage 0
+        SimpleCov.start 'rails'
+      end
+    end
+
     parallelize(workers: :number_of_processors)
 
     fixtures :all

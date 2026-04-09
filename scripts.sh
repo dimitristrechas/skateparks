@@ -176,7 +176,7 @@ case $OPTION in
 
     12)
     echo -e "${GREEN}Running tests with coverage...${NC}"
-    docker compose -f $TEST_COMPOSE_FILE exec $TEST_SERVICE_NAME bash -c "bin/rails test"
+    docker compose -f $TEST_COMPOSE_FILE exec $TEST_SERVICE_NAME bash -c "rm -rf coverage && bin/rails test"
     echo ""
     echo -e "${CYAN}Coverage report: ${NC}file://$(pwd)/coverage/index.html"
     ;;

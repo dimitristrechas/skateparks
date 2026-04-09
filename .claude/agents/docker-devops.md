@@ -40,11 +40,11 @@ docker compose -f docker-compose.development.yml down
 ## Running Tests (ALWAYS via Docker)
 
 ```bash
-# All tests
-docker compose -f docker-compose.test.yml exec skateparks-web-test bin/rails test
+# All tests (SimpleCov on by default; clear `coverage/` for a clean merged report)
+docker compose -f docker-compose.test.yml exec skateparks-web-test bash -c "rm -rf coverage && bin/rails test"
 
-# With coverage report
-docker compose -f docker-compose.test.yml exec skateparks-web-test bash -c "COVERAGE=true bin/rails test"
+# All tests without coverage (faster)
+docker compose -f docker-compose.test.yml exec skateparks-web-test bash -c "DISABLE_SIMPLECOV=1 bin/rails test"
 
 # Single file
 docker compose -f docker-compose.test.yml exec skateparks-web-test bin/rails test test/models/skatepark_test.rb
