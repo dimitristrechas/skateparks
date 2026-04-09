@@ -195,6 +195,16 @@ class SkateparksControllerTest < ActionDispatch::IntegrationTest
 end
 ```
 
+### N+1 / query-count guards (integration)
+
+For hot listing actions, add a focused test that subscribes to `sql.active_record`, runs the request, and asserts each expensive table or join pattern appears at most once (or within a small budget). This complements eager loading in controllers.
+
+See `test/controllers/skateparks_controller_test.rb` (`test_get_index_with_distance_avoids_n_plus_one_queries_for_listing_fields`) for the `capture_sql_queries` + `count_matching_queries` helpers used there.
+
+### Translated UI in integration tests
+
+Pass `locale` on the path (this app uses `default_url_options` with `I18n.locale`) and assert the response body includes the expected `I18n.t` values for both `en` and `el` when adding new chrome copy. Example: `HomeControllerTest#test_get_index_renders_translated_header_logo_alt_per_locale`.
+
 ### Component Tests
 
 ```ruby

@@ -51,6 +51,30 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_equal 'el', assigns(:locale)
   end
 
+  def test_get_index_renders_translated_header_logo_alt_per_locale
+    get root_path(locale: 'en')
+
+    assert_response :success
+    assert_includes response.body, I18n.t('home.logo_alt', locale: 'en')
+
+    get root_path(locale: 'el')
+
+    assert_response :success
+    assert_includes response.body, I18n.t('home.logo_alt', locale: 'el')
+  end
+
+  def test_get_index_renders_translated_theme_toggle_aria_label_per_locale
+    get root_path(locale: 'en')
+
+    assert_response :success
+    assert_includes response.body, I18n.t('home.theme_toggle_aria_label', locale: 'en')
+
+    get root_path(locale: 'el')
+
+    assert_response :success
+    assert_includes response.body, I18n.t('home.theme_toggle_aria_label', locale: 'el')
+  end
+
   def test_get_index_assigns_skateparks_latest_from_cache
     get root_path
 

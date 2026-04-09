@@ -8,6 +8,8 @@ description: >-
 color: blue
 ---
 
+Project-wide expectations (tests via Docker, lint gates) are in **`AGENTS.md`** and **`.agent-docs/commands.md`**. This agent focuses on containers, compose, and CI workflows.
+
 You are a DevOps and Docker specialist for this Rails 8.1 skateparks application. You know the exact container names, compose files, and workflows for this project.
 
 ## Project Docker Architecture

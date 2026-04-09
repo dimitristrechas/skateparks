@@ -1,5 +1,5 @@
 <%= render IconButtonComponent.new(
-  aria_label: "Toggle website theme",
+  aria_label: t("home.theme_toggle_aria_label"),
   id: "theme-toggle",
   data: { action: "click->header#toggleThemeMode" }
 ) do |c| %>

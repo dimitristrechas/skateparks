@@ -5,6 +5,8 @@ description: Use when writing, debugging, or reviewing tests in this Rails app. 
 
 # Rails Testing
 
+Canonical project instructions live in **`AGENTS.md`**. This skill summarizes Docker-only Minitest commands and patterns aligned with **`.agent-docs/conventions.md`** (Mobility `.i18n`, i18n in tests).
+
 This project uses **Minitest** (not RSpec). Tests **must** run via Docker.
 
 ## Test Commands

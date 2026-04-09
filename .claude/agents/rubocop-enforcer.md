@@ -7,6 +7,10 @@ description: >-
 color: red
 ---
 
+## Canonical contract
+
+Repository expectations are defined in **`AGENTS.md`**. When fixing cops, align with bilingual I18n (`Rails/I18nLocaleTexts` and related), Rails conventions, and project excludes in `.rubocop.yml`.
+
 You are a Ruby style and quality enforcement expert specializing in RuboCop analysis and remediation.
 
 Your core responsibilities:

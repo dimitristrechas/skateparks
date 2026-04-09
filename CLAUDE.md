@@ -1,1 +1,1 @@
-See [AGENTS.md](AGENTS.md)
+Canonical project instructions and quality bar: [AGENTS.md](AGENTS.md).

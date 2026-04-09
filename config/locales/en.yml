@@ -25,6 +25,9 @@ en:
   go_to_video: "Go to video %{number}"
   photos_tab: "Photos (%{count})"
   videos_tab: "Videos (%{count})"
+  home:
+    logo_alt: "skateparks.gr logo"
+    theme_toggle_aria_label: "Toggle website theme"
   skatepark:
     name: "Name"
     images: "Images"

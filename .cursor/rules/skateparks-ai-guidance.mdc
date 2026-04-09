@@ -5,8 +5,9 @@ alwaysApply: true
 
 # Shared AI Project Guidance
 
-- Follow `AGENTS.md` as the canonical project instructions and read the linked files in `.agent-docs/` and `docs/` when they are relevant to the task.
-- Treat `.claude/agents/*.md` as the canonical project subagent prompts. Reuse them instead of creating duplicate tool-specific agent files unless a tool requires a thin wrapper.
-- Treat `.claude/skills/*/SKILL.md` as the canonical shared skill format for project-local skills.
-- When changing AI tooling, keep `opencode.json`, `.mcp.json`, and `.cursor/mcp.json` aligned for any shared MCP integration.
+- **`AGENTS.md` is canonical** for instructions and product-quality expectations (i18n, a11y, mobile, N+1 avoidance, UI consistency). This rule file applies those expectations in Cursor; read linked `.agent-docs/` and `docs/` when relevant.
+- **Workflow entry point:** Prefer `sh scripts.sh` for development server, test server, lint, and formatter workflows whenever it supports the task. Use direct `docker compose`, `bundle`, or `yarn` commands only when `scripts.sh` does not cover the needed operation or the task requires non-interactive automation.
+- **Subagent prompts:** `.claude/agents/*.md` are reusable role prompts for Claude Code and OpenCode; they must stay aligned with `AGENTS.md`, not diverge into a second source of truth.
+- **Skills:** `.claude/skills/*/SKILL.md` is the shared skill format; keep content consistent with `AGENTS.md` and testing docs.
+- **Cross-tool MCP:** When changing MCP integration, keep `opencode.json`, `.mcp.json`, and `.cursor/mcp.json` aligned. See [.agent-docs/ai-tooling.md](.agent-docs/ai-tooling.md) for env placeholder differences.
 - Do not add GitHub Copilot-specific instructions, agent files, or MCP endpoints back into this repository.
