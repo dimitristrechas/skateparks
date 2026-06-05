@@ -21,6 +21,7 @@ Rails 8.1 skatepark directory app (Ruby 3.3.6, PostgreSQL 17, Hotwire, Tailwind 
 
 ## Reference
 
+- Operations & troubleshooting: [.agent-docs/operations.md](.agent-docs/operations.md)
 - Commands: [.agent-docs/commands.md](.agent-docs/commands.md)
 - Conventions: [.agent-docs/conventions.md](.agent-docs/conventions.md)
 - Testing guide: [docs/minitest-implementation.md](docs/minitest-implementation.md)
