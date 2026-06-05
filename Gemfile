@@ -87,7 +87,7 @@ end
 
 gem 'tailwindcss-rails', '~> 4.0'
 
-gem 'view_component', '~> 4.5.0'
+gem 'view_component', '~> 4.9'
 
 gem 'dockerfile-rails', '~> 1.6', '>= 1.6.24'
 
