@@ -46,7 +46,7 @@ class GoSkateDayCountdownComponentTest < ViewComponent::TestCase
       I18n.with_locale(:en) do
         render_inline(GoSkateDayCountdownComponent.new)
 
-        assert_selector MESSAGE_ID, text: '1 day until Go Skate Day!'
+        assert_selector MESSAGE_ID, text: I18n.t('home.go_skate_day.countdown', count: 1)
       end
     end
   end
@@ -56,7 +56,7 @@ class GoSkateDayCountdownComponentTest < ViewComponent::TestCase
       I18n.with_locale(:el) do
         render_inline(GoSkateDayCountdownComponent.new)
 
-        assert_selector MESSAGE_ID, text: '1 ημέρα μέχρι το Go Skate Day!'
+        assert_selector MESSAGE_ID, text: I18n.t('home.go_skate_day.countdown', count: 1)
       end
     end
   end
