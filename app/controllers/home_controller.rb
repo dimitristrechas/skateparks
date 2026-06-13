@@ -20,4 +20,9 @@ class HomeController < ApplicationController
     @title = t('contact')
     @meta_description = t('contact_details')
   end
+
+  def privacy
+    @title = t('privacy.title')
+    @meta_description = t('privacy.meta_description')
+  end
 end
