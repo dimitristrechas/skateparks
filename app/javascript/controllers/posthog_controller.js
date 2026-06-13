@@ -5,7 +5,7 @@ const ACCEPTED = "accepted";
 const REJECTED = "rejected";
 
 export default class extends Controller {
-  static targets = ["banner"];
+  static targets = ["banner", "consentStatus", "consentAccept", "consentReject"];
 
   static values = {
     apiKey: String,
@@ -20,6 +20,7 @@ export default class extends Controller {
     }
 
     this.applyConsentState(consent);
+    this.updateConsentStatus();
   }
 
   accept(event) {
@@ -27,6 +28,7 @@ export default class extends Controller {
     localStorage.setItem(CONSENT_KEY, ACCEPTED);
     this.enableAnalytics();
     this.hideBanner();
+    this.updateConsentStatus();
   }
 
   reject(event) {
@@ -34,6 +36,7 @@ export default class extends Controller {
     localStorage.setItem(CONSENT_KEY, REJECTED);
     this.disableAnalytics();
     this.hideBanner();
+    this.updateConsentStatus();
   }
 
   applyConsentState(consent) {
@@ -103,6 +106,35 @@ export default class extends Controller {
   hideBanner() {
     if (this.hasBannerTarget) {
       this.bannerTarget.classList.add("hidden");
+    }
+  }
+
+  updateConsentStatus() {
+    if (!this.hasConsentStatusTarget) return;
+
+    const consent = localStorage.getItem(CONSENT_KEY);
+    const { consentStatusTarget } = this;
+    const statusLabel = this.consentStatusLabel(consent, consentStatusTarget);
+
+    consentStatusTarget.textContent = consentStatusTarget.dataset.currentChoiceLabel.replace("%{status}", statusLabel);
+
+    this.updateConsentButtons(consent);
+  }
+
+  consentStatusLabel(consent, element) {
+    if (consent === ACCEPTED) return element.dataset.acceptedLabel;
+    if (consent === REJECTED) return element.dataset.rejectedLabel;
+
+    return element.dataset.unsetLabel;
+  }
+
+  updateConsentButtons(consent) {
+    if (this.hasConsentAcceptTarget) {
+      this.consentAcceptTarget.setAttribute("aria-pressed", consent === ACCEPTED ? "true" : "false");
+    }
+
+    if (this.hasConsentRejectTarget) {
+      this.consentRejectTarget.setAttribute("aria-pressed", consent === REJECTED ? "true" : "false");
     }
   }
 }

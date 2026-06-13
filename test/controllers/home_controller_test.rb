@@ -170,6 +170,19 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_equal I18n.t('privacy.meta_description'), assigns(:meta_description)
   end
 
+  def test_get_privacy_renders_consent_status_when_cookie_consent_enabled
+    with_posthog_key('phc_test') do
+      get privacy_path
+
+      assert_response :success
+      assert_includes response.body, 'data-posthog-target="consentStatus"'
+      assert_includes response.body, 'data-current-choice-label='
+      assert_predicate %w[status_accepted status_rejected status_not_set], :all? do |key|
+        response.body.include?(I18n.t("cookie_consent.#{key}"))
+      end
+    end
+  end
+
   def test_get_index_renders_go_skate_day_countdown_during_visibility_window
     travel_to Time.zone.local(2026, 5, 21, 12) do
       get root_path
@@ -214,6 +227,24 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
 
       assert_response :success
       assert_not_includes response.body, I18n.t('home.go_skate_day.today')
+    end
+  end
+
+  private
+
+  def with_posthog_key(value)
+    previous = ENV.fetch('POSTHOG_API_KEY', nil)
+    if value.present?
+      ENV['POSTHOG_API_KEY'] = value
+    else
+      ENV.delete('POSTHOG_API_KEY')
+    end
+    yield
+  ensure
+    if previous.present?
+      ENV['POSTHOG_API_KEY'] = previous
+    else
+      ENV.delete('POSTHOG_API_KEY')
     end
   end
 end

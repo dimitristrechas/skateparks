@@ -81,6 +81,10 @@ en:
     accept: "Accept analytics"
     reject: "Reject analytics"
     learn_more: "Learn more"
+    current_choice: "Your current choice: %{status}"
+    status_accepted: "Analytics accepted"
+    status_rejected: "Analytics rejected"
+    status_not_set: "No choice made yet"
   privacy:
     title: "Privacy & cookies"
     meta_description: "How skateparks.gr uses cookies, local storage, and analytics—and how you can manage your consent."

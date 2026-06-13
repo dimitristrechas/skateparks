@@ -81,6 +81,10 @@ el:
     accept: "Αποδοχή analytics"
     reject: "Απόρριψη analytics"
     learn_more: "Μάθετε περισσότερα"
+    current_choice: "Η τρέχουσα επιλογή σας: %{status}"
+    status_accepted: "Αποδοχή analytics"
+    status_rejected: "Απόρριψη analytics"
+    status_not_set: "Δεν έχει γίνει ακόμη επιλογή"
   privacy:
     title: "Απόρρητο & cookies"
     meta_description: "Πώς το skateparks.gr χρησιμοποιεί cookies, local storage και analytics—και πώς μπορείτε να διαχειριστείτε τη συγκατάθεσή σας."

@@ -1,0 +1,31 @@
+<% if cookie_consent_enabled? %>
+  <p
+    data-posthog-target="consentStatus"
+    class="mb-4 text-sm font-medium"
+    aria-live="polite"
+    data-accepted-label="<%= t('cookie_consent.status_accepted') %>"
+    data-rejected-label="<%= t('cookie_consent.status_rejected') %>"
+    data-unset-label="<%= t('cookie_consent.status_not_set') %>"
+    data-current-choice-label="<%= t('cookie_consent.current_choice') %>"
+  ></p>
+  <div class="flex flex-wrap gap-3">
+    <%= render ButtonComponent.new(
+          title: t('cookie_consent.reject'),
+          type: 'button',
+          ghost: true,
+          data: {
+            posthog_target: 'consentReject',
+            action: 'click->posthog#reject'
+          }
+        ) %>
+
+    <%= render ButtonComponent.new(
+          title: t('cookie_consent.accept'),
+          type: 'button',
+          data: {
+            posthog_target: 'consentAccept',
+            action: 'click->posthog#accept'
+          }
+        ) %>
+  </div>
+<% end %>
