@@ -8,6 +8,9 @@ gem 'rails', '8.1.3'
 # Use Propshaft, the new asset pipeline for Rails 8 [https://github.com/rails/propshaft]
 gem 'propshaft'
 
+# Pin net-imap for CVE-2026-47240, CVE-2026-47241, and CVE-2026-47242.
+gem 'net-imap', '>= 0.6.4.1'
+
 # Use postgresql as the database for Active Record
 gem 'pg', '~> 1.1'
 
