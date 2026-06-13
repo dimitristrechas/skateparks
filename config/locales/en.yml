@@ -28,6 +28,11 @@ en:
   home:
     logo_alt: "skateparks.gr logo"
     theme_toggle_aria_label: "Toggle website theme"
+    go_skate_day:
+      countdown:
+        one: "1 day until Go Skate Day!"
+        other: "%{count} days until Go Skate Day!"
+      today: "It's Go Skate Day!"
   skatepark:
     name: "Name"
     images: "Images"
