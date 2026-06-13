@@ -30,8 +30,8 @@ el:
     theme_toggle_aria_label: "Εναλλαγή θέματος εμφάνισης"
     go_skate_day:
       countdown:
-        one: "1 ημέρα μέχρι το Go Skate Day!"
-        other: "%{count} ημέρες μέχρι το Go Skate Day!"
+        one: "1 ημέρα μέχρι την Go Skate Day!"
+        other: "%{count} ημέρες μέχρι την Go Skate Day!"
       today: "Είναι Go Skate Day!"
   skatepark:
     name: "Όνομα"
