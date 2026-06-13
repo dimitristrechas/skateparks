@@ -28,6 +28,11 @@ el:
   home:
     logo_alt: "Λογότυπο skateparks.gr"
     theme_toggle_aria_label: "Εναλλαγή θέματος εμφάνισης"
+    go_skate_day:
+      countdown: "%{count} ημέρες μέχρι το Go Skate Day!"
+      today: "Είναι Go Skate Day!"
+      aria_label_countdown: "Αντίστροφη μέτρηση Go Skate Day: %{count} ημέρες απομένουν"
+      aria_label_today: "Είναι Go Skate Day"
   skatepark:
     name: "Όνομα"
     images: "Φωτογραφίες"

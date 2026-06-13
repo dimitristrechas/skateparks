@@ -1,6 +1,8 @@
 require 'test_helper'
 
 class HomeControllerTest < ActionDispatch::IntegrationTest
+  include ActiveSupport::Testing::TimeHelpers
+
   def setup
     @published_skatepark = create(:skatepark)
     Rails.cache.clear
@@ -166,5 +168,43 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
 
     assert_equal I18n.t('privacy.title'), assigns(:title)
     assert_equal I18n.t('privacy.meta_description'), assigns(:meta_description)
+  end
+
+  def test_get_index_renders_go_skate_day_countdown_during_visibility_window
+    travel_to Time.zone.local(2026, 5, 21, 12) do
+      get root_path
+
+      assert_response :success
+      assert_includes response.body, I18n.t('home.go_skate_day.countdown', count: 31)
+    end
+  end
+
+  def test_get_index_renders_go_skate_day_celebration_on_june_twenty_first
+    travel_to Time.zone.local(2026, 6, 21, 12) do
+      get root_path
+
+      assert_response :success
+      assert_includes response.body, 'Go Skate Day!'
+      assert_includes response.body, CGI.escapeHTML(I18n.t('home.go_skate_day.today'))
+    end
+  end
+
+  def test_get_index_hides_go_skate_day_countdown_before_visibility_window
+    travel_to Time.zone.local(2026, 5, 20, 12) do
+      get root_path
+
+      assert_response :success
+      assert_not_includes response.body, I18n.t('home.go_skate_day.countdown', count: 32)
+      assert_not_includes response.body, I18n.t('home.go_skate_day.today')
+    end
+  end
+
+  def test_get_index_hides_go_skate_day_countdown_after_visibility_window
+    travel_to Time.zone.local(2026, 6, 22, 12) do
+      get root_path
+
+      assert_response :success
+      assert_not_includes response.body, I18n.t('home.go_skate_day.today')
+    end
   end
 end
