@@ -18,12 +18,8 @@ class GoSkateDayCountdownComponent < ViewComponent::Base
     GoSkateDay.days_remaining(@date)
   end
 
-  def aria_label
-    if celebration_day?
-      t('home.go_skate_day.aria_label_today')
-    else
-      t('home.go_skate_day.aria_label_countdown', count: days_remaining)
-    end
+  def message_id
+    'go-skate-day-countdown-message'
   end
 
   def message

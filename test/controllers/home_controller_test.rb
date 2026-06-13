@@ -179,6 +179,15 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  def test_get_index_renders_singular_go_skate_day_countdown_on_june_twentieth
+    travel_to Time.zone.local(2026, 6, 20, 12) do
+      get root_path
+
+      assert_response :success
+      assert_includes response.body, I18n.t('home.go_skate_day.countdown', count: 1)
+    end
+  end
+
   def test_get_index_renders_go_skate_day_celebration_on_june_twenty_first
     travel_to Time.zone.local(2026, 6, 21, 12) do
       get root_path
