@@ -96,6 +96,10 @@
       </script>
     <% end %>
 
+    <% if posthog_enabled? %>
+      <%= render "application/posthog" %>
+    <% end %>
+
     <meta name="view-transition" content="same-origin">
   </head>
 
@@ -104,11 +108,20 @@
       container mx-auto grid min-h-screen grid-rows-layout bg-neutral-100 p-4 text-neutral-700 md:p-6 2xl:px-0
       dark:bg-neutral-800 dark:text-neutral-200
     "
+    <% if posthog_enabled? %>
+      data-controller="posthog"
+      data-posthog-api-key-value="<%= ENV["POSTHOG_API_KEY"] %>"
+      data-posthog-api-host-value="https://eu.i.posthog.com"
+    <% end %>
   >
     <%= render "home/header" %>
 
     <main><%= yield %></main>
 
     <%= render "home/footer" %>
+
+    <% if posthog_enabled? %>
+      <%= render CookieConsentBannerComponent.new %>
+    <% end %>
   </body>
 </html>

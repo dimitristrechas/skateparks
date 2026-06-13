@@ -1,7 +1,16 @@
 <footer class="mx-auto w-full pb-0 mt-12 lg:mt-20">
-  <ul class="mb-4 flex items-center justify-center gap-8 sm:mb-0 md:justify-end">
+  <ul class="mb-4 flex flex-wrap items-center justify-center gap-8 sm:mb-0 md:justify-end">
     <li><%= render LinkComponent.new(title: t("about"), url: about_path) %></li>
     <li><%= render LinkComponent.new(title: t("contact"), url: contact_path) %></li>
+
+    <% if posthog_enabled? %>
+      <li>
+        <%= button_tag t("cookie_consent.settings"),
+              type: "button",
+              class: "hover:underline py-1 px-2 cursor-pointer",
+              data: { action: "click->posthog#openSettings" } %>
+      </li>
+    <% end %>
   </ul>
 
   <hr class="my-6 border-neutral-400 sm:mx-auto lg:my-8 dark:border-neutral-700">

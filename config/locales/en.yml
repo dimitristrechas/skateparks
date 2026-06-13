@@ -70,6 +70,12 @@ en:
   new: "New"
   popular: "Popular"
   cancel: "Cancel"
+  cookie_consent:
+    aria_label: "Cookie consent"
+    message: "We use cookies and local storage on this site. With your consent, we also use analytics cookies to collect anonymised usage statistics and session recordings, so we can understand how skateparks.gr is used and improve it. Analytics cookies are not essential—you can use this site without them. You can withdraw your consent at any time."
+    accept: "Accept analytics"
+    reject: "Reject analytics"
+    settings: "Cookie settings"
   sessions:
     title: "Sign in"
     email_label: "Email address"

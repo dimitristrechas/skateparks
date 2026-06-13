@@ -70,6 +70,12 @@ el:
   new: "Νέο"
   popular: "Δημοφιλές"
   cancel: "Ακύρωση"
+  cookie_consent:
+    aria_label: "Συγκατάθεση cookies"
+    message: "Χρησιμοποιούμε cookies και local storage σε αυτόν τον ιστότοπο. Με τη συγκατάθεσή σας, χρησιμοποιούμε επίσης analytics cookies για τη συλλογή ανώνυμων στατιστικών χρήσης και καταγραφών συνεδριών, ώστε να κατανοήσουμε πώς χρησιμοποιείται το skateparks.gr και να το βελτιώσουμε. Τα analytics cookies δεν είναι απαραίτητα—μπορείτε να χρησιμοποιήσετε τον ιστότοπο χωρίς αυτά. Μπορείτε να ανακαλέσετε τη συγκατάθεσή σας ανά πάσα στιγμή."
+    accept: "Αποδοχή analytics"
+    reject: "Απόρριψη analytics"
+    settings: "Ρυθμίσεις cookies"
   sessions:
     title: "Σύνδεση"
     email_label: "Διεύθυνση email"
