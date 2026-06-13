@@ -32,7 +32,7 @@ el:
       countdown:
         one: "1 ημέρα μέχρι την Go Skate Day!"
         other: "%{count} ημέρες μέχρι την Go Skate Day!"
-      today: "Είναι Go Skate Day!"
+      today: "Go Skate Day!"
   skatepark:
     name: "Όνομα"
     images: "Φωτογραφίες"
