@@ -96,4 +96,15 @@ class ButtonComponentTest < ViewComponent::TestCase
     assert_includes html, 'px-6'
     assert_includes html, 'py-2.5'
   end
+
+  def test_passes_data_attributes_through_html_options
+    component = ButtonComponent.new(
+      title: @title,
+      type: 'button',
+      data: { action: 'click->posthog#accept' }
+    )
+    render_inline(component)
+
+    assert_selector "button[data-action='click->posthog#accept']"
+  end
 end

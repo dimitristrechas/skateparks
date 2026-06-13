@@ -154,4 +154,17 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_equal I18n.t('contact'), assigns(:title)
     assert_equal I18n.t('contact_details'), assigns(:meta_description)
   end
+
+  def test_get_privacy_returns_success
+    get privacy_path
+
+    assert_response :success
+  end
+
+  def test_get_privacy_assigns_title_and_meta_description
+    get privacy_path
+
+    assert_equal I18n.t('privacy.title'), assigns(:title)
+    assert_equal I18n.t('privacy.meta_description'), assigns(:meta_description)
+  end
 end

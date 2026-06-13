@@ -1,5 +1,5 @@
 <% if @form %>
-  <%= @form.button @title, type: @type, class: button_classes %>
+  <%= @form.button @title, **merged_html_options %>
 <% else %>
-  <%= button_tag @title, type: @type, class: button_classes %>
+  <%= button_tag @title, **merged_html_options %>
 <% end %>

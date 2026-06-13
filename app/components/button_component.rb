@@ -1,11 +1,12 @@
 class ButtonComponent < ViewComponent::Base
-  def initialize(title:, type:, form: nil, ghost: false, large: false)
+  def initialize(title:, type:, form: nil, **options)
     super()
     @title = title
     @form = form
     @type = type
-    @ghost = ghost
-    @large = large
+    @ghost = options.delete(:ghost) { false }
+    @large = options.delete(:large) { false }
+    @html_options = options
   end
 
   private
@@ -36,6 +37,10 @@ class ButtonComponent < ViewComponent::Base
   end
 
   def button_classes
-    class_names(base_classes, default_classes, ghost_classes, large_classes)
+    class_names(base_classes, default_classes, ghost_classes, large_classes, @html_options[:class])
+  end
+
+  def merged_html_options
+    @html_options.except(:class).merge(type: @type, class: button_classes)
   end
 end

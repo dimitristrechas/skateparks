@@ -1,0 +1,38 @@
+<section>
+  <h2 class="text-2xl leading-loose"><%= t('privacy.title') %></h2>
+
+  <p><%= t('privacy.intro') %></p>
+
+  <h3 class="mt-6 text-xl leading-loose"><%= t('privacy.cookies_heading') %></h3>
+
+  <p><%= t('privacy.cookies_body') %></p>
+
+  <h3 class="mt-6 text-xl leading-loose"><%= t('privacy.analytics_heading') %></h3>
+
+  <p><%= t('privacy.analytics_body') %></p>
+
+  <h3 class="mt-6 text-xl leading-loose"><%= t('privacy.rights_heading') %></h3>
+
+  <p><%= t('privacy.rights_body') %></p>
+
+  <h3 class="mt-6 text-xl leading-loose"><%= t('privacy.consent_heading') %></h3>
+
+  <p class="mb-4"><%= t('privacy.consent_body') %></p>
+
+  <% if cookie_consent_enabled? %>
+    <div class="flex flex-wrap gap-3">
+      <%= render ButtonComponent.new(
+            title: t('cookie_consent.reject'),
+            type: 'button',
+            ghost: true,
+            data: { action: 'click->posthog#reject' }
+          ) %>
+
+      <%= render ButtonComponent.new(
+            title: t('cookie_consent.accept'),
+            type: 'button',
+            data: { action: 'click->posthog#accept' }
+          ) %>
+    </div>
+  <% end %>
+</section>
