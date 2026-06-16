@@ -10,6 +10,7 @@ export default class extends Controller {
   static values = {
     apiKey: String,
     apiHost: String,
+    uiHost: String,
   };
 
   connect() {
@@ -56,6 +57,7 @@ export default class extends Controller {
 
     window.posthog.init(this.apiKeyValue, {
       api_host: this.apiHostValue,
+      ui_host: this.uiHostValue,
       cookieless_mode: "on_reject",
       person_profiles: "identified_only",
       opt_out_capturing_by_default: true,

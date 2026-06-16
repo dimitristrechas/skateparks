@@ -111,7 +111,8 @@
     <% if cookie_consent_enabled? %>
       data-controller="posthog"
       data-posthog-api-key-value="<%= ENV["POSTHOG_API_KEY"] %>"
-      data-posthog-api-host-value="https://eu.i.posthog.com"
+      data-posthog-api-host-value="https://t.skateparks.gr"
+      data-posthog-ui-host-value="https://eu.posthog.com"
     <% end %>
   >
     <%= render "home/header" %>
