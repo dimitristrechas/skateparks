@@ -9,7 +9,7 @@
     "linear": {
       "url": "https://mcp.linear.app/mcp",
       "headers": {
-        "Authorization": "Bearer {env:LINEAR_MCP_TOKEN}"
+        "Authorization": "Bearer ${env:LINEAR_MCP_TOKEN}"
       }
     }
   }
