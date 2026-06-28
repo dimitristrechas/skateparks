@@ -16,15 +16,9 @@
     - `export GITHUB_MCP_TOKEN=<your-token>`
     - `export LINEAR_MCP_TOKEN=<your-token>`
 
-### MCP Secrets (OpenCode)
+    All AI tools (Cursor, Claude Code, OpenCode) read these env vars. Config files that must stay in sync: `opencode.json`, `.mcp.json`, and `.cursor/mcp.json`. See [.agent-docs/ai-tooling.md](.agent-docs/ai-tooling.md).
 
-MCP integrations in `opencode.json` use tokens stored in `.secrets/`:
-
-1. `mkdir .secrets`
-2. Add token files (raw token, no extension):
-   - `.secrets/github-mcp-token`
-   - `.secrets/linear-token`
-3. Folder is gitignored
+    **Optional:** store raw tokens in `.secrets/` (gitignored) and export from there, e.g. `export GITHUB_MCP_TOKEN=$(cat .secrets/github-mcp-token)`.
 
 ### How to run tests
 
