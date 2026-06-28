@@ -110,7 +110,7 @@ GEM
     connection_pool (2.5.5)
     countries (8.0.2)
       unaccent (~> 0.3)
-    crass (1.0.6)
+    crass (1.0.7)
     cronex (0.15.0)
       tzinfo
       unicode (>= 0.4.4.5)
