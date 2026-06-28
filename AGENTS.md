@@ -8,7 +8,7 @@ Rails 8.1 skatepark directory app (Ruby 3.3.6, PostgreSQL 17, Hotwire, Tailwind 
 
 - Do not commit unless explicitly instructed
 - All code must pass linting (RuboCop, Herb, Prettier)
-- Prefer `sh scripts.sh` for development server, test server, lint, and formatter workflows whenever it supports the task. Fall back to direct `docker compose`, `bundle`, or `yarn` commands only when `scripts.sh` does not cover the needed operation or automation requires a non-interactive command.
+- Prefer `sh scripts.sh` for development server, test server, lint, and formatter workflows whenever it supports the task. Fall back to direct `docker compose`, `bundle`, or `pnpm` commands only when `scripts.sh` does not cover the needed operation or automation requires a non-interactive command.
 
 ## Product quality (i18n, a11y, performance, UI)
 

@@ -64,9 +64,9 @@ docker compose -f docker-compose.test.yml exec skateparks-web-test bin/rails tes
 
 ```bash
 bundle exec rubocop -A              # Auto-fix Ruby
-yarn herb:lint --fix                # Fix ERB lint violations
-yarn herb:format                    # Format ERB
-yarn prettier:fix                   # Fix JS/CSS/JSON
+pnpm herb:lint --fix                # Fix ERB lint violations
+pnpm herb:format                    # Format ERB
+pnpm prettier:fix                   # Fix JS/CSS/JSON
 bundle exec brakeman -q --no-pager  # Security scan
 bundle exec bundle-audit check --update  # Gem vulnerability scan
 ```
@@ -79,7 +79,7 @@ cd skateparks
 # Get key files from team: config/credentials/development.key, test.key, production.key
 cp .env.example .env && cp .env.example .env.test
 # Fill in .env and .env.test (RAILS_MASTER_KEY = contents of dev.key / test.key)
-bundle install && yarn
+bundle install && corepack enable && pnpm install
 lefthook install
 sh scripts.sh  # → "Fresh build & start development server"
 ```
@@ -109,9 +109,9 @@ Then in shell profile: `export GITHUB_MCP_TOKEN=$(cat ~/path/to/.secrets/github-
 Seven jobs in `.github/workflows/ci-cd.yml`:
 
 1. **workflow-lint** — `actionlint` plus `hadolint` for `Dockerfile`, `Dockerfile.development`, and `Dockerfile.test`
-2. **test** — `bundle install` → conditional `yarn install` → `db:create + schema:load` → conditional `assets:precompile` → `bin/rails test` across the test directories
+2. **test** — `bundle install` → conditional `pnpm install` → `db:create + schema:load` → conditional `assets:precompile` → `bin/rails test` across the test directories
 3. **rubocop-brakeman** — `rails zeitwerk:check` + `rubocop --force-exclusion` + `brakeman -q --no-pager` + `bundle-audit check --update`
-4. **herb-prettier** — `prettier:check` + `herb:lint` + `herb:format:check` + `yarn audit --audit-level moderate`
+4. **herb-prettier** — `prettier:check` + `herb:lint` + `herb:format:check` + `pnpm audit --audit-level moderate`
 5. **docker-validate** — PR-only `linux/arm64` application image build validation
 6. **docker-publish** — push-to-`main` GHCR image build and publish
 7. **deploy** — push-to-`main` Dokploy webhook trigger

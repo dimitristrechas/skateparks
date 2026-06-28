@@ -46,7 +46,7 @@ node_modules
 
 .idea
 /skateparks.iml
-/yarn-error.log
+/pnpm-debug.log
 /.claude/settings.local.json
 /coverage/
 /spec/examples.txt

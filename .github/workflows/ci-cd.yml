@@ -122,7 +122,7 @@ jobs:
           path: |
             public/assets
             app/assets/builds
-          key: assets-${{ runner.os }}-${{ hashFiles('app/assets/**', 'app/javascript/**', 'app/stylesheets/**', 'package.json', 'yarn.lock', 'Gemfile.lock') }}
+          key: assets-${{ runner.os }}-${{ hashFiles('app/assets/**', 'app/javascript/**', 'app/stylesheets/**', 'package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml', 'Gemfile.lock') }}
           restore-keys: |
             assets-${{ runner.os }}-
 
@@ -131,8 +131,8 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: yarn
-          cache-dependency-path: yarn.lock
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
 
       - name: Enable Corepack
         if: steps.cache-assets.outputs.cache-hit != 'true'
@@ -140,7 +140,7 @@ jobs:
 
       - name: Install JS dependencies
         if: steps.cache-assets.outputs.cache-hit != 'true'
-        run: yarn install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Setup database
         run: bundle exec rails db:create db:schema:load
@@ -177,14 +177,14 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: yarn
-          cache-dependency-path: yarn.lock
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
       - run: corepack enable
-      - run: yarn install --frozen-lockfile
-      - run: yarn prettier:check
-      - run: yarn herb:lint
-      - run: yarn herb:format:check
-      - run: yarn audit --audit-level moderate
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm prettier:check
+      - run: pnpm herb:lint
+      - run: pnpm herb:format:check
+      - run: pnpm audit --audit-level moderate
 
   docker-validate:
     runs-on: ubuntu-24.04-arm

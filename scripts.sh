@@ -67,7 +67,7 @@ echo -e "${GREEN}--- Tests & Linting & Formatting ---${NC}"
 echo -e " ${BLUE}(12)${NC} Run tests"
 echo -e " ${BLUE}(13)${NC} Run Brakeman security scan"
 echo -e " ${BLUE}(14)${NC} Run bundle-audit security scan"
-echo -e " ${BLUE}(15)${NC} Run yarn audit"
+echo -e " ${BLUE}(15)${NC} Run pnpm audit"
 echo -e " ${BLUE}(16)${NC} Check Herb format"
 echo -e " ${BLUE}(17)${NC} Run Herb format"
 echo -e " ${BLUE}(18)${NC} Check Herb lint"
@@ -200,17 +200,17 @@ case $OPTION in
     ;;
 
     15)
-    echo -e "${GREEN}Running yarn audit...${NC}"
-    if yarn audit --audit-level moderate; then
-        echo -e "${GREEN}✅ No yarn vulnerabilities found${NC}"
+    echo -e "${GREEN}Running pnpm audit...${NC}"
+    if pnpm audit --audit-level moderate; then
+        echo -e "${GREEN}✅ No dependency vulnerabilities found${NC}"
     else
-        echo -e "${RED}❌ Yarn vulnerabilities detected${NC}"
+        echo -e "${RED}❌ Dependency vulnerabilities detected${NC}"
     fi
     ;;
 
     16)
     echo -e "${GREEN}Checking Herb format...${NC}"
-    if yarn herb:format:check; then
+    if pnpm herb:format:check; then
         echo -e "${GREEN}✅ ERB files are properly formatted${NC}"
     else
         echo -e "${RED}❌ ERB files need formatting${NC}"
@@ -219,7 +219,7 @@ case $OPTION in
 
     17)
     echo -e "${GREEN}Formatting ERB files with Herb...${NC}"
-    if yarn herb:format; then
+    if pnpm herb:format; then
         echo -e "${GREEN}✅ ERB files formatted successfully${NC}"
     else
         echo -e "${RED}❌ Failed to format ERB files${NC}"
@@ -228,7 +228,7 @@ case $OPTION in
 
     18)
     echo -e "${GREEN}Linting ERB files with Herb...${NC}"
-    if yarn herb:lint; then
+    if pnpm herb:lint; then
         echo -e "${GREEN}✅ No Herb lint errors found${NC}"
     else
         echo -e "${RED}❌ Herb lint errors detected${NC}"
@@ -237,7 +237,7 @@ case $OPTION in
 
     19)
     echo -e "${GREEN}Running Herb lint auto-fix...${NC}"
-    if yarn herb:lint:fix; then
+    if pnpm herb:lint:fix; then
         echo -e "${GREEN}✅ Herb lint issues fixed${NC}"
     else
         echo -e "${YELLOW}⚠️  Some issues could not be auto-fixed${NC}"
@@ -260,7 +260,7 @@ case $OPTION in
 
     22)
     echo -e "${GREEN}Checking Prettier errors...${NC}"
-    if yarn prettier:check; then
+    if pnpm prettier:check; then
         echo -e "${GREEN}✅ No Prettier errors found${NC}"
     else
         echo -e "${RED}❌ Prettier errors detected${NC}"
@@ -269,7 +269,7 @@ case $OPTION in
 
     23)
     echo -e "${GREEN}Running Prettier...${NC}"
-    if yarn prettier:fix; then
+    if pnpm prettier:fix; then
         echo -e "${GREEN}✅ Files formatted with Prettier successfully${NC}"
     else
         echo -e "${RED}❌ Failed to format files with Prettier${NC}"
