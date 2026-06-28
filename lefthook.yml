@@ -2,19 +2,19 @@ pre-commit:
   commands:
     prettier-fix:
       glob: "*.{js,ts,json,css}"
-      run: yarn prettier --write {staged_files}
+      run: pnpm prettier --write {staged_files}
       stage_fixed: true
       priority: 1
 
     herb-format-fix:
       glob: "*.erb"
-      run: yarn herb:format {staged_files}
+      run: pnpm herb:format {staged_files}
       stage_fixed: true
       priority: 1
 
     herb-lint-fix:
       glob: "*.erb"
-      run: yarn herb:lint --fix {staged_files}
+      run: pnpm herb:lint --fix {staged_files}
       stage_fixed: true
       priority: 1
 
@@ -26,7 +26,7 @@ pre-commit:
 
     herb-lint:
       glob: "*.erb"
-      run: yarn herb:lint {staged_files}
+      run: pnpm herb:lint {staged_files}
       priority: 2
 
     rubocop:

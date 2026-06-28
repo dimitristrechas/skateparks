@@ -7,11 +7,11 @@
 ```bash
 bundle exec rubocop                 # Check Ruby
 bundle exec rubocop -A              # Auto-fix Ruby
-yarn herb:lint                      # Lint ERB
-yarn herb:lint --fix                # Fix ERB lint
-yarn herb:format                    # Format ERB
-yarn prettier:check                 # Check JS/CSS/JSON
-yarn prettier:fix                   # Fix JS/CSS/JSON
+pnpm herb:lint                      # Lint ERB
+pnpm herb:lint --fix                # Fix ERB lint
+pnpm herb:format                    # Format ERB
+pnpm prettier:check                 # Check JS/CSS/JSON
+pnpm prettier:fix                   # Fix JS/CSS/JSON
 bundle exec brakeman -q --no-pager  # Security scan
 bundle exec bundle-audit check --update  # Gem vulnerability scan
 ```
