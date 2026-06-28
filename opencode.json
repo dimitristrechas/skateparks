@@ -39,25 +39,19 @@
   },
   "mcp": {
     "github": {
-      "type": "local",
-      "command": [
-        "npx",
-        "-y",
-        "@modelcontextprotocol/server-github",
-        "--owner",
-        "dimitristrechas",
-        "--repo",
-        "skateparks"
-      ],
+      "type": "remote",
+      "url": "https://api.githubcopilot.com/mcp/",
       "enabled": true,
-      "environment": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "{env:GITHUB_MCP_TOKEN}"
+      "oauth": false,
+      "headers": {
+        "Authorization": "Bearer {env:GITHUB_MCP_TOKEN}"
       }
     },
     "linear": {
       "type": "remote",
       "url": "https://mcp.linear.app/mcp",
       "enabled": true,
+      "oauth": false,
       "headers": {
         "Authorization": "Bearer {env:LINEAR_MCP_TOKEN}"
       }

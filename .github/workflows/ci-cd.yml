@@ -126,6 +126,10 @@ jobs:
           restore-keys: |
             assets-${{ runner.os }}-
 
+      - name: Install pnpm
+        if: steps.cache-assets.outputs.cache-hit != 'true'
+        uses: pnpm/action-setup@v4
+
       - name: Set up Node
         if: steps.cache-assets.outputs.cache-hit != 'true'
         uses: actions/setup-node@v6
@@ -133,10 +137,6 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
-
-      - name: Enable Corepack
-        if: steps.cache-assets.outputs.cache-hit != 'true'
-        run: corepack enable
 
       - name: Install JS dependencies
         if: steps.cache-assets.outputs.cache-hit != 'true'
@@ -174,12 +174,12 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
-      - run: corepack enable
       - run: pnpm install --frozen-lockfile
       - run: pnpm prettier:check
       - run: pnpm herb:lint

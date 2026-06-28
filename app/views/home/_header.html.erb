@@ -1,4 +1,4 @@
-<header data-controller="header" class="mb-8 sm:mb-12 flex flex-wrap items-start gap-2 lg:mb-20">
+<header data-controller="header" class="mb-8 flex flex-wrap items-start gap-2 sm:mb-12 lg:mb-20">
   <%= link_to root_path, class: 'order-1 sm:order-0 mx-auto sm:mx-0' do %>
     <%= image_tag(
       "logo.png",
@@ -7,7 +7,7 @@
     ) %>
   <% end %>
 
-  <div class="order-0 item ms-auto flex gap-2 sm:gap-4">
+  <div class="item order-0 ms-auto flex gap-2 sm:gap-4">
     <%= render "home/locale_selector" %>
     <%= render "home/dark_mode_switch" %>
   </div>

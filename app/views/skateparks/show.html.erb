@@ -58,7 +58,7 @@
           id="previewImage-<%= index %>"
           role="img"
           class="
-            overflow-hidden cursor-pointer transition-opacity hover:opacity-50 focus-visible:outline
+            cursor-pointer overflow-hidden transition-opacity hover:opacity-50 focus-visible:outline
             focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-neutral-700
             dark:focus-visible:outline-neutral-200
           "
@@ -89,7 +89,7 @@
           type="button"
           id="previewVideo-<%= index %>"
           class="
-            group relative overflow-hidden cursor-pointer transition-opacity hover:opacity-90 focus-visible:outline
+            group relative cursor-pointer overflow-hidden transition-opacity hover:opacity-90 focus-visible:outline
             focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-neutral-700
             dark:focus-visible:outline-neutral-200
           "
@@ -141,9 +141,9 @@
           aria-selected="false"
           tabindex="-1"
           class="
-            rounded-t-lg rounded-b-none border-b-2 border-transparent px-1 py-3 text-sm font-medium transition
-            sm:px-4 sm:text-base cursor-pointer focus-visible:rounded-lg focus-visible:outline
-            focus-visible:outline-offset-1 focus-visible:outline-neutral-700 dark:focus-visible:outline-neutral-200
+            cursor-pointer rounded-t-lg rounded-b-none border-b-2 border-transparent px-1 py-3 text-sm font-medium
+            transition focus-visible:rounded-lg focus-visible:outline focus-visible:outline-offset-1
+            focus-visible:outline-neutral-700 sm:px-4 sm:text-base dark:focus-visible:outline-neutral-200
           "
           data-skatepark-tabs-target="tab"
           data-tab="photos"
@@ -160,9 +160,9 @@
           aria-selected="false"
           tabindex="-1"
           class="
-            rounded-t-lg rounded-b-none border-b-2 border-transparent px-1 py-3 text-sm font-medium transition
-            sm:px-4 sm:text-base cursor-pointer focus-visible:rounded-lg focus-visible:outline
-            focus-visible:outline-offset-1 focus-visible:outline-neutral-700 dark:focus-visible:outline-neutral-200
+            cursor-pointer rounded-t-lg rounded-b-none border-b-2 border-transparent px-1 py-3 text-sm font-medium
+            transition focus-visible:rounded-lg focus-visible:outline focus-visible:outline-offset-1
+            focus-visible:outline-neutral-700 sm:px-4 sm:text-base dark:focus-visible:outline-neutral-200
           "
           data-skatepark-tabs-target="tab"
           data-tab="videos"
@@ -280,7 +280,7 @@
         } %>
       <% end %>
 
-      <div class="absolute inset-x-0 bottom-0 h-24 pointer-events-none"></div>
+      <div class="pointer-events-none absolute inset-x-0 bottom-0 h-24"></div>
 
       <div
         class="absolute inset-x-0 bottom-6 flex flex-wrap items-center justify-center gap-3"
@@ -291,8 +291,8 @@
           <button
             type="button"
             class="
-              h-3 w-3 sm:h-2 sm:w-2 cursor-pointer rounded-full bg-white opacity-50 transition-all
-              focus-visible:outline focus-visible:outline-2 focus-visible:outline-white
+              h-3 w-3 cursor-pointer rounded-full bg-white opacity-50 transition-all focus-visible:outline
+              focus-visible:outline-2 focus-visible:outline-white sm:h-2 sm:w-2
             "
             id="indicatorImage-<%= index %>"
             data-action="click->skatepark#onGalleryImageIndicatorClick focus->skatepark#onGalleryImageIndicatorClick"
@@ -415,8 +415,8 @@
               <button
                 type="button"
                 class="
-                  h-3 w-3 sm:h-2 sm:w-2 cursor-pointer rounded-full bg-white opacity-50 transition-all
-                  focus-visible:outline focus-visible:outline-2 focus-visible:outline-white
+                  h-3 w-3 cursor-pointer rounded-full bg-white opacity-50 transition-all focus-visible:outline
+                  focus-visible:outline-2 focus-visible:outline-white sm:h-2 sm:w-2
                 "
                 id="indicatorVideo-<%= index %>"
                 data-action="click->skatepark#onVideoModalIndicatorClick focus->skatepark#onVideoModalIndicatorClick"
