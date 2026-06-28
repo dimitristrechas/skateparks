@@ -3,7 +3,7 @@
             rel: (@target == '_blank' ? 'noopener noreferrer' : nil),
             aria: (@current ? { current: 'page' } : nil),
             class: class_names(base_classes, current_classes, contained_classes, ghost_classes, large_classes, @classnames) do %>
-  <span class="flex items-center text-center gap-2">
+  <span class="flex items-center gap-2 text-center">
     <%= icon_before if icon_before? %>
     <%= @title %>
     <%= icon_after if icon_after? %>

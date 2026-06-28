@@ -10,11 +10,11 @@ Claude Code subagents (`.claude/agents/*.md`), skills (`.claude/skills/*/SKILL.m
 
 ## Per-tool file map
 
-| Tool | Rules | Subagents | Skills | MCP config | Other |
-| ---- | ----- | --------- | ------ | ---------- | ----- |
-| **Cursor** | `AGENTS.md` + `.cursor/rules/*.mdc` | `.claude/agents/` (canonical); `.cursor/agents/` symlinks for Cursor discovery | `.claude/skills/` (canonical); `.cursor/skills/` symlinks for Cursor discovery | `.cursor/mcp.json` | — |
-| **Claude Code** | `CLAUDE.md` → `AGENTS.md` | `.claude/agents/` (auto-discovered) | `.claude/skills/` (auto-discovered) | `.mcp.json` | `.claude/settings.local.json` gitignored |
-| **OpenCode** | `AGENTS.md` (via agent prompts) | `opencode.json` → `{file:./.claude/agents/...}` | `.claude/skills/` (filesystem; not registered in `opencode.json`) | `opencode.json` `mcp` block | `permission` block (git safety; OpenCode-only) |
+| Tool            | Rules                               | Subagents                                                                      | Skills                                                                         | MCP config                  | Other                                          |
+| --------------- | ----------------------------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------ | --------------------------- | ---------------------------------------------- |
+| **Cursor**      | `AGENTS.md` + `.cursor/rules/*.mdc` | `.claude/agents/` (canonical); `.cursor/agents/` symlinks for Cursor discovery | `.claude/skills/` (canonical); `.cursor/skills/` symlinks for Cursor discovery | `.cursor/mcp.json`          | —                                              |
+| **Claude Code** | `CLAUDE.md` → `AGENTS.md`           | `.claude/agents/` (auto-discovered)                                            | `.claude/skills/` (auto-discovered)                                            | `.mcp.json`                 | `.claude/settings.local.json` gitignored       |
+| **OpenCode**    | `AGENTS.md` (via agent prompts)     | `opencode.json` → `{file:./.claude/agents/...}`                                | `.claude/skills/` (filesystem; not registered in `opencode.json`)              | `opencode.json` `mcp` block | `permission` block (git safety; OpenCode-only) |
 
 **Canonical source for subagents and skills:** `.claude/agents/` and `.claude/skills/`. Cursor symlinks under `.cursor/agents/` and `.cursor/skills/` point at those paths so official Cursor discovery works without duplicating content.
 
@@ -29,13 +29,17 @@ Claude Code subagents (`.claude/agents/*.md`), skills (`.claude/skills/*/SKILL.m
 
 Three files define MCP servers for different clients. **Keep the same servers, URLs, and env var names** across all three.
 
-| File | Client | Notes |
-| ---- | ------ | ----- |
-| `opencode.json` | OpenCode | Uses `{env:VAR}` for environment substitution. Linear uses native `type: remote`. |
-| `.mcp.json` | Claude Code | Uses `${VAR}` (shell-style) for env substitution. Linear uses `mcp-remote` wrapper. |
-| `.cursor/mcp.json` | Cursor | Uses `${env:VAR}` for GitHub token env; `{env:VAR}` for Linear header (Cursor convention). |
+| File               | Client      | Notes                                                                                                                  |
+| ------------------ | ----------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `opencode.json`    | OpenCode    | Uses `{env:VAR}` for environment substitution. Both servers use `type: remote` with `oauth: false` and Bearer headers. |
+| `.mcp.json`        | Claude Code | Uses `${VAR}` (shell-style) for env substitution. Both servers use `type: http` (Streamable HTTP).                     |
+| `.cursor/mcp.json` | Cursor      | Remote Streamable HTTP. GitHub headers use `${env:VAR}`; Linear headers use `{env:VAR}` (Cursor convention).           |
 
 **Required env vars:** `LINEAR_MCP_TOKEN`, `GITHUB_MCP_TOKEN` — names must stay consistent; only the **placeholder syntax** differs per file format.
+
+**Servers:** [GitHub MCP](https://github.com/github/github-mcp-server) remote at `https://api.githubcopilot.com/mcp/`; [Linear MCP](https://linear.app/docs/mcp) at `https://mcp.linear.app/mcp`. The deprecated npm package `@modelcontextprotocol/server-github` is not used.
+
+**Node / `npx`:** [`bin/mcp-npx`](../bin/mcp-npx) remains available for any future stdio MCP servers that need `npx` with a login-shell `PATH` (common with nvm/fnm).
 
 **Optional local storage:** store raw tokens in `.secrets/` (gitignored) and export them to the env vars above in your shell profile. See [README.md](../README.md) setup step 11.
 

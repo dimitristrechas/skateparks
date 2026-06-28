@@ -1,8 +1,8 @@
 <%= render GoSkateDayCountdownComponent.new %>
 
-<h1 class="mb-8 text-center text-lg sm:text-3xl font-bold lg:mb-8"><%= t("explore_all_skateparks") %></h1>
+<h1 class="mb-8 text-center text-lg font-bold sm:text-3xl lg:mb-8"><%= t("explore_all_skateparks") %></h1>
 
-<section class="mb-12 lg:mb-20 flex items-center justify-center gap-2">
+<section class="mb-12 flex items-center justify-center gap-2 lg:mb-20">
   <%= render LinkButtonComponent.new(
     title: t("view_all_skateparks"),
     url: skateparks_path,

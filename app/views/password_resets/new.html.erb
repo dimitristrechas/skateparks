@@ -1,7 +1,7 @@
-<div class="mx-auto md:w-2/3 w-full">
+<div class="mx-auto w-full md:w-2/3">
   <%= render "shared/flash" %>
 
-  <h1 class="font-bold text-4xl"><%= t('passwords.new_title') %></h1>
+  <h1 class="text-4xl font-bold"><%= t('passwords.new_title') %></h1>
 
   <%= form_with url: password_resets_path, class: "contents" do |form| %>
     <div class="my-5">
