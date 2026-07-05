@@ -1,0 +1,116 @@
+<p style="color: green"><%= notice %></p>
+
+<% if alert.present? %>
+  <p class="mb-4 text-red-600 dark:text-red-400" role="alert"><%= alert %></p>
+<% end %>
+
+<div class="mb-8 flex items-center justify-between gap-4">
+  <h1 class="text-3xl font-bold"><%= t("admin.video_suggestions.title") %></h1>
+
+  <% pending_count = @video_suggestions.size %>
+
+  <% if pending_count.positive? %>
+    <span class="rounded-full bg-pink-600/85 px-3 py-1 text-sm text-white dark:bg-pink-600/65">
+      <%= t("admin.video_suggestions.pending_count", count: pending_count) %>
+    </span>
+  <% end %>
+</div>
+
+<div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+  <table class="text-md w-full text-left text-gray-500 rtl:text-right dark:text-gray-400">
+    <thead class="bg-gray-50 text-sm text-gray-700 dark:bg-gray-700 dark:text-gray-400">
+      <tr>
+        <th scope="col" class="px-6 py-3"><%= t("admin.video_suggestions.thumbnail") %></th>
+        <th scope="col" class="px-6 py-3"><%= t("admin.video_suggestions.proposed_for") %></th>
+        <th scope="col" class="px-6 py-3"><%= t("admin.video_suggestions.assign_to") %></th>
+        <th scope="col" class="px-6 py-3"><%= t("admin.video_suggestions.url") %></th>
+        <th scope="col" class="px-6 py-3"><%= t("admin.video_suggestions.submitted_at") %></th>
+        <th scope="col" class="px-6 py-3"><%= t("admin.video_suggestions.actions") %></th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% if @video_suggestions.empty? %>
+        <tr class="border-b bg-white dark:border-gray-700 dark:bg-gray-900">
+          <td colspan="6" class="px-6 py-4 text-center"><%= t("admin.video_suggestions.empty_state") %></td>
+        </tr>
+      <% else %>
+        <% @video_suggestions.each do |video_suggestion| %>
+          <% activate_form_id = dom_id(video_suggestion, :activate) %>
+
+          <tr class="border-b odd:bg-white even:bg-gray-50 dark:border-gray-700 odd:dark:bg-gray-900 even:dark:bg-gray-800">
+            <td class="px-6 py-4">
+              <%= image_tag video_suggestion.thumbnail_url,
+                        alt: t("admin.video_suggestions.thumbnail_alt"),
+                        class: "h-[60px] w-[80px] rounded object-cover" %>
+            </td>
+
+            <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">
+              <%= link_to video_suggestion.proposed_skatepark&.name || video_suggestion.skatepark.name,
+                          edit_admin_skatepark_path(video_suggestion.proposed_skatepark || video_suggestion.skatepark),
+                          class: "hover:underline" %>
+            </td>
+
+            <td class="px-6 py-4">
+              <label for="<%= dom_id(video_suggestion, :skatepark_id) %>" class="sr-only">
+                <%= t("admin.video_suggestions.assign_to") %>
+              </label>
+
+              <select
+                id="<%= dom_id(video_suggestion, :skatepark_id) %>"
+                name="skatepark_id"
+                form="<%= activate_form_id %>"
+                class="
+                  w-full min-w-48 rounded border-neutral-300 p-2 text-sm text-neutral-700 dark:border-neutral-600
+                  dark:bg-gray-800 dark:text-neutral-100
+                "
+              >
+                <% @skateparks.each do |skatepark| %>
+                  <option
+                    value="<%= skatepark.id %>"
+                    <%= "selected" if skatepark.id == video_suggestion.skatepark_id %>
+                  >
+                    <%= skatepark.name %>
+                  </option>
+                <% end %>
+              </select>
+            </td>
+
+            <td class="px-6 py-4">
+              <p class="max-w-xs truncate"><%= video_suggestion.youtube_url %></p>
+            </td>
+
+            <td class="px-6 py-4 whitespace-nowrap"><%= l(video_suggestion.created_at, format: :short) %></td>
+
+            <td class="px-6 py-4">
+              <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+                <%= form_with url: activate_admin_video_suggestion_path(video_suggestion),
+                              method: :post,
+                              id: activate_form_id,
+                              class: "contents" do |activate_form| %>
+                  <%= activate_form.submit t("admin.video_suggestions.activate"),
+                                           class: "cursor-pointer rounded-lg bg-green-600 px-3 py-2 text-sm text-white hover:bg-green-700" %>
+                <% end %>
+
+                <%= button_to t("admin.video_suggestions.reject"),
+                              reject_admin_video_suggestion_path(video_suggestion),
+                              method: :post,
+                              form: { data: { turbo_confirm: t("admin.video_suggestions.reject_confirm") } },
+                              class: "text-red-500 hover:underline" %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<%= render(
+  LinkComponent.new(
+    title: t("back_to_admin"),
+    url: admin_root_path,
+    classnames:
+      "flex flex-col sm:flex-row my-8 gap-4 items-center sm:items-start justify-end",
+  ),
+) %>

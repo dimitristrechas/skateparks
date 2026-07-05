@@ -1,0 +1,11 @@
+<div id="<%= skatepark.present? ? dom_id(skatepark, :video_suggestion_feedback) : "video_suggestion_feedback" %>">
+  <% if local_assigns[:success].present? %>
+    <p class="text-sm text-green-700 dark:text-green-400" role="status"><%= success %></p>
+  <% elsif local_assigns[:errors].present? %>
+    <div class="space-y-1 text-sm text-red-600 dark:text-red-400" role="alert">
+      <% errors.each do |error| %>
+        <p><%= error %></p>
+      <% end %>
+    </div>
+  <% end %>
+</div>

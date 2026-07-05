@@ -52,6 +52,21 @@ el:
     video_thumbnail_alt: "%{name} - Βίντεο %{current} από %{total}"
     image_indicators: "Δείκτες φωτογραφιών"
     video_indicators: "Δείκτες βίντεο"
+  skateparks:
+    not_found: "Δεν βρέθηκε αυτό το skatepark. Μπορεί να έχει αφαιρεθεί ή ο σύνδεσμος να είναι παλιός."
+    video_suggestion:
+      cta: "Πρότεινε βίντεο"
+      dialog_title: "Πρότεινε βίντεο"
+      empty_state_title: "Δεν υπάρχουν βίντεο ακόμα"
+      instructions: "Επικόλλησε ένα YouTube link που δείχνει αυτό το skatepark. Θα το ελέγξουμε πριν εμφανιστεί στη σελίδα."
+      url_label: "YouTube URL"
+      url_placeholder: "https://www.youtube.com/watch?v=..."
+      submit: "Υποβολή πρότασης"
+      close_dialog: "Κλείσιμο φόρμας πρότασης"
+      success: "Ευχαριστούμε! Η πρόταση βίντεο υποβλήθηκε για έλεγχο."
+      invalid_url: "Εισάγετε ένα έγκυρο YouTube URL."
+      rate_limit_exceeded: "Πολλές προτάσεις. Δοκιμάστε αργότερα."
+      honeypot_label: "Αφήστε αυτό το πεδίο κενό"
   edit: "Επεξεργασία"
   create: "Δημιουργία"
   about: "Σχετικά με το skateparks.gr"
@@ -161,6 +176,7 @@ el:
       title: "Πίνακας ελέγχου"
       manage_skateparks: "Διαχείριση Skateparks"
       manage_popular_skateparks: "Διαχείριση Δημοφιλών Skateparks"
+      manage_video_suggestions: "Έλεγχος Προτάσεων Βίντεο"
       view_account: "Διαχελιριση Λογαριασμού"
     users:
       title: "Διαχείριση Χρηστών"
@@ -250,6 +266,10 @@ el:
         video_added: "Το βίντεο προστέθηκε στη λίστα"
         invalid_video_url: "Εισάγετε ένα έγκυρο YouTube URL."
         duplicate_video_url: "Αυτό το YouTube URL έχει ήδη προστεθεί."
+        video_statuses:
+          pending: "Σε αναμονή"
+          active: "Ενεργό"
+          rejected: "Απορριφθέν"
     popular_skateparks:
       title: "Δημοφιλή Skateparks"
       add_section_title: "Προσθήκη Δημοφιλούς Skatepark"
@@ -264,6 +284,26 @@ el:
       added_notice: "Το skatepark προστέθηκε στη λίστα δημοφιλών."
       updated_notice: "Η θέση ενημερώθηκε επιτυχώς."
       removed_notice: "Το skatepark αφαιρέθηκε από τη λίστα δημοφιλών."
+    video_suggestions:
+      title: "Προτάσεις βίντεο"
+      pending_count:
+        one: "%{count} σε αναμονή"
+        other: "%{count} σε αναμονή"
+      thumbnail: "Μικρογραφία"
+      thumbnail_alt: "Μικρογραφία προτεινόμενου βίντεο"
+      proposed_for: "Προτάθηκε για"
+      assign_to: "Ανάθεση σε"
+      url: "YouTube URL"
+      submitted_at: "Υποβλήθηκε"
+      actions: "Ενέργειες"
+      activate: "Ενεργοποίηση"
+      reject: "Απόρριψη"
+      reject_confirm: "Απόρριψη αυτής της πρότασης βίντεο;"
+      empty_state: "Δεν υπάρχουν προτάσεις βίντεο σε αναμονή."
+      activated_notice: "Η πρόταση βίντεο ενεργοποιήθηκε."
+      activated_reassigned_notice: "Η πρόταση βίντεο ενεργοποιήθηκε στο %{skatepark}."
+      rejected_notice: "Η πρόταση βίντεο απορρίφθηκε."
+      invalid_skatepark: "Το επιλεγμένο skatepark δεν είναι διαθέσιμο."
   activerecord:
     attributes:
       skatepark:
@@ -271,6 +311,7 @@ el:
         skatepark_videos: "Βίντεο"
       skatepark_video:
         youtube_url: "YouTube URL"
+        status: "Κατάσταση"
     errors:
       models:
         skatepark:
@@ -284,6 +325,11 @@ el:
           attributes:
             youtube_url:
               invalid_format: "πρέπει να είναι έγκυρο YouTube URL"
+              already_published: "Αυτό το βίντεο υπάρχει ήδη στη σελίδα του skatepark."
+              already_pending: "Αυτό το βίντεο έχει ήδη προταθεί και περιμένει έλεγχο."
+              already_submitted: "Αυτό το βίντεο έχει ήδη προταθεί για αυτό το skatepark."
+            proposed_skatepark_id:
+              immutable: "δεν μπορεί να αλλάξει"
   errors:
     messages:
       taken: "έχει ήδη χρησιμοποιηθεί"

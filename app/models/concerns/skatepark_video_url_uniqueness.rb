@@ -14,22 +14,23 @@ module SkateparkVideoUrlUniqueness
   end
 
   def duplicate_video_urls
-    active_skatepark_videos
-      .group_by { |skatepark_video| normalized_video_url(skatepark_video) }
-      .filter_map do |normalized_url, video_records|
-        next if video_records.one?
+    nested_skatepark_videos
+      .group_by { |skatepark_video| normalized_video_id(skatepark_video) }
+      .filter_map do |video_id, video_records|
+        next if video_id.blank? || video_records.one?
 
-        normalized_url
+        video_records.first.youtube_url.to_s.strip
       end
   end
 
-  def active_skatepark_videos
+  def nested_skatepark_videos
     skatepark_videos.reject(&:marked_for_destruction?).select do |skatepark_video|
       skatepark_video.youtube_url.present?
     end
   end
 
-  def normalized_video_url(skatepark_video)
-    skatepark_video.youtube_url.to_s.strip
+  def normalized_video_id(skatepark_video)
+    skatepark_video.youtube_video_id.presence ||
+      SkateparkVideo.extract_video_id(skatepark_video.youtube_url)
   end
 end

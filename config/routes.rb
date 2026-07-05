@@ -12,6 +12,12 @@ Rails.application.routes.draw do
     root to: 'dashboard#index'
     resources :skateparks
     resources :popular_skateparks, only: %i[index create update destroy], path: 'skateparks_popular'
+    resources :video_suggestions, only: :index do
+      member do
+        post :activate
+        post :reject
+      end
+    end
     resources :users, only: %i[index show] do
       member do
         post :ban
@@ -36,7 +42,9 @@ Rails.application.routes.draw do
     get '/skateparks/32-elefsina' => redirect('/skateparks/35-elefsina', status: 301)
   end
 
-  resources :skateparks
+  resources :skateparks do
+    resource :video_suggestion, only: :create, module: :skateparks
+  end
 
   get 'available_states(/:country_code)', to: 'skateparks#available_states'
 

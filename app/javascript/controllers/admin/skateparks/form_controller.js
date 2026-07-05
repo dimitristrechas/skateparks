@@ -1,11 +1,11 @@
 import Sortable from "sortablejs";
 import { Controller } from "@hotwired/stimulus";
+import { extractYouTubeVideoId, thumbnailUrlFor } from "lib/youtube_url";
 
 const ACTIVE_SORT_CLASSES = ["bg-neutral-50", "dark:bg-gray-800", "shadow-md"];
 const DISABLED_BUTTON_CLASSES = ["cursor-not-allowed", "opacity-50"];
 const SORTABLE_ITEM_SELECTOR = "[data-sortable-item]";
 const VISIBLE_SORTABLE_ITEM_SELECTOR = `${SORTABLE_ITEM_SELECTOR}:not([data-destroyed='true'])`;
-const YOUTUBE_VIDEO_ID_REGEX = /^[\w-]{11}$/;
 
 export default class extends Controller {
   static targets = [
@@ -152,7 +152,7 @@ export default class extends Controller {
     this.clearVideoUrlError();
     if (!youtubeUrl) return;
 
-    const videoId = this.extractYouTubeVideoId(youtubeUrl);
+    const videoId = extractYouTubeVideoId(youtubeUrl);
     if (!videoId) {
       this.reportVideoUrlError(this.invalidVideoUrlValue);
       return;
@@ -407,7 +407,7 @@ export default class extends Controller {
     const urlLabel = fragment.querySelector("[data-video-url-label]");
 
     item.dataset.newRecord = "true";
-    preview.src = this.thumbnailUrlFor(videoId);
+    preview.src = thumbnailUrlFor(videoId);
     urlField.value = youtubeUrl;
     urlLabel.textContent = youtubeUrl;
 
@@ -529,42 +529,5 @@ export default class extends Controller {
         this.syncReorderedItems(item, oldDraggableIndex ?? oldIndex, newDraggableIndex ?? newIndex);
       },
     });
-  }
-
-  extractYouTubeVideoId(url) {
-    try {
-      const parsedUrl = new URL(url);
-      const host = parsedUrl.hostname.replace(/^www\./, "");
-      const pathSegments = parsedUrl.pathname.split("/").filter(Boolean);
-
-      let candidate;
-
-      switch (host) {
-        case "youtu.be":
-          candidate = pathSegments[0];
-          break;
-        case "youtube.com":
-        case "m.youtube.com":
-          if (pathSegments[0] === "watch") {
-            candidate = parsedUrl.searchParams.get("v");
-          } else if (["shorts", "embed", "v"].includes(pathSegments[0])) {
-            candidate = pathSegments[1];
-          }
-          break;
-        case "youtube-nocookie.com":
-          if (pathSegments[0] === "embed") candidate = pathSegments[1];
-          break;
-        default:
-          candidate = null;
-      }
-
-      return YOUTUBE_VIDEO_ID_REGEX.test(candidate || "") ? candidate : null;
-    } catch {
-      return null;
-    }
-  }
-
-  thumbnailUrlFor(videoId) {
-    return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
   }
 }

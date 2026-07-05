@@ -253,20 +253,22 @@ class SkateparksControllerTest < ActionDispatch::IntegrationTest
     assert_equal @skatepark, assigns(:skatepark)
   end
 
-  def test_get_show_returns_not_found_for_draft_skatepark
+  def test_get_show_redirects_to_homepage_for_draft_skatepark
     draft_skatepark = create(:skatepark, :draft)
 
     get skatepark_path(draft_skatepark)
 
-    assert_response :not_found
+    assert_redirected_to root_path
+    assert_equal I18n.t('skateparks.not_found'), flash[:alert]
   end
 
-  def test_get_show_returns_not_found_for_archived_skatepark
+  def test_get_show_redirects_to_homepage_for_archived_skatepark
     archived_skatepark = create(:skatepark, :archived)
 
     get skatepark_path(archived_skatepark)
 
-    assert_response :not_found
+    assert_redirected_to root_path
+    assert_equal I18n.t('skateparks.not_found'), flash[:alert]
   end
 
   def test_get_show_sets_meta_tags
@@ -277,10 +279,62 @@ class SkateparksControllerTest < ActionDispatch::IntegrationTest
     assert_equal url_for(@skatepark.cover_image), assigns(:meta_image)
   end
 
-  def test_get_show_raises_error_if_skatepark_not_found
+  def test_get_show_redirects_to_homepage_when_skatepark_not_found
     get skatepark_path('nonexistent-id')
 
-    assert_response :not_found
+    assert_redirected_to root_path
+    assert_equal I18n.t('skateparks.not_found'), flash[:alert]
+  end
+
+  def test_get_show_redirects_to_homepage_for_stale_slug
+    get skatepark_path("#{@skatepark.id}-wrong-slug-name")
+
+    assert_redirected_to root_path
+    assert_equal I18n.t('skateparks.not_found'), flash[:alert]
+  end
+
+  def test_get_show_includes_videos_tab_when_no_active_videos
+    get skatepark_path(@skatepark)
+
+    assert_response :success
+    assert_includes response.body, 'videos-tab'
+    assert_includes response.body, I18n.t('skateparks.video_suggestion.cta')
+    assert_includes response.body, 'video_suggestion_dialog'
+  end
+
+  def test_importmap_includes_video_suggestion_assets
+    get root_path
+
+    assert_response :success
+
+    importmap_json = response.body[%r{type="importmap"[^>]*>(\{.*?\})</script>}m, 1]
+
+    assert importmap_json, 'expected importmap script on page'
+
+    imports = JSON.parse(importmap_json).fetch('imports')
+
+    assert imports.key?('controllers/skatepark_video_suggestion_controller')
+    assert imports.key?('lib/youtube_url')
+  end
+
+  def test_get_show_does_not_render_pending_videos
+    create(:skatepark_video, :pending, skatepark: @skatepark, youtube_url: 'https://youtu.be/dQw4w9WgXcQ')
+
+    get skatepark_path(@skatepark)
+
+    assert_response :success
+    assert_not_includes response.body, 'previewVideo-0'
+  end
+
+  def test_get_show_renders_active_videos_only
+    create(:skatepark_video, skatepark: @skatepark, youtube_url: 'https://youtu.be/dQw4w9WgXcQ')
+    create(:skatepark_video, :pending, skatepark: @skatepark, youtube_url: 'https://youtu.be/00000000001')
+
+    get skatepark_path(@skatepark)
+
+    assert_response :success
+    assert_includes response.body, 'previewVideo-0'
+    assert_not_includes response.body, 'previewVideo-1'
   end
 
   def test_get_available_states_returns_json_with_country_code

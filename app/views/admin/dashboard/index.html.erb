@@ -19,6 +19,13 @@
     ) %>
 
   <%= render LinkButtonComponent.new(
+      title: t('admin.dashboard.manage_video_suggestions'),
+      url: admin_video_suggestions_path,
+      large: true,
+      ghost: true
+    ) %>
+
+  <%= render LinkButtonComponent.new(
       title: t('admin.users.title'),
       url: admin_users_path,
       large: true,

@@ -13,7 +13,10 @@ class SkateparkVideoTest < ActiveSupport::TestCase
   end
 
   def test_requires_position_to_be_a_positive_integer
-    skatepark_video = build(:skatepark_video, position: 0)
+    skatepark_video = create(:skatepark_video)
+
+    skatepark_video.position = 0
+    skatepark_video.allow_negative_position = false
 
     assert_not skatepark_video.valid?
 
@@ -70,7 +73,31 @@ class SkateparkVideoTest < ActiveSupport::TestCase
     duplicate_video = build(:skatepark_video, skatepark: skatepark, youtube_url: 'https://youtu.be/dQw4w9WgXcQ')
 
     assert_not duplicate_video.valid?
-    assert_includes duplicate_video.errors[:youtube_url], 'has already been taken'
+    assert_includes duplicate_video.errors[:youtube_url],
+                    I18n.t('activerecord.errors.models.skatepark_video.attributes.youtube_url.already_published')
+  end
+
+  def test_rejects_duplicate_video_id_from_different_url_format
+    skatepark = create(:skatepark)
+    create(:skatepark_video, skatepark: skatepark, youtube_url: 'https://youtu.be/dQw4w9WgXcQ')
+
+    duplicate_video = build(
+      :skatepark_video,
+      skatepark: skatepark,
+      youtube_url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+    )
+
+    assert_not duplicate_video.valid?
+    assert_includes duplicate_video.errors[:youtube_url],
+                    I18n.t('activerecord.errors.models.skatepark_video.attributes.youtube_url.already_published')
+    assert_equal 'dQw4w9WgXcQ', duplicate_video.youtube_video_id
+  end
+
+  def test_rejects_youtube_url_longer_than_255_characters
+    skatepark_video = build(:skatepark_video, youtube_url: "https://youtu.be/#{'a' * 250}")
+
+    assert_not skatepark_video.valid?
+    assert_includes skatepark_video.errors[:youtube_url], 'is too long (maximum is 255 characters)'
   end
 
   def test_allows_same_youtube_url_for_different_skateparks
@@ -88,7 +115,7 @@ class SkateparkVideoTest < ActiveSupport::TestCase
     assert_equal 'https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg', skatepark_video.thumbnail_url
   end
 
-  def test_updates_counter_cache_on_create_and_destroy
+  def test_updates_counter_cache_for_active_videos_only
     skatepark = create(:skatepark)
     skatepark_video = nil
 
@@ -96,9 +123,41 @@ class SkateparkVideoTest < ActiveSupport::TestCase
       skatepark_video = create(:skatepark_video, skatepark: skatepark)
     end
 
+    assert_no_difference(-> { skatepark.reload.skatepark_videos_count }) do
+      create(:skatepark_video, :pending, skatepark: skatepark)
+    end
+
     assert_difference(-> { skatepark.reload.skatepark_videos_count }, -1) do
       skatepark_video.destroy!
     end
+  end
+
+  def test_pending_video_defaults_to_pending_status
+    skatepark_video = build(:skatepark_video, :pending)
+
+    assert_predicate skatepark_video, :valid?
+    assert_predicate skatepark_video, :pending?
+    assert_equal 0, skatepark_video.position
+  end
+
+  def test_rejected_url_can_be_resubmitted_for_same_skatepark
+    skatepark = create(:skatepark)
+    create(:skatepark_video, :rejected, skatepark: skatepark, youtube_url: 'https://youtu.be/dQw4w9WgXcQ')
+
+    duplicate_video = build(:skatepark_video, :pending, skatepark: skatepark, youtube_url: 'https://youtu.be/dQw4w9WgXcQ')
+
+    assert_predicate duplicate_video, :valid?
+  end
+
+  def test_pending_duplicate_reports_clear_error_message
+    skatepark = create(:skatepark)
+    create(:skatepark_video, :pending, skatepark: skatepark, youtube_url: 'https://youtu.be/dQw4w9WgXcQ')
+
+    duplicate_video = build(:skatepark_video, :pending, skatepark: skatepark, youtube_url: 'https://youtu.be/dQw4w9WgXcQ')
+
+    assert_not duplicate_video.valid?
+    assert_includes duplicate_video.errors[:youtube_url],
+                    I18n.t('activerecord.errors.models.skatepark_video.attributes.youtube_url.already_pending')
   end
 
   def test_clears_homepage_caches_when_saved_and_destroyed

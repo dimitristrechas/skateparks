@@ -1,24 +1,37 @@
 require 'cgi'
 require 'uri'
 
-class SkateparkVideo < ApplicationRecord
+class SkateparkVideo < ApplicationRecord # rubocop:disable Metrics/ClassLength
   include ReorderablePosition
 
-  YOUTUBE_VIDEO_ID_REGEX = /\A[\w-]{11}\z/
+  YOUTUBE_VIDEO_ID_REGEX = /\A[A-Za-z0-9_-]{11}\z/
 
-  belongs_to :skatepark, counter_cache: true, inverse_of: :skatepark_videos, touch: true
+  enum :status, { pending: 0, active: 1, rejected: 2 }
+
+  belongs_to :skatepark, inverse_of: :skatepark_videos, touch: true
+  belongs_to :proposed_skatepark, class_name: 'Skatepark', optional: true, inverse_of: :proposed_skatepark_videos
 
   scope :ordered, -> { order(:position, :id) }
+  scope :active, -> { where(status: statuses[:active]) }
+  scope :pending_review, -> { where(status: statuses[:pending]) }
 
-  validates :youtube_url, presence: true
-  validates :youtube_url, uniqueness: { scope: :skatepark_id }, unless: :duplicate_url_reported_on_skatepark?
+  validates :youtube_url, presence: true, length: { maximum: 255 }
   validate :youtube_url_format
+  validate :unique_youtube_video_id_per_skatepark, unless: :duplicate_url_reported_on_skatepark?
+  validate :proposed_skatepark_immutable, on: :update
 
-  after_destroy :clear_homepage_caches
-  after_save :clear_homepage_caches
+  before_validation :assign_youtube_video_id
+  before_validation :prepare_non_active_position
+  before_validation :assign_active_position_if_needed, if: lambda {
+    active? && (new_record? || will_save_change_to_status?)
+  }
+  before_create :remove_stale_rejected_duplicates
+  after_destroy :clear_homepage_caches_if_active
+  after_save :clear_homepage_caches_if_active
+  after_commit :sync_skatepark_active_videos_count, on: %i[create update destroy]
 
   def youtube_video_id
-    self.class.extract_video_id(youtube_url)
+    self[:youtube_video_id].presence || self.class.extract_video_id(youtube_url)
   end
 
   def embed_url
@@ -40,6 +53,10 @@ class SkateparkVideo < ApplicationRecord
     candidate = candidate_video_id_for(uri)
 
     candidate if candidate&.match?(YOUTUBE_VIDEO_ID_REGEX)
+  end
+
+  def self.next_active_position_for(skatepark)
+    skatepark.skatepark_videos.active.maximum(:position).to_i + 1
   end
 
   def self.extract_youtube_dot_com_video_id(path_segments, query)
@@ -83,18 +100,69 @@ class SkateparkVideo < ApplicationRecord
 
   private
 
+  def prepare_non_active_position
+    return if active?
+
+    self.position = 0
+    self.allow_negative_position = true
+  end
+
+  def assign_active_position_if_needed
+    return if skatepark.blank?
+    return if position.to_i.positive?
+
+    self.position = self.class.next_active_position_for(skatepark)
+    self.allow_negative_position = false
+  end
+
+  def assign_youtube_video_id
+    self[:youtube_video_id] = self.class.extract_video_id(youtube_url)
+  end
+
+  def proposed_skatepark_immutable
+    return unless proposed_skatepark_id_changed? && proposed_skatepark_id_was.present?
+
+    errors.add(:proposed_skatepark_id, :immutable)
+  end
+
   def youtube_url_format
-    return if youtube_url.blank? || youtube_video_id.present?
+    return if youtube_url.blank?
+    return if youtube_video_id.present?
 
     errors.add(:youtube_url, :invalid_format)
   end
 
   def duplicate_url_reported_on_skatepark?
-    return false if skatepark.blank? || normalized_youtube_url.blank?
+    return false if skatepark.blank? || youtube_video_id.blank?
 
     skatepark.errors.where(:skatepark_videos, :duplicate_video).any? do |error|
-      error.options[:youtube_url].to_s == normalized_youtube_url
+      self.class.extract_video_id(error.options[:youtube_url]) == youtube_video_id
     end
+  end
+
+  def unique_youtube_video_id_per_skatepark
+    return if youtube_video_id.blank? || skatepark_id.blank?
+
+    scope = self.class.where(skatepark_id: skatepark_id, youtube_video_id: youtube_video_id)
+                .where(status: %i[pending active])
+    scope = scope.where.not(id: id) if persisted?
+    existing = scope.first
+    return unless existing
+
+    errors.add(:youtube_url, existing.active? ? :already_published : :already_pending)
+  end
+
+  def remove_stale_rejected_duplicates
+    return if youtube_video_id.blank? || skatepark_id.blank?
+
+    self.class.rejected.where(skatepark_id: skatepark_id, youtube_video_id: youtube_video_id).delete_all
+  end
+
+  def clear_homepage_caches_if_active
+    was_active = saved_change_to_status? && status_before_last_save == 'active'
+    return unless active? || was_active
+
+    clear_homepage_caches
   end
 
   def clear_homepage_caches
@@ -102,7 +170,11 @@ class SkateparkVideo < ApplicationRecord
     Rails.cache.delete(Skatepark.homepage_popular_cache_key)
   end
 
-  def normalized_youtube_url
-    youtube_url.to_s.strip
+  def sync_skatepark_active_videos_count
+    affected_skatepark_ids = [skatepark_id, skatepark_id_before_last_save].compact.uniq
+    affected_skatepark_ids.each do |affected_skatepark_id|
+      active_count = SkateparkVideo.active.where(skatepark_id: affected_skatepark_id).count
+      Skatepark.where(id: affected_skatepark_id).update_all(skatepark_videos_count: active_count) # rubocop:disable Rails/SkipsModelValidations
+    end
   end
 end

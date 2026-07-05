@@ -39,6 +39,7 @@ services:
       - PORT=${PORT:-3002}
       - ADMIN_EMAIL=${ADMIN_EMAIL}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - LISTEN_GEM_USE_POLLING=true
     volumes:
       - app-storage:/rails/storage
       - ${CODEBASE_VOLUME}:/rails

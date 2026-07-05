@@ -1,0 +1,43 @@
+<div class="mb-6 grid auto-rows-[8rem] grid-cols-3 gap-1 sm:mb-8 md:auto-rows-[14rem] lg:grid-cols-4 xl:auto-rows-[20rem]">
+  <% skatepark_videos.each_with_index do |skatepark_video, index| %>
+    <button
+      type="button"
+      id="previewVideo-<%= index %>"
+      class="
+        group relative cursor-pointer overflow-hidden transition-opacity hover:opacity-90 focus-visible:outline
+        focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-neutral-700
+        dark:focus-visible:outline-neutral-200
+      "
+      data-skatepark-target="previewVideo"
+      data-action="click->skatepark#onVideoClick"
+      data-embed-url="<%= skatepark_video.embed_url %>"
+      aria-label="<%= t('view_video_in_player', number: index + 1) %>"
+    >
+      <%= image_tag skatepark_video.thumbnail_url,
+                class: "h-full w-full object-cover",
+                loading: index < 5 ? "eager" : "lazy",
+                alt: t("skatepark.video_thumbnail_alt",
+                       name: skatepark.name,
+                       current: index + 1,
+                       total: skatepark_videos.length) %>
+
+      <span class="pointer-events-none absolute inset-0 bg-neutral-950/20"></span>
+
+      <span class="pointer-events-none absolute inset-0 flex items-center justify-center">
+        <span class="rounded-full bg-white/90 p-3 text-neutral-900 shadow-md">
+          <svg
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            class="size-6"
+          >
+            <path d="M8 6.82v10.36a1 1 0 0 0 1.53.85l8.14-5.18a1 1 0 0 0 0-1.7L9.53 5.97A1 1 0 0 0 8 6.82Z" />
+          </svg>
+        </span>
+      </span>
+    </button>
+  <% end %>
+
+  <%= render "skateparks/video_suggestion_cta_tile", skatepark: skatepark %>
+</div>

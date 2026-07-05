@@ -8,6 +8,10 @@ class Skatepark < ApplicationRecord
   accepts_nested_attributes_for :skatepark_images, allow_destroy: true
   has_many :skatepark_videos, -> { order(:position, :id) }, dependent: :destroy, inverse_of: :skatepark
   accepts_nested_attributes_for :skatepark_videos, allow_destroy: true
+  has_many :active_skatepark_videos, -> { active.ordered }, # rubocop:disable Rails/HasManyOrHasOneDependent -- destroyed via skatepark_videos
+           class_name: 'SkateparkVideo', inverse_of: :skatepark
+  has_many :proposed_skatepark_videos, class_name: 'SkateparkVideo', foreign_key: :proposed_skatepark_id,
+                                       inverse_of: :proposed_skatepark, dependent: :nullify
   has_one :popular_skatepark, dependent: :destroy
   has_one_attached :cover_image
   reverse_geocoded_by :lat, :lng

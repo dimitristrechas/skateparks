@@ -6,6 +6,11 @@ Rails.application.configure do
   # Make code changes take effect immediately without server restart.
   config.enable_reloading = true
 
+  config.file_watcher = ActiveSupport::EventedFileUpdateChecker
+
+  # Avoid stale digests from public/assets/.manifest.json after assets:precompile.
+  config.assets.manifest_path = Rails.root.join('tmp/propshaft-manifest.json')
+
   # Do not eager load code on boot.
   config.eager_load = false
 

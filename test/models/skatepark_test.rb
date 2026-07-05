@@ -60,7 +60,7 @@ class SkateparkTest < ActiveSupport::TestCase
   def test_rejects_duplicate_video_urls
     skatepark = create(:skatepark)
     create(:skatepark_video, skatepark: skatepark, youtube_url: 'https://youtu.be/dQw4w9WgXcQ')
-    skatepark.skatepark_videos.build(position: 2, youtube_url: 'https://youtu.be/dQw4w9WgXcQ')
+    skatepark.skatepark_videos.build(position: 2, youtube_url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ')
 
     assert_not skatepark.valid?
     assert_includes skatepark.errors[:skatepark_videos], 'https://youtu.be/dQw4w9WgXcQ has already been added'
