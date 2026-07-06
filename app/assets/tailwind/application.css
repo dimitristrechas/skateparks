@@ -63,12 +63,4 @@
   .distance-filter:has(> :nth-child(5) input:checked) {
     --distance-filter-index: 3;
   }
-
-  .video-suggestion-dialog::backdrop {
-    @apply bg-neutral-950/60;
-  }
-
-  .video-suggestion-dialog {
-    @apply fixed top-1/2 left-1/2 max-h-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 overflow-y-auto;
-  }
 }
