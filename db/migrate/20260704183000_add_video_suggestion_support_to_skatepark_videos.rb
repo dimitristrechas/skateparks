@@ -21,13 +21,13 @@ class AddVideoSuggestionSupportToSkateparkVideos < ActiveRecord::Migration[8.1]
       :skatepark_videos, name: YOUTUBE_URL_INDEX
     )
 
-    return if index_exists?(:skatepark_videos, %i[skatepark_id youtube_video_id], name: VIDEO_ID_INDEX)
-
-    add_index :skatepark_videos, %i[skatepark_id youtube_video_id],
-              unique: true,
-              where: 'status IN (0, 1)',
-              name: VIDEO_ID_INDEX,
-              algorithm: :concurrently
+    unless index_exists?(:skatepark_videos, %i[skatepark_id youtube_video_id], name: VIDEO_ID_INDEX)
+      add_index :skatepark_videos, %i[skatepark_id youtube_video_id],
+                unique: true,
+                where: 'status IN (0, 1)',
+                name: VIDEO_ID_INDEX,
+                algorithm: :concurrently
+    end
 
     recount_active_video_counters!
   end
@@ -71,9 +71,14 @@ class AddVideoSuggestionSupportToSkateparkVideos < ActiveRecord::Migration[8.1]
   def add_proposed_skatepark_reference!
     return if column_exists?(:skatepark_videos, :proposed_skatepark_id)
 
-    safety_assured do
-      add_reference :skatepark_videos, :proposed_skatepark, foreign_key: { to_table: :skateparks }
-    end
+    add_reference :skatepark_videos, :proposed_skatepark, index: false, foreign_key: false
+    add_index :skatepark_videos, :proposed_skatepark_id,
+              name: 'index_skatepark_videos_on_proposed_skatepark_id',
+              algorithm: :concurrently
+    add_foreign_key :skatepark_videos, :skateparks,
+                    column: :proposed_skatepark_id,
+                    validate: false
+    validate_foreign_key :skatepark_videos, column: :proposed_skatepark_id
   end
 
   def add_youtube_video_id_column!

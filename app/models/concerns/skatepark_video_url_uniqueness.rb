@@ -14,13 +14,13 @@ module SkateparkVideoUrlUniqueness
   end
 
   def duplicate_video_urls
-    nested_skatepark_videos
-      .group_by { |skatepark_video| normalized_video_id(skatepark_video) }
-      .filter_map do |video_id, video_records|
-        next if video_id.blank? || video_records.one?
+    nested_skatepark_videos.reject(&:rejected?)
+                           .group_by { |skatepark_video| normalized_video_id(skatepark_video) }
+                           .filter_map do |video_id, video_records|
+      next if video_id.blank? || video_records.one?
 
-        video_records.first.youtube_url.to_s.strip
-      end
+      video_records.first.youtube_url.to_s.strip
+    end
   end
 
   def nested_skatepark_videos

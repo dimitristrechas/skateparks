@@ -66,6 +66,14 @@ class SkateparkTest < ActiveSupport::TestCase
     assert_includes skatepark.errors[:skatepark_videos], 'https://youtu.be/dQw4w9WgXcQ has already been added'
   end
 
+  def test_allows_active_video_when_rejected_video_has_same_url
+    skatepark = create(:skatepark)
+    create(:skatepark_video, :rejected, skatepark: skatepark, youtube_url: 'https://youtu.be/dQw4w9WgXcQ')
+    skatepark.skatepark_videos.build(position: 2, youtube_url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ')
+
+    assert_predicate skatepark, :valid?
+  end
+
   def test_requires_status_to_be_present_and_valid
     skatepark = build(:skatepark, status: nil)
 

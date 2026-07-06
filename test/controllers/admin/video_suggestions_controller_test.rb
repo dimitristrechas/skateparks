@@ -85,6 +85,14 @@ module Admin
                       I18n.t('activerecord.errors.models.skatepark_video.attributes.youtube_url.already_published')
     end
 
+    def test_post_activate_redirects_when_skatepark_missing
+      post activate_admin_video_suggestion_path(@video_suggestion),
+           params: { skatepark_id: 0 }
+
+      assert_redirected_to admin_video_suggestions_path
+      assert_equal I18n.t('admin.video_suggestions.invalid_skatepark'), flash[:alert]
+    end
+
     def test_post_reject_keeps_record_on_original_skatepark
       post reject_admin_video_suggestion_path(@video_suggestion)
 

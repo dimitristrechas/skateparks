@@ -55,7 +55,7 @@ module Skateparks
           ), status: :too_many_requests
         end
         format.html do
-          redirect_to @skatepark, alert: t('skateparks.video_suggestion.rate_limit_exceeded')
+          redirect_to(@skatepark || root_path, alert: t('skateparks.video_suggestion.rate_limit_exceeded'))
         end
       end
     end

@@ -37,6 +37,7 @@ export default class extends Controller {
   }
 
   close() {
+    if (!this.hasDialogTarget) return;
     if (!this.dialogTarget.open) return;
 
     this.dialogTarget.close();

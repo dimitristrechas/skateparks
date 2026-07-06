@@ -11,7 +11,7 @@ module Admin
     end
 
     def activate
-      target_skatepark = Skatepark.published.find(activate_params[:skatepark_id])
+      target_skatepark = Skatepark.published.find(activate_params)
 
       if activate_video_on!(target_skatepark)
         redirect_to admin_video_suggestions_path, notice: activation_notice_for(target_skatepark)
@@ -42,20 +42,22 @@ module Admin
     end
 
     def activate_params
-      params.permit(:skatepark_id)
+      params.expect(:skatepark_id)
     end
 
     def activate_video_on!(target_skatepark)
       success = false
 
-      ActiveRecord::Base.transaction do
-        @video_suggestion.skatepark = target_skatepark
-        @video_suggestion.status = :active
-        @video_suggestion.position = SkateparkVideo.next_active_position_for(target_skatepark)
-        @video_suggestion.allow_negative_position = false
+      target_skatepark.with_lock do
+        ActiveRecord::Base.transaction do
+          @video_suggestion.skatepark = target_skatepark
+          @video_suggestion.status = :active
+          @video_suggestion.position = SkateparkVideo.next_active_position_for(target_skatepark)
+          @video_suggestion.allow_negative_position = false
 
-        success = @video_suggestion.save
-        raise ActiveRecord::Rollback unless success
+          success = @video_suggestion.save
+          raise ActiveRecord::Rollback unless success
+        end
       end
 
       success

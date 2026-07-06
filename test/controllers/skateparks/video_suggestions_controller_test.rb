@@ -134,5 +134,24 @@ module Skateparks
 
       assert_response :too_many_requests
     end
+
+    def test_create_rate_limit_redirects_to_homepage_when_skatepark_missing
+      5.times do |index|
+        post skatepark_video_suggestion_path(@skatepark),
+             params: { video_suggestion: { youtube_url: "https://youtu.be/#{format('%011d', index)}" } },
+             as: :turbo_stream
+
+        assert_response :success
+      end
+
+      draft_skatepark = create(:skatepark, :draft)
+
+      post skatepark_video_suggestion_path(draft_skatepark),
+           params: { video_suggestion: { youtube_url: 'https://youtu.be/zzzzzzzzzzz' } },
+           as: :html
+
+      assert_redirected_to root_path
+      assert_equal I18n.t('skateparks.video_suggestion.rate_limit_exceeded'), flash[:alert]
+    end
   end
 end
