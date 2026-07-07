@@ -313,7 +313,11 @@
     <div class="col-span-2 space-y-4">
       <% persisted_skatepark_videos =
            skatepark.skatepark_videos.select(&:persisted?).sort_by do |video_record|
-             [video_record.position || Float::INFINITY, video_record.id || Float::INFINITY]
+             [
+               video_record.active? ? 0 : 1,
+               video_record.active? ? (video_record.position || Float::INFINITY) : 0,
+               video_record.id || Float::INFINITY,
+             ]
            end %>
 
       <div
@@ -352,6 +356,13 @@
                 <%= video_fields.hidden_field :_destroy,
                                          value: (marked_for_destruction ? 1 : 0),
                                          data: { destroy_field: true } %>
+
+                <%= video_fields.select :status,
+                                    SkateparkVideo.statuses.keys.map { |status|
+                                      [t("admin.skateparks.form.video_statuses.#{status}"), status]
+                                    },
+                                    {},
+                                    class: "mt-2 w-full rounded border-neutral-300 p-1 text-sm text-neutral-600 dark:border-neutral-600 dark:bg-gray-800 dark:text-neutral-200" %>
               <% end %>
 
               <% item.with_preview do %>
@@ -367,7 +378,11 @@
                 </p>
 
                 <p class="text-sm text-neutral-500 dark:text-neutral-400">
-                  <%= t("admin.skateparks.form.drag_to_reorder_hint") %>
+                  <% if skatepark_video.active? %>
+                    <%= t("admin.skateparks.form.drag_to_reorder_hint") %>
+                  <% else %>
+                    <%= t("admin.skateparks.form.video_statuses.#{skatepark_video.status}") %>
+                  <% end %>
                 </p>
               <% end %>
             <% end %>

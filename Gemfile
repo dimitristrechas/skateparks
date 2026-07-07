@@ -14,6 +14,7 @@ gem 'net-imap', '>= 0.6.4.1'
 # Pin transitive gems for bundle-audit / pre-push security checks.
 gem 'concurrent-ruby', '>= 1.3.7' # CVE-2026-54904, CVE-2026-54905, CVE-2026-54906
 gem 'faraday', '>= 2.14.3' # CVE-2026-54297
+gem 'msgpack', '>= 1.8.2' # CVE-2026-54522
 gem 'nokogiri', '>= 1.19.4' # GHSA advisories through 1.19.3
 
 # Use postgresql as the database for Active Record

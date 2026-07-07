@@ -7,7 +7,7 @@ module Admin
 
     def attach_new_videos(skatepark)
       ordered_new_videos(skatepark).each do |youtube_url, position|
-        skatepark.skatepark_videos.build(youtube_url: youtube_url, position: position)
+        skatepark.skatepark_videos.build(youtube_url: youtube_url, position: position, status: :active)
       end
     end
 

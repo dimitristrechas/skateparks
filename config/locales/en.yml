@@ -52,6 +52,21 @@ en:
     video_thumbnail_alt: "%{name} - Video %{current} of %{total}"
     image_indicators: "Image indicators"
     video_indicators: "Video indicators"
+  skateparks:
+    not_found: "That skatepark could not be found. It may have been removed or the link is out of date."
+    video_suggestion:
+      cta: "Suggest a video"
+      dialog_title: "Suggest a video"
+      empty_state_title: "No videos yet"
+      instructions: "Paste a YouTube link that shows this skatepark. We'll review it before it appears on the page."
+      url_label: "YouTube URL"
+      url_placeholder: "https://www.youtube.com/watch?v=..."
+      submit: "Submit suggestion"
+      close_dialog: "Close suggestion form"
+      success: "Thanks! Your video suggestion was submitted for review."
+      invalid_url: "Enter a valid YouTube URL."
+      rate_limit_exceeded: "Too many suggestions. Try again later."
+      honeypot_label: "Leave this field blank"
   edit: "Edit"
   create: "Create"
   about: "About skateparks.gr"
@@ -161,6 +176,7 @@ en:
       title: "Dashboard"
       manage_skateparks: "Manage Skateparks"
       manage_popular_skateparks: "Manage Popular Skateparks"
+      manage_video_suggestions: "Review Video Suggestions"
       view_account: "Manage Account"
     users:
       title: "Manage Users"
@@ -250,6 +266,10 @@ en:
         video_added: "Video added to the list"
         invalid_video_url: "Enter a valid YouTube URL."
         duplicate_video_url: "This YouTube URL has already been added."
+        video_statuses:
+          pending: "Pending review"
+          active: "Active"
+          rejected: "Rejected"
     popular_skateparks:
       title: "Popular Skateparks"
       add_section_title: "Add Popular Skatepark"
@@ -264,6 +284,26 @@ en:
       added_notice: "Skatepark added to popular list."
       updated_notice: "Position updated successfully."
       removed_notice: "Skatepark removed from popular list."
+    video_suggestions:
+      title: "Video suggestions"
+      pending_count:
+        one: "%{count} pending"
+        other: "%{count} pending"
+      thumbnail: "Thumbnail"
+      thumbnail_alt: "Suggested video thumbnail"
+      proposed_for: "Proposed for"
+      assign_to: "Assign to"
+      url: "YouTube URL"
+      submitted_at: "Submitted"
+      actions: "Actions"
+      activate: "Activate"
+      reject: "Reject"
+      reject_confirm: "Reject this video suggestion?"
+      empty_state: "No pending video suggestions."
+      activated_notice: "Video suggestion activated."
+      activated_reassigned_notice: "Video suggestion activated on %{skatepark}."
+      rejected_notice: "Video suggestion rejected."
+      invalid_skatepark: "Selected skatepark is not available."
   activerecord:
     attributes:
       skatepark:
@@ -271,6 +311,7 @@ en:
         skatepark_videos: "Videos"
       skatepark_video:
         youtube_url: "YouTube URL"
+        status: "Status"
     errors:
       models:
         skatepark:
@@ -284,6 +325,11 @@ en:
           attributes:
             youtube_url:
               invalid_format: "must be a valid YouTube URL"
+              already_published: "This video is already on the skatepark page."
+              already_pending: "This video has already been suggested and is waiting for review."
+              already_submitted: "This video has already been suggested for this skatepark."
+            proposed_skatepark_id:
+              immutable: "cannot be changed"
   errors:
     messages:
       taken: "has already been taken"

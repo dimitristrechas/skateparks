@@ -30,11 +30,18 @@ class SkateparksController < ApplicationController
   private
 
   def set_skatepark
+    skatepark_id = params[:id].to_s.split('-', 2).first
     @skatepark = Skatepark.published.includes(
-      :skatepark_videos,
+      :active_skatepark_videos,
       cover_image_attachment: :blob,
       skatepark_images: { image_attachment: :blob }
-    ).find(params[:id])
+    ).find(skatepark_id)
+
+    return if @skatepark.to_param == params[:id].to_s
+
+    redirect_to root_path, alert: t('skateparks.not_found')
+  rescue ActiveRecord::RecordNotFound, ArgumentError
+    redirect_to root_path, alert: t('skateparks.not_found')
   end
 
   def skatepark_params

@@ -94,7 +94,9 @@ module Admin
                                                       { new_video_urls: [] },
                                                       { new_video_positions: [] },
                                                       { skatepark_images_attributes: [%i[id position _destroy]] },
-                                                      { skatepark_videos_attributes: [%i[id position _destroy]] },])
+                                                      {
+                                                        skatepark_videos_attributes: [%i[id position status _destroy]],
+                                                      },])
     end
 
     def skatepark_attributes
