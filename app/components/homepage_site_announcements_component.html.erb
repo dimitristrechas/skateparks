@@ -1,0 +1,92 @@
+<div
+  role="region"
+  aria-label="<%= t('home.site_announcements.region_label') %>"
+  class="mb-8 flex flex-col gap-4"
+  data-controller="site-announcements"
+>
+  <% @announcements.each do |announcement| %>
+    <article
+      aria-labelledby="<%= message_id_for(announcement) %>"
+      class="
+        flex items-center justify-between gap-4 rounded-2xl border border-blue-800/30 bg-blue-950/10 px-6 py-3
+        text-center dark:border-blue-700/40 dark:bg-blue-950/30
+      "
+      data-site-announcements-target="item"
+      data-announcement-id="<%= announcement.id %>"
+      data-dismiss-token="<%= announcement.dismiss_token %>"
+    >
+      <div class="flex flex-1 flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
+        <p
+          id="<%= message_id_for(announcement) %>"
+          class="text-base font-semibold text-blue-950 sm:text-lg dark:text-blue-100"
+        >
+          <%= announcement.message %>
+        </p>
+
+        <% if announcement.link_url.present? %>
+          <%= render(
+                LinkComponent.new(
+                  title: link_label_for(announcement),
+                  url: announcement.link_url,
+                  target: external_link?(announcement.link_url) ? '_blank' : '_self',
+                  classnames: 'font-semibold text-blue-900 dark:text-blue-100'
+                )
+              ) %>
+        <% end %>
+      </div>
+
+      <%= render IconButtonComponent.new(
+            aria_label: t('home.site_announcements.dismiss'),
+            data: { action: 'click->site-announcements#dismiss' }
+          ) do |icon_button| %>
+        <% icon_button.with_icon do %>
+          <svg
+            class="size-5"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            aria-hidden="true"
+          >
+            <path
+              d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z"
+            />
+          </svg>
+        <% end %>
+      <% end %>
+    </article>
+  <% end %>
+</div>
+
+<script>
+  (function () {
+    var root = document.currentScript.previousElementSibling;
+    if (!root) return;
+
+    var prefix = "skateparks.site_announcement.dismissed.";
+
+    root.querySelectorAll("[data-site-announcements-target='item']").forEach(function (item) {
+      var id = item.dataset.announcementId;
+      var token = item.dataset.dismissToken;
+      var stored = null;
+
+      try {
+        stored = localStorage.getItem(prefix + id);
+      } catch (error) {
+        stored = null;
+      }
+
+      if (stored === token) {
+        item.remove();
+      } else if (stored) {
+        try {
+          localStorage.removeItem(prefix + id);
+        } catch (error) {
+          // Ignore storage errors in private browsing or quota failures.
+        }
+      }
+    });
+
+    if (root.querySelectorAll("[data-site-announcements-target='item']").length === 0) {
+      root.remove();
+    }
+  })();
+</script>
