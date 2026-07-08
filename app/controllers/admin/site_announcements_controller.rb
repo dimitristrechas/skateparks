@@ -17,7 +17,7 @@ module Admin
     def create
       @site_announcement = SiteAnnouncement.new(site_announcement_params)
 
-      if @site_announcement.save
+      if persist_new_site_announcement
         redirect_to admin_site_announcements_url, notice: t('admin.site_announcements.created_notice')
       else
         render :new, status: :unprocessable_content
@@ -60,9 +60,21 @@ module Admin
     end
 
     def next_position
+      locked_next_position
+    end
+
+    def persist_new_site_announcement
       SiteAnnouncement.transaction do
-        SiteAnnouncement.lock.order(position: :desc).first&.position.to_i + 1
+        @site_announcement.position = locked_next_position
+        saved = @site_announcement.save
+        raise ActiveRecord::Rollback unless saved
+
+        saved
       end
+    end
+
+    def locked_next_position
+      SiteAnnouncement.lock.order(position: :desc).first&.position.to_i + 1
     end
   end
 end

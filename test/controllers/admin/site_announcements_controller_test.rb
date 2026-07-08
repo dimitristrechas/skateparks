@@ -47,6 +47,22 @@ module Admin
       assert_redirected_to admin_site_announcements_url
     end
 
+    def test_post_create_assigns_next_available_position_ignoring_stale_form_value
+      create(:site_announcement, position: 5)
+
+      post admin_site_announcements_path, params: {
+        site_announcement: {
+          message_en: 'Queued announcement',
+          message_el: 'Σειρά ανακοίνωση',
+          position: 2,
+          published: true,
+        },
+      }
+
+      assert_redirected_to admin_site_announcements_url
+      assert_equal 6, SiteAnnouncement.order(:id).last.position
+    end
+
     def test_post_create_with_invalid_params_renders_new
       params = {
         site_announcement: {
