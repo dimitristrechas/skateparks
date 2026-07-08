@@ -293,6 +293,8 @@ en:
       title: "Site Announcements"
       new_announcement: "New announcement"
       edit_announcement: "Edit announcement"
+      back_to_list: "Back to announcements"
+      position: "Position"
       message_en: "Message in English"
       message_el: "Message in Greek"
       link_label_en: "Link label in English"

@@ -127,6 +127,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_07_190000) do
     t.boolean "published", default: false, null: false
     t.datetime "starts_at"
     t.datetime "updated_at", null: false
+    t.index ["position"], name: "index_site_announcements_on_position", unique: true
+    t.index ["published", "starts_at", "ends_at"], name: "index_site_announcements_on_published_and_starts_at_and_ends_at"
   end
 
   create_table "skatepark_images", force: :cascade do |t|

@@ -24,7 +24,7 @@ Rails.application.routes.draw do
         post :unban
       end
     end
-    resources :site_announcements
+    resources :site_announcements, only: %i[index new create edit update destroy]
 
     constraints lambda { |request|
       session_token = request.cookie_jar.signed[:session_token]

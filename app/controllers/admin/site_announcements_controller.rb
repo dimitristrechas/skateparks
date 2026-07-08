@@ -5,7 +5,7 @@ module Admin
     before_action :set_site_announcement, only: %i[edit update destroy]
 
     def index
-      @site_announcements = SiteAnnouncement.ordered
+      @site_announcements = SiteAnnouncement.ordered.includes(:string_translations)
     end
 
     def new
@@ -60,7 +60,9 @@ module Admin
     end
 
     def next_position
-      SiteAnnouncement.maximum(:position).to_i + 1
+      SiteAnnouncement.transaction do
+        SiteAnnouncement.lock.order(position: :desc).first&.position.to_i + 1
+      end
     end
   end
 end

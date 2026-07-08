@@ -3,6 +3,7 @@
   aria-label="<%= t('home.site_announcements.region_label') %>"
   class="mb-8 flex flex-col gap-4"
   data-controller="site-announcements"
+  data-dismiss-key-prefix="<%= dismissal_key_prefix %>"
 >
   <% @announcements.each do |announcement| %>
     <article
@@ -61,7 +62,8 @@
     var root = document.currentScript.previousElementSibling;
     if (!root) return;
 
-    var prefix = "skateparks.site_announcement.dismissed.";
+    var prefix = root.dataset.dismissKeyPrefix;
+    if (!prefix) return;
 
     root.querySelectorAll("[data-site-announcements-target='item']").forEach(function (item) {
       var id = item.dataset.announcementId;

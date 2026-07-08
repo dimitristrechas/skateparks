@@ -19,7 +19,7 @@
     <%= render(TextFieldComponent.new(name: "link_label_en", title: t("admin.site_announcements.link_label_en"), form: form)) %>
     <%= render(TextFieldComponent.new(name: "link_label_el", title: t("admin.site_announcements.link_label_el"), form: form)) %>
     <%= render(TextFieldComponent.new(name: "link_url", title: t("admin.site_announcements.link_url"), form: form)) %>
-    <%= render(TextFieldComponent.new(name: "position", title: t("skatepark.position"), form: form)) %>
+    <%= render(TextFieldComponent.new(name: "position", title: t("admin.site_announcements.position"), form: form)) %>
   </div>
 
   <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
@@ -34,10 +34,10 @@
     </div>
   </div>
 
-  <div class="flex items-center gap-2">
+  <label class="flex min-h-8 cursor-pointer items-center gap-2 text-neutral-600 dark:text-neutral-300">
     <%= form.check_box :published, class: "size-4 rounded" %>
-    <%= form.label :published, t("admin.site_announcements.published"), class: "text-neutral-600 dark:text-neutral-300" %>
-  </div>
+    <%= t("admin.site_announcements.published") %>
+  </label>
 
   <div>
     <%= render(

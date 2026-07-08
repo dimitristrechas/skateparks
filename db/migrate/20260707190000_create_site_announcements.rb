@@ -11,5 +11,8 @@ class CreateSiteAnnouncements < ActiveRecord::Migration[8.1]
 
       t.timestamps
     end
+
+    add_index :site_announcements, :position, unique: true
+    add_index :site_announcements, %i[published starts_at ends_at]
   end
 end

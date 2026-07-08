@@ -14,7 +14,7 @@
 
 <%= render(TableComponent.new) do |table| %>
   <% table.with_header do %>
-    <th scope="col" class="px-6 py-3"><%= t("skatepark.position") %></th>
+    <th scope="col" class="px-6 py-3"><%= t("admin.site_announcements.position") %></th>
     <th scope="col" class="px-6 py-3"><%= t("admin.site_announcements.message_en") %></th>
     <th scope="col" class="px-6 py-3"><%= t("admin.site_announcements.published") %></th>
     <th scope="col" class="px-6 py-3"><%= t("admin.site_announcements.schedule") %></th>
@@ -35,7 +35,7 @@
                         class: "flex items-center gap-2" do |form| %>
             <%= form.number_field :position,
                                   value: site_announcement.position,
-                                  class: "w-20 rounded p-1 text-neutral-600 dark:text-neutral-700" %>
+                                  class: "min-h-8 min-w-8 w-20 rounded p-1 text-neutral-600 dark:text-neutral-700" %>
 
             <%= render(
                   ButtonComponent.new(
@@ -87,11 +87,19 @@
                 )
               ) %>
 
-          <%= button_to t("admin.site_announcements.destroy"),
-                        admin_site_announcement_path(site_announcement),
+          <%= form_with url: admin_site_announcement_path(site_announcement),
                         method: :delete,
-                        form: { data: { turbo_confirm: t("admin.site_announcements.destroy_confirm") } },
-                        class: "text-red-500 hover:underline" %>
+                        data: { turbo_confirm: t("admin.site_announcements.destroy_confirm") } do |form| %>
+            <%= render(
+                  ButtonComponent.new(
+                    title: t("admin.site_announcements.destroy"),
+                    form: form,
+                    type: "submit",
+                    ghost: true,
+                    class: "text-red-600 dark:text-red-400"
+                  )
+                ) %>
+          <% end %>
         </td>
       <% end %>
     <% end %>

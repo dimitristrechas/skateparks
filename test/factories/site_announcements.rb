@@ -4,7 +4,7 @@ FactoryBot.define do
   factory :site_announcement do
     sequence(:message_en) { |n| "Site news announcement #{n}" }
     sequence(:message_el) { |n| "Ανακοίνωση ιστότοπου #{n}" }
-    position { 1 }
+    sequence(:position)
     published { true }
 
     trait :draft do

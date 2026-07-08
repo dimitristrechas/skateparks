@@ -19,7 +19,9 @@ export default class extends Controller {
     const itemIndex = this.itemTargets.indexOf(item);
     const { announcementId, dismissToken } = item.dataset;
 
-    writeDismissal(announcementId, dismissToken);
+    const prefix = this.element.dataset.dismissKeyPrefix;
+
+    writeDismissal(announcementId, dismissToken, prefix);
     item.remove();
 
     if (this.itemTargets.length === 0) {

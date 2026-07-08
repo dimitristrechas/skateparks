@@ -5,7 +5,7 @@ class SiteAnnouncement < ApplicationRecord
 
   include ReorderablePosition
 
-  LINK_URL_PATTERN = %r{\A(/[^\s]*|https?://[^\s]+)\z}
+  LINK_URL_PATTERN = %r{\A(/(?!/)[^\s]*|https?://[^\s]+)\z}
 
   translates :message, type: :string
   translates :link_label, type: :string

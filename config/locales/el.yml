@@ -293,6 +293,8 @@ el:
       title: "Ανακοινώσεις Ιστότοπου"
       new_announcement: "Νέα ανακοίνωση"
       edit_announcement: "Επεξεργασία ανακοίνωσης"
+      back_to_list: "Πίσω στις ανακοινώσεις"
+      position: "Θέση"
       message_en: "Μήνυμα στα Αγγλικά"
       message_el: "Μήνυμα στα Ελληνικά"
       link_label_en: "Ετικέτα συνδέσμου στα Αγγλικά"

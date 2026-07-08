@@ -44,6 +44,13 @@ class SiteAnnouncementTest < ActiveSupport::TestCase
     assert_predicate announcement, :valid?
   end
 
+  def test_rejects_protocol_relative_link_url
+    announcement = build(:site_announcement, link_url: '//evil.com')
+
+    assert_not announcement.valid?
+    assert_includes announcement.errors[:link_url], 'is invalid'
+  end
+
   def test_validates_ends_at_after_starts_at
     announcement = build(
       :site_announcement,

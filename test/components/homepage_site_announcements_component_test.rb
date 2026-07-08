@@ -86,12 +86,20 @@ class HomepageSiteAnnouncementsComponentTest < ViewComponent::TestCase
     assert_no_selector '[role="region"].hidden'
   end
 
+  def test_renders_dismiss_key_prefix_on_region
+    announcement = build_stubbed(:site_announcement)
+
+    render_inline(HomepageSiteAnnouncementsComponent.new(announcements: [announcement]))
+
+    assert_selector "[data-dismiss-key-prefix='#{HomepageSiteAnnouncementsComponent::DISMISSAL_KEY_PREFIX}']"
+  end
+
   def test_renders_inline_boot_script_for_dismiss_filtering
     announcement = build_stubbed(:site_announcement)
 
     render_inline(HomepageSiteAnnouncementsComponent.new(announcements: [announcement]))
 
     assert_selector 'script', visible: :all
-    assert_includes rendered_content, 'skateparks.site_announcement.dismissed.'
+    assert_includes rendered_content, 'dataset.dismissKeyPrefix'
   end
 end

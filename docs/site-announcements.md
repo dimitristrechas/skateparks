@@ -17,7 +17,7 @@ The homepage region renders only when at least one announcement matches `SiteAnn
 
 ## Data Model
 
-```
+```text
 site_announcements:
   published     boolean, not null, default false
   position      integer, not null (display order; lower first)
@@ -37,7 +37,7 @@ site_announcements:
 
 ### Visibility lifecycle
 
-```
+```text
                     ┌─────────────┐
   Admin creates ───►│    draft    │  published: false
                     └──────┬──────┘
@@ -74,7 +74,7 @@ site_announcements:
 
 ## Routes
 
-```
+```text
 # Admin (requires admin session)
 GET    /admin/site_announcements
 GET    /admin/site_announcements/new
@@ -107,7 +107,7 @@ The two banner features are intentionally separate — no shared model, controll
 - Defaults to `SiteAnnouncement.visible.to_a` when no `announcements:` argument is passed.
 - `render?` returns false when the list is empty (no DOM output).
 - Shows the localized `message` and an optional `LinkComponent` CTA.
-- External URLs (`http://` / `https://`) open in a new tab; relative paths stay in the same tab.
+- External URLs (`http://` / `https://`) open in a new tab; relative paths stay in the same tab. Protocol-relative URLs (`//…`) are rejected at validation.
 - Each announcement is an `<article>` inside a `role="region"` wrapper labeled via `home.site_announcements.region_label`.
 - No decorative icon in the message row — only text and optional link.
 
@@ -119,11 +119,11 @@ The two banner features are intentionally separate — no shared model, controll
 | `lib/site_announcement_dismissals.js` | Read/write/clear `localStorage` keys |
 | Inline `<script>` in component template | No-JS fallback: removes dismissed items before paint when JS is disabled |
 
-**Storage key:** `skateparks.site_announcement.dismissed.{id}`
+**Storage key:** `skateparks.site_announcement.dismissed.{id}` (prefix rendered via `data-dismiss-key-prefix` on the region root)
 
 **Stored value:** `dismiss_token` — SHA256 hex digest of content fields:
 
-```
+```text
 message_en, message_el, link_label_en, link_label_el, link_url
 ```
 
@@ -178,7 +178,7 @@ Schedule column labels:
 
 Form fields: bilingual message and link label, `link_url`, `position`, `starts_at`, `ends_at`, `published` checkbox.
 
-New records default `position` to `maximum(:position) + 1`.
+New records default `position` to the next value inside a locked transaction (`maximum(:position) + 1`). `position` has a unique DB index.
 
 ### Destroy
 
@@ -192,7 +192,7 @@ Hard delete via `destroy!` with confirmation prompt on the index page.
 | ---- | ------ |
 | `message_en`, `message_el` | Presence |
 | `position` | Positive integer (`ReorderablePosition`) |
-| `link_url` | Optional; must match `/…` or `http(s)://…` (`LINK_URL_PATTERN`) |
+| `link_url` | Optional; must match `/…` (not `//…`) or `http(s)://…` (`LINK_URL_PATTERN`) |
 | `ends_at` | Must be after `starts_at` when both present |
 
 ---
@@ -200,6 +200,8 @@ Hard delete via `destroy!` with confirmation prompt on the index page.
 ## Database
 
 Migration: `db/migrate/20260707190000_create_site_announcements.rb`
+
+Indexes: unique on `position`; composite on `published`, `starts_at`, `ends_at` for the homepage `visible` scope.
 
 Mobility string translations are stored in the shared `string_translations` table (no extra columns on `site_announcements`).
 
