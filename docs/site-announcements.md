@@ -33,7 +33,7 @@ site_announcements:
 | `message` | Yes (EN + EL) |
 | `link_label` | No (falls back to `home.site_announcements.read_more` when `link_url` is set) |
 
-**Concerns:** `ReorderablePosition` — `position` must be a positive integer.
+**Concerns:** `ReorderablePosition` — `position` must be a positive integer. A unique DB index enforces one row per position value.
 
 ### Visibility lifecycle
 
@@ -86,6 +86,8 @@ DELETE /admin/site_announcements/:id
 
 Linked from **Admin dashboard** → “Manage Site Announcements”.
 
+Routes are scoped to implemented actions only (`only: %i[index new create edit update destroy]` — no `show`).
+
 ---
 
 ## Public flow
@@ -115,11 +117,12 @@ The two banner features are intentionally separate — no shared model, controll
 
 | Piece | Role |
 | ----- | ---- |
-| `site_announcements_controller.js` | Filters dismissed items on connect; handles dismiss click, focus management |
+| `site_announcements_controller.js` | On `connect`, filters dismissed items; handles dismiss click and focus management |
 | `lib/site_announcement_dismissals.js` | Read/write/clear `localStorage` keys |
-| Inline `<script>` in component template | No-JS fallback: removes dismissed items before paint when JS is disabled |
 
-**Storage key:** `skateparks.site_announcement.dismissed.{id}` (prefix rendered via `data-dismiss-key-prefix` on the region root)
+**Storage key:** `skateparks.site_announcement.dismissed.{id}`
+
+The prefix is single-sourced from `HomepageSiteAnnouncementsComponent::DISMISSAL_KEY_PREFIX`, rendered as `data-dismiss-key-prefix` on the region root. The Stimulus controller and `site_announcement_dismissals.js` read that attribute (with the JS module constant as fallback).
 
 **Stored value:** `dismiss_token` — SHA256 hex digest of content fields:
 
@@ -161,9 +164,9 @@ Dismissal storage is **not** tied to analytics consent (PostHog). It uses the sa
 
 ### Index
 
-`Admin::SiteAnnouncementsController#index` lists all announcements (`SiteAnnouncement.ordered`), including drafts and out-of-schedule records.
+`Admin::SiteAnnouncementsController#index` lists all announcements (`SiteAnnouncement.ordered.includes(:string_translations)`), including drafts and out-of-schedule records. Translations are eager-loaded to avoid N+1 queries when rendering `message_en`.
 
-Columns: position (inline PATCH form), English message preview, published status, schedule summary, edit/delete actions.
+Columns: position (inline PATCH form), English message preview, published status, schedule summary, edit/delete actions. Delete uses `ButtonComponent` with a Turbo confirm prompt.
 
 Schedule column labels:
 
@@ -176,13 +179,25 @@ Schedule column labels:
 
 ### Create / edit
 
-Form fields: bilingual message and link label, `link_url`, `position`, `starts_at`, `ends_at`, `published` checkbox.
+Form fields: bilingual message and link label, `link_url`, `position`, `starts_at`, `ends_at`, `published` checkbox. Copy uses dedicated `admin.site_announcements.*` keys (including `position` and `back_to_list`).
 
-New records default `position` to the next value inside a locked transaction (`maximum(:position) + 1`). `position` has a unique DB index.
+**Position assignment:**
+
+| Step | Behavior |
+| ---- | -------- |
+| `GET new` | Pre-fills `position` with `next_position` (a suggested value for the form) |
+| `POST create` | `persist_new_site_announcement` allocates the next position inside a DB transaction with `SELECT … FOR UPDATE`, ignoring any stale value submitted from the form |
+| `PATCH` (index or edit) | Admin can set an explicit `position`; the unique index rejects duplicates |
+
+`locked_next_position` reads the highest existing position under row lock and returns `max + 1` (or `1` when the table is empty).
 
 ### Destroy
 
 Hard delete via `destroy!` with confirmation prompt on the index page.
+
+### Authorization
+
+All admin actions require an admin session (`Admin::BaseController`). Non-admin users are redirected to the homepage for `index`, `create`, `update`, and `destroy`.
 
 ---
 
@@ -212,7 +227,7 @@ Mobility string translations are stored in the shared `string_translations` tabl
 Copy lives under:
 
 - `home.site_announcements.*` — public region label, read-more fallback, dismiss button
-- `admin.site_announcements.*` — CRUD UI, schedule labels, flash notices
+- `admin.site_announcements.*` — CRUD UI, schedule labels, flash notices, `position`, `back_to_list`
 - `privacy.cookies_body`, `privacy.rights_body` — dismissal storage disclosure
 
 Keys exist in both `config/locales/en.yml` and `config/locales/el.yml`.
@@ -247,10 +262,10 @@ docker compose -f docker-compose.test.yml --env-file ./.env.test run --rm skatep
 
 Coverage includes:
 
-- Model validations, scopes, `visible?`, `dismiss_token` stability on reorder vs content change
-- Admin CRUD, authorization, validation errors
-- Component rendering, locale, links, ARIA, dismiss controls, no-JS script presence
-- Homepage integration (visible vs draft announcements)
+- Model validations (including protocol-relative `//…` URL rejection), scopes, `visible?`, `dismiss_token` stability on reorder vs content change
+- Admin CRUD, authorization on all mutating endpoints, validation errors, atomic position assignment on create
+- Component rendering, locale, links, ARIA, dismiss controls, `data-dismiss-key-prefix`
+- Homepage integration (visible vs draft announcements) and updated privacy copy
 
 See [minitest-implementation.md](minitest-implementation.md) for general test conventions.
 
@@ -258,6 +273,8 @@ See [minitest-implementation.md](minitest-implementation.md) for general test co
 
 ## Operational notes
 
+- **JavaScript required for dismissal** — Filtering dismissed announcements and persisting dismiss state both run through Stimulus on `connect`. Without JavaScript, all visible announcements render and dismiss controls do not work.
+- **Position collisions** — The unique index on `position` is the final guard. Create always allocates under lock; explicit position changes via edit/index can still fail validation if the target position is taken.
 - **No server-side dismissal** — Dismiss state is client-only. Clearing browser storage or using another device shows announcements again.
 - **Content edits resurrect dismissed banners** — By design: the `dismiss_token` fingerprint changes when copy or links change so users see updated news.
 - **Homepage caching** — Unlike skatepark video activation, announcements are queried directly on each homepage render. If traffic grows, consider a fragment or query cache keyed on announcement `updated_at` max (tracked as SK8-115).

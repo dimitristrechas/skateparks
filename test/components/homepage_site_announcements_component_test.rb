@@ -9,13 +9,14 @@ class HomepageSiteAnnouncementsComponentTest < ViewComponent::TestCase
     assert_no_selector '[role="region"]'
   end
 
-  def test_renders_region_with_aria_label
+  def test_renders_region_with_heading
     announcement = build_stubbed(:site_announcement)
 
     I18n.with_locale(:en) do
       render_inline(HomepageSiteAnnouncementsComponent.new(announcements: [announcement]))
 
-      assert_selector "[role='region'][aria-label='#{I18n.t('home.site_announcements.region_label')}']"
+      assert_selector "[role='region'][aria-labelledby='site-announcements-heading']"
+      assert_selector 'h2#site-announcements-heading', text: 'News'
     end
   end
 
@@ -77,15 +78,6 @@ class HomepageSiteAnnouncementsComponentTest < ViewComponent::TestCase
     assert_selector '#site-announcement-message-7', text: 'Important news'
   end
 
-  def test_wrapper_visible_without_hidden_class_for_no_js_fallback
-    announcement = build_stubbed(:site_announcement)
-
-    render_inline(HomepageSiteAnnouncementsComponent.new(announcements: [announcement]))
-
-    assert_selector '[role="region"]'
-    assert_no_selector '[role="region"].hidden'
-  end
-
   def test_renders_dismiss_key_prefix_on_region
     announcement = build_stubbed(:site_announcement)
 
@@ -94,12 +86,20 @@ class HomepageSiteAnnouncementsComponentTest < ViewComponent::TestCase
     assert_selector "[data-dismiss-key-prefix='#{HomepageSiteAnnouncementsComponent::DISMISSAL_KEY_PREFIX}']"
   end
 
-  def test_renders_inline_boot_script_for_dismiss_filtering
+  def test_wrapper_visible_without_hidden_class
     announcement = build_stubbed(:site_announcement)
 
     render_inline(HomepageSiteAnnouncementsComponent.new(announcements: [announcement]))
 
-    assert_selector 'script', visible: :all
-    assert_includes rendered_content, 'dataset.dismissKeyPrefix'
+    assert_selector '[role="region"]'
+    assert_no_selector '[role="region"].hidden'
+  end
+
+  def test_does_not_render_inline_script
+    announcement = build_stubbed(:site_announcement)
+
+    render_inline(HomepageSiteAnnouncementsComponent.new(announcements: [announcement]))
+
+    assert_no_selector 'script', visible: :all
   end
 end

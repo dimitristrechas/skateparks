@@ -24,6 +24,10 @@ class HomepageSiteAnnouncementsComponent < ViewComponent::Base
     DISMISSAL_KEY_PREFIX
   end
 
+  def region_heading_id
+    'site-announcements-heading'
+  end
+
   def message_id_for(announcement)
     "site-announcement-message-#{announcement.id}"
   end

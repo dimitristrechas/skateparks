@@ -34,6 +34,7 @@ el:
         other: "%{count} ημέρες μέχρι την Go Skate Day!"
       today: "Go Skate Day!"
     site_announcements:
+      heading: "Νέα"
       region_label: "Ανακοινώσεις ιστότοπου"
       read_more: "Μάθετε περισσότερα"
       dismiss: "Απόρριψη ανακοίνωσης"

@@ -1,5 +1,4 @@
 <%= render GoSkateDayCountdownComponent.new %>
-<%= render HomepageSiteAnnouncementsComponent.new %>
 
 <h1 class="mb-8 text-center text-lg font-bold sm:text-3xl lg:mb-8"><%= t("explore_all_skateparks") %></h1>
 
@@ -21,3 +20,5 @@
     <%= render(HomepageSkateparkCardComponent.new(skatepark: skatepark, badge_type: :popular)) %>
   <% end %>
 </section>
+
+<%= render HomepageSiteAnnouncementsComponent.new %>

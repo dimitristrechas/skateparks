@@ -34,6 +34,7 @@ en:
         other: "%{count} days until Go Skate Day!"
       today: "It's Go Skate Day!"
     site_announcements:
+      heading: "News"
       region_label: "Site news"
       read_more: "Read more"
       dismiss: "Dismiss announcement"
