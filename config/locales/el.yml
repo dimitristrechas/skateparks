@@ -38,6 +38,7 @@ el:
       region_label: "Ανακοινώσεις ιστότοπου"
       read_more: "Μάθετε περισσότερα"
       dismiss: "Απόρριψη ανακοίνωσης"
+      dismiss_named: "Απόρριψη ανακοίνωσης: %{message}"
   skatepark:
     name: "Όνομα"
     images: "Φωτογραφίες"

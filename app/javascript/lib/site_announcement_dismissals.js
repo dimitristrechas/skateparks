@@ -50,3 +50,64 @@ export function filterDismissedAnnouncements(root) {
 
   return true;
 }
+
+export function dismissAnnouncementItem(root, item) {
+  if (!root || !item) return false;
+
+  const prefix = root.dataset.dismissKeyPrefix || KEY_PREFIX;
+  const { announcementId, dismissToken } = item.dataset;
+
+  writeDismissal(announcementId, dismissToken, prefix);
+  item.remove();
+
+  if (root.querySelectorAll("[data-site-announcements-target='item']").length === 0) {
+    root.remove();
+    return true;
+  }
+
+  return false;
+}
+
+export function dismissAnnouncementFromEvent(root, event) {
+  const button = event.target.closest("[data-site-announcements-dismiss-button]");
+  if (!button || !root.contains(button)) return null;
+
+  event.preventDefault();
+
+  const item = button.closest("[data-site-announcements-target='item']");
+  if (!item) return null;
+
+  const itemIndex = [...root.querySelectorAll("[data-site-announcements-target='item']")].indexOf(item);
+  dismissAnnouncementItem(root, item);
+
+  if (!root.isConnected) {
+    return { itemIndex, regionRemoved: true };
+  }
+
+  return { itemIndex, regionRemoved: false };
+}
+
+export function attachDismissListeners(root) {
+  if (root.dataset.siteAnnouncementsDismissBound === "true") return;
+
+  root.addEventListener("click", (event) => {
+    const result = dismissAnnouncementFromEvent(root, event);
+    if (!result) return;
+
+    root.dispatchEvent(
+      new CustomEvent("site-announcements:dismissed", {
+        bubbles: false,
+        detail: result,
+      })
+    );
+  });
+
+  root.dataset.siteAnnouncementsDismissBound = "true";
+}
+
+export function initializeSiteAnnouncements(root) {
+  if (!root) return;
+
+  filterDismissedAnnouncements(root);
+  attachDismissListeners(root);
+}

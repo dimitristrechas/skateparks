@@ -5,7 +5,7 @@ class HomepageSiteAnnouncementsComponent < ViewComponent::Base
 
   def initialize(announcements: nil)
     super()
-    @announcements = announcements || SiteAnnouncement.visible.to_a
+    @announcements = announcements || SiteAnnouncement.visible.includes(:string_translations).to_a
   end
 
   def render?
@@ -24,8 +24,16 @@ class HomepageSiteAnnouncementsComponent < ViewComponent::Base
     DISMISSAL_KEY_PREFIX
   end
 
+  def dismiss_label_for(announcement)
+    t('home.site_announcements.dismiss_named', message: announcement.message)
+  end
+
   def region_heading_id
     'site-announcements-heading'
+  end
+
+  def region_id
+    'site-announcements-region'
   end
 
   def message_id_for(announcement)

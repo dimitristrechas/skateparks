@@ -1,4 +1,5 @@
 <div
+  id="<%= region_id %>"
   role="region"
   aria-labelledby="<%= region_heading_id %>"
   class="mt-16 flex flex-col gap-4 lg:mt-20"
@@ -15,7 +16,7 @@
       data-announcement-id="<%= announcement.id %>"
       data-dismiss-token="<%= announcement.dismiss_token %>"
     >
-      <div class="flex flex-row flex-wrap items-center justify-center gap-x-1 gap-y-0 sm:text-lg">
+      <div class="flex flex-row flex-wrap items-center justify-center gap-x-1 gap-y-0 pe-10 sm:text-lg">
         <p id="<%= message_id_for(announcement) %>" class="p-1"><%= announcement.message %></p>
 
         <% if announcement.link_url.present? %>
@@ -32,8 +33,8 @@
 
       <div class="absolute top-1/2 right-2 -translate-y-1/2">
         <%= render IconButtonComponent.new(
-              aria_label: t('home.site_announcements.dismiss'),
-              data: { action: 'click->site-announcements#dismiss' }
+              aria_label: dismiss_label_for(announcement),
+              data: { site_announcements_dismiss_button: true }
             ) do |icon_button| %>
           <% icon_button.with_icon do %>
             <svg
@@ -52,3 +53,8 @@
     </article>
   <% end %>
 </div>
+
+<%= javascript_tag(type: "module") do %>
+  import { initializeSiteAnnouncements } from "lib/site_announcement_dismissals"; const root =
+  document.getElementById("<%= region_id %>"); if (root) initializeSiteAnnouncements(root);
+<% end %>

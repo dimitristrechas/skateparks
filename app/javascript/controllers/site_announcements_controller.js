@@ -1,5 +1,5 @@
 import { Controller } from "@hotwired/stimulus";
-import { filterDismissedAnnouncements, writeDismissal } from "lib/site_announcement_dismissals";
+import { attachDismissListeners, filterDismissedAnnouncements } from "lib/site_announcement_dismissals";
 
 export default class extends Controller {
   static targets = ["item"];
@@ -8,38 +8,28 @@ export default class extends Controller {
     if (!this.element.isConnected) return;
 
     filterDismissedAnnouncements(this.element);
+    attachDismissListeners(this.element);
+    this.handleDismissed = this.handleDismissed.bind(this);
+    this.element.addEventListener("site-announcements:dismissed", this.handleDismissed);
   }
 
-  dismiss(event) {
-    event.preventDefault();
+  disconnect() {
+    this.element.removeEventListener("site-announcements:dismissed", this.handleDismissed);
+  }
 
-    const item = event.currentTarget.closest("[data-site-announcements-target='item']");
-    if (!item) return;
-
-    const itemIndex = this.itemTargets.indexOf(item);
-    const { announcementId, dismissToken } = item.dataset;
-
-    const prefix = this.element.dataset.dismissKeyPrefix;
-
-    writeDismissal(announcementId, dismissToken, prefix);
-    item.remove();
+  handleDismissed({ detail: { itemIndex, regionRemoved } }) {
+    if (regionRemoved) {
+      this.focusMainHeading();
+      return;
+    }
 
     if (this.itemTargets.length === 0) {
       this.focusMainHeading();
-      this.removeWrapperIfEmpty();
       return;
     }
 
     const focusIndex = Math.min(itemIndex, this.itemTargets.length - 1);
-    this.itemTargets[focusIndex].querySelector("button")?.focus();
-  }
-
-  removeWrapperIfEmpty() {
-    if (!this.element.isConnected) return;
-
-    if (this.itemTargets.length === 0) {
-      this.element.remove();
-    }
+    this.itemTargets[focusIndex].querySelector("[data-site-announcements-dismiss-button]")?.focus();
   }
 
   focusMainHeading() {

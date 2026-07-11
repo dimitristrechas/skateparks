@@ -38,6 +38,7 @@ en:
       region_label: "Site news"
       read_more: "Read more"
       dismiss: "Dismiss announcement"
+      dismiss_named: "Dismiss announcement: %{message}"
   skatepark:
     name: "Name"
     images: "Images"

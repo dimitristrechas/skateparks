@@ -1,6 +1,6 @@
 # Site Announcements
 
-Admins can publish short bilingual news banners on the homepage. Announcements are separate from the **Go Skate Day** countdown banner and appear directly below it. Visitors can dismiss individual announcements; dismissal state is stored in browser `localStorage` and is independent of analytics consent.
+Admins can publish short bilingual news banners on the homepage. Announcements are separate from the **Go Skate Day** countdown banner and render at the bottom of the homepage (below the skatepark grid). Visitors can dismiss individual announcements; dismissal state is stored in browser `localStorage` and is independent of analytics consent.
 
 ---
 
@@ -97,8 +97,8 @@ Routes are scoped to implemented actions only (`only: %i[index new create edit u
 `app/views/home/index.html.erb` renders, in order:
 
 1. `GoSkateDayCountdownComponent`
-2. `HomepageSiteAnnouncementsComponent`
-3. Main skatepark grid heading and content
+2. Main skatepark grid heading and content
+3. `HomepageSiteAnnouncementsComponent`
 
 The two banner features are intentionally separate — no shared model, controller, or component.
 
@@ -106,19 +106,26 @@ The two banner features are intentionally separate — no shared model, controll
 
 `HomepageSiteAnnouncementsComponent`:
 
-- Defaults to `SiteAnnouncement.visible.to_a` when no `announcements:` argument is passed.
+- Defaults to `SiteAnnouncement.visible.includes(:string_translations).to_a` when no `announcements:` argument is passed (eager-loads Mobility translations to avoid N+1 queries).
 - `render?` returns false when the list is empty (no DOM output).
 - Shows the localized `message` and an optional `LinkComponent` CTA.
 - External URLs (`http://` / `https://`) open in a new tab; relative paths stay in the same tab. Protocol-relative URLs (`//…`) are rejected at validation.
-- Each announcement is an `<article>` inside a `role="region"` wrapper labeled via `home.site_announcements.region_label`.
+- Each announcement is an `<article>` inside a `role="region"` wrapper (`id="site-announcements-region"`) labeled via a visible `h2` (`aria-labelledby`).
+- Article content uses right padding (`pe-10`) so long text does not run under the absolutely positioned dismiss control.
 - No decorative icon in the message row — only text and optional link.
+- A module `<script type="module">` immediately after the region initializes dismissal via the shared lib (see **Dismissal**).
 
 ### Dismissal
 
 | Piece | Role |
 | ----- | ---- |
-| `site_announcements_controller.js` | On `connect`, filters dismissed items; handles dismiss click and focus management |
-| `lib/site_announcement_dismissals.js` | Read/write/clear `localStorage` keys |
+| `site_announcements_controller.js` | On `connect`, filters dismissed items, attaches shared dismiss listeners, and manages post-dismiss focus |
+| `lib/site_announcement_dismissals.js` | Read/write/clear `localStorage` keys; shared click handling for dismiss buttons |
+| Module `<script>` in the component template | Initializes dismissal via `document.getElementById("site-announcements-region")` when the shared lib loads without waiting on Stimulus |
+
+Dismiss buttons use `data-site-announcements-dismiss-button` (not a Stimulus `data-action`). Clicks are handled by the shared lib; Stimulus listens for a `site-announcements:dismissed` custom event for focus management.
+
+On page load, both the module script and the Stimulus controller call `filterDismissedAnnouncements` to remove items the visitor previously dismissed (and remove the entire region when nothing remains).
 
 **Storage key:** `skateparks.site_announcement.dismissed.{id}`
 
@@ -146,9 +153,9 @@ On dismiss with JavaScript enabled:
 
 ### Accessibility
 
-- Region: `aria-label` from i18n.
+- Region: `aria-labelledby` pointing at the visible `h2` heading (`home.site_announcements.heading`).
 - Article: `aria-labelledby` pointing at the message `<p>` id (`site-announcement-message-{id}`).
-- Dismiss control: `IconButtonComponent` with `home.site_announcements.dismiss` as accessible name.
+- Dismiss control: `IconButtonComponent` with `home.site_announcements.dismiss_named` (includes the announcement message).
 - Post-dismiss focus management for keyboard users.
 
 ### Privacy
@@ -197,7 +204,7 @@ Hard delete via `destroy!` with confirmation prompt on the index page.
 
 ### Authorization
 
-All admin actions require an admin session (`Admin::BaseController`). Non-admin users are redirected to the homepage for `index`, `create`, `update`, and `destroy`.
+All admin actions require an admin session (`Admin::BaseController`). Non-admin users are redirected to the homepage for any `Admin::SiteAnnouncementsController` action (covered in tests for `index`, `create`, `update`, and `destroy`).
 
 ---
 
@@ -226,11 +233,13 @@ Mobility string translations are stored in the shared `string_translations` tabl
 
 Copy lives under:
 
-- `home.site_announcements.*` — public region label, read-more fallback, dismiss button
+- `home.site_announcements.*` — public region heading (`heading`), read-more fallback (`read_more`), generic dismiss label (`dismiss`), per-announcement dismiss label (`dismiss_named`)
 - `admin.site_announcements.*` — CRUD UI, schedule labels, flash notices, `position`, `back_to_list`
 - `privacy.cookies_body`, `privacy.rights_body` — dismissal storage disclosure
 
 Keys exist in both `config/locales/en.yml` and `config/locales/el.yml`.
+
+Note: `home.site_announcements.region_label` exists in locale files but is unused; the region is labeled via the visible `heading` and `aria-labelledby`.
 
 ---
 
@@ -264,7 +273,7 @@ Coverage includes:
 
 - Model validations (including protocol-relative `//…` URL rejection), scopes, `visible?`, `dismiss_token` stability on reorder vs content change
 - Admin CRUD, authorization on all mutating endpoints, validation errors, atomic position assignment on create
-- Component rendering, locale, links, ARIA, dismiss controls, `data-dismiss-key-prefix`
+- Component rendering, locale, links, ARIA (`heading`, `dismiss_named`), dismiss controls (`data-site-announcements-dismiss-button`), module-script fallback, `data-dismiss-key-prefix`, distinct dismiss labels for multiple announcements
 - Homepage integration (visible vs draft announcements) and updated privacy copy
 
 See [minitest-implementation.md](minitest-implementation.md) for general test conventions.
@@ -273,7 +282,7 @@ See [minitest-implementation.md](minitest-implementation.md) for general test co
 
 ## Operational notes
 
-- **JavaScript required for dismissal** — Filtering dismissed announcements and persisting dismiss state both run through Stimulus on `connect`. Without JavaScript, all visible announcements render and dismiss controls do not work.
+- **JavaScript required for dismissal** — Filtering previously dismissed announcements and persisting new dismissals require JavaScript (`initializeSiteAnnouncements` via the module `<script>` and `site_announcement_dismissals.js`). Stimulus adds post-dismiss focus management when it connects. Without JavaScript, all server-rendered visible announcements remain on the page and dismiss buttons have no effect.
 - **Position collisions** — The unique index on `position` is the final guard. Create always allocates under lock; explicit position changes via edit/index can still fail validation if the target position is taken.
 - **No server-side dismissal** — Dismiss state is client-only. Clearing browser storage or using another device shows announcements again.
 - **Content edits resurrect dismissed banners** — By design: the `dismiss_token` fingerprint changes when copy or links change so users see updated news.
