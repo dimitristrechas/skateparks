@@ -28,16 +28,4 @@ class SiteAnnouncement < ApplicationRecord
       (starts_at.nil? || starts_at <= at) &&
       (ends_at.nil? || ends_at >= at)
   end
-
-  def dismiss_token
-    fingerprint = [
-      message_en,
-      message_el,
-      link_label_en,
-      link_label_el,
-      link_url,
-    ].join("\n")
-
-    Digest::SHA256.hexdigest(fingerprint)
-  end
 end

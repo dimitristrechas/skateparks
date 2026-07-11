@@ -237,7 +237,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_includes response.body, announcement.message_en
-    assert_includes response.body, 'data-controller="site-announcements"'
+    assert_includes response.body, 'id="site-announcements-region"'
   end
 
   def test_get_index_hides_unpublished_site_announcement

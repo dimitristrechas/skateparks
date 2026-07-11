@@ -35,10 +35,7 @@ en:
       today: "It's Go Skate Day!"
     site_announcements:
       heading: "News"
-      region_label: "Site news"
       read_more: "Read more"
-      dismiss: "Dismiss announcement"
-      dismiss_named: "Dismiss announcement: %{message}"
   skatepark:
     name: "Name"
     images: "Images"
@@ -111,11 +108,11 @@ en:
     meta_description: "How skateparks.gr uses cookies, local storage, and analytics—and how you can manage your consent."
     intro: "Skateparks.gr respects your privacy. This page explains what data we store in your browser, how we use analytics to improve the site, and what choices you have under GDPR and similar regulations."
     cookies_heading: "Cookies and local storage"
-    cookies_body: "We use browser local storage to remember your theme preference (light or dark mode) and which site news banners you have dismissed on the homepage. These preferences are stored only on your device, are not shared with analytics providers, and do not track you across other websites."
+    cookies_body: "We use browser local storage to remember your theme preference (light or dark mode). This preference is stored only on your device, is not shared with analytics providers, and does not track you across other websites."
     analytics_heading: "Analytics"
     analytics_body: "With your consent, we use PostHog analytics to collect anonymised usage statistics and session recordings. This helps us understand how skateparks.gr is used—such as which pages are visited and how visitors navigate the site—so we can improve it. Session recordings capture interactions on the page (clicks, scrolling) but we configure PostHog to avoid collecting personally identifiable information. Analytics cookies and storage are not essential; you can use this site without them."
     rights_heading: "Your rights"
-    rights_body: "Under GDPR, you have the right to withdraw consent at any time, request information about data we hold, and lodge a complaint with your supervisory authority. Withdrawing analytics consent stops future collection and clears PostHog cookies and local storage on your device. Your theme preference and dismissed site news banners are not affected."
+    rights_body: "Under GDPR, you have the right to withdraw consent at any time, request information about data we hold, and lodge a complaint with your supervisory authority. Withdrawing analytics consent stops future collection and clears PostHog cookies and local storage on your device. Your theme preference is not affected."
     consent_heading: "Manage your consent"
     consent_body: "Use the buttons below to accept or reject analytics cookies. Your choice is stored in your browser until you change it here or clear your site data."
   sessions:

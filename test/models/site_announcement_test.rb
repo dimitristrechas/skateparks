@@ -108,22 +108,4 @@ class SiteAnnouncementTest < ActiveSupport::TestCase
 
     assert_equal [first, second], SiteAnnouncement.ordered.to_a
   end
-
-  def test_dismiss_token_is_stable_when_only_position_changes
-    announcement = create(:site_announcement, position: 1)
-    original_token = announcement.dismiss_token
-
-    announcement.update!(position: 2)
-
-    assert_equal original_token, announcement.dismiss_token
-  end
-
-  def test_dismiss_token_changes_when_message_changes
-    announcement = create(:site_announcement)
-    original_token = announcement.dismiss_token
-
-    announcement.update!(message_en: 'Updated announcement copy')
-
-    assert_not_equal original_token, announcement.dismiss_token
-  end
 end
