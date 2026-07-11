@@ -78,13 +78,9 @@ export function dismissAnnouncementFromEvent(root, event) {
   if (!item) return null;
 
   const itemIndex = [...root.querySelectorAll("[data-site-announcements-target='item']")].indexOf(item);
-  dismissAnnouncementItem(root, item);
+  const regionRemoved = dismissAnnouncementItem(root, item);
 
-  if (!root.isConnected) {
-    return { itemIndex, regionRemoved: true };
-  }
-
-  return { itemIndex, regionRemoved: false };
+  return { itemIndex, regionRemoved };
 }
 
 export function attachDismissListeners(root) {
