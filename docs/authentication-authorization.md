@@ -107,7 +107,8 @@ GET /protected
 
 ```
 POST /session
-  rate_limit: 10 req / 3 min
+  rate_limit: 10 req / 3 min per IP
+  rate_limit: 10 req / 3 min per email
   → authenticate_user
       User.find_by(email_address)
       if nil: BCrypt.create(dummy) → return nil   ← timing attack mitigation
@@ -157,12 +158,15 @@ DELETE /session
 
 ```
 POST /password_resets
+  rate_limit: 5 req / 15 min per IP
+  rate_limit: 3 req / 15 min per email
   User.find_by(email) → nil = no-op  ← prevents user enumeration
   user.signed_id(expires_in: 15min, purpose: :password_reset)
   PasswordsMailer.reset(user).deliver_later
   redirect with generic notice
 
 PATCH /password_resets/:token
+  rate_limit: 10 req / 15 min per IP
   User.find_signed(token, purpose: :password_reset)  ← HMAC + expiry validation
   nil → redirect (expired or forged token)
   user.update(password, password_confirmation)

@@ -2,8 +2,16 @@ class PasswordResetsController < ApplicationController
   include Authentication
 
   allow_unauthenticated_access
-  rate_limit to: 5, within: 15.minutes, only: :create, with: lambda {
+  rate_limit to: 5, within: 15.minutes, only: :create, name: 'per-ip', with: lambda {
     redirect_to new_password_reset_url, alert: t('authentication.rate_limit_exceeded')
+  }
+  rate_limit to: 3, within: 15.minutes, only: :create, name: 'per-email', by: lambda {
+    params[:email_address].to_s.downcase.strip
+  }, with: lambda {
+    redirect_to new_password_reset_url, alert: t('authentication.rate_limit_exceeded')
+  }
+  rate_limit to: 10, within: 15.minutes, only: :update, with: lambda {
+    redirect_to edit_password_reset_path(params[:token]), alert: t('authentication.rate_limit_exceeded')
   }
   before_action :set_user_by_token, only: %i[edit update]
 

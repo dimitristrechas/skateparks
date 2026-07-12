@@ -1,6 +1,10 @@
 require 'test_helper'
 
 class SessionsControllerTest < ActionDispatch::IntegrationTest
+  def setup
+    Rails.cache.clear
+  end
+
   test 'login success for active user' do
     user = create(:user, email_address: 'active@example.com', password: 'password123456')
     post session_url, params: { email_address: 'active@example.com', password: 'password123456' }
@@ -60,5 +64,20 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to new_session_path
     assert_not Session.exists?(session.id)
+  end
+
+  test 'should rate limit login attempts per email' do
+    create(:user, email_address: 'target@example.com', password: 'password123456')
+
+    10.times do
+      post session_url, params: { email_address: 'target@example.com', password: 'wrongpassword123' }
+
+      assert_redirected_to new_session_path
+    end
+
+    post session_url, params: { email_address: 'target@example.com', password: 'wrongpassword123' }
+
+    assert_redirected_to new_session_url
+    assert_equal I18n.t('authentication.rate_limit_exceeded'), flash[:alert]
   end
 end
