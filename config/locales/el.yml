@@ -182,6 +182,12 @@ el:
       manage_video_suggestions: "Έλεγχος Προτάσεων Βίντεο"
       manage_site_announcements: "Διαχείριση Ανακοινώσεων"
       view_account: "Διαχελιριση Λογαριασμού"
+      video_suggestions_count:
+        one: "1 πρόταση βίντεο σε εκκρεμότητα"
+        other: "%{count} προτάσεις βίντεο σε εκκρεμότητα"
+      site_announcements_count:
+        one: "1 ορατή ανακοίνωση ιστοτόπου"
+        other: "%{count} ορατές ανακοινώσεις ιστοτόπου"
     users:
       title: "Διαχείριση Χρηστών"
       email: "Email"

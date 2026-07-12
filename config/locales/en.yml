@@ -182,6 +182,12 @@ en:
       manage_video_suggestions: "Review Video Suggestions"
       manage_site_announcements: "Manage Site Announcements"
       view_account: "Manage Account"
+      video_suggestions_count:
+        one: "1 pending video suggestion"
+        other: "%{count} pending video suggestions"
+      site_announcements_count:
+        one: "1 visible site announcement"
+        other: "%{count} visible site announcements"
     users:
       title: "Manage Users"
       email: "Email"

@@ -23,14 +23,28 @@
       url: admin_video_suggestions_path,
       large: true,
       ghost: true
-    ) %>
+    ) do |button| %>
+    <% button.with_icon_after do %>
+      <%= render CounterBubbleComponent.new(
+            count: @pending_video_suggestions_count,
+            label: t('admin.dashboard.video_suggestions_count', count: @pending_video_suggestions_count)
+          ) %>
+    <% end %>
+  <% end %>
 
   <%= render LinkButtonComponent.new(
       title: t('admin.dashboard.manage_site_announcements'),
       url: admin_site_announcements_path,
       large: true,
       ghost: true
-    ) %>
+    ) do |button| %>
+    <% button.with_icon_after do %>
+      <%= render CounterBubbleComponent.new(
+            count: @visible_site_announcements_count,
+            label: t('admin.dashboard.site_announcements_count', count: @visible_site_announcements_count)
+          ) %>
+    <% end %>
+  <% end %>
 
   <%= render LinkButtonComponent.new(
       title: t('admin.users.title'),
