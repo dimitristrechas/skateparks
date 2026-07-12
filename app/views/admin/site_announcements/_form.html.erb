@@ -1,0 +1,52 @@
+<%= form_with(model: [:admin, site_announcement], class: "my-8 flex flex-col gap-6") do |form| %>
+  <% if site_announcement.errors.any? %>
+    <div class="mb-4">
+      <h2 class="mb-1 text-xl font-semibold">
+        <%= t("admin.site_announcements.errors_title", count: site_announcement.errors.count) %>
+      </h2>
+
+      <ul class="list-inside list-disc text-red-600">
+        <% site_announcement.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+    <%= render(TextFieldComponent.new(name: "message_en", title: t("admin.site_announcements.message_en"), form: form)) %>
+    <%= render(TextFieldComponent.new(name: "message_el", title: t("admin.site_announcements.message_el"), form: form)) %>
+    <%= render(TextFieldComponent.new(name: "link_label_en", title: t("admin.site_announcements.link_label_en"), form: form)) %>
+    <%= render(TextFieldComponent.new(name: "link_label_el", title: t("admin.site_announcements.link_label_el"), form: form)) %>
+    <%= render(TextFieldComponent.new(name: "link_url", title: t("admin.site_announcements.link_url"), form: form)) %>
+    <%= render(TextFieldComponent.new(name: "position", title: t("admin.site_announcements.position"), form: form)) %>
+  </div>
+
+  <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+    <div>
+      <%= form.label :starts_at, t("admin.site_announcements.starts_at"), class: "mb-1 block text-neutral-600 dark:text-neutral-300" %>
+      <%= form.datetime_local_field :starts_at, class: "w-full rounded p-2 text-neutral-600 dark:text-neutral-700" %>
+    </div>
+
+    <div>
+      <%= form.label :ends_at, t("admin.site_announcements.ends_at"), class: "mb-1 block text-neutral-600 dark:text-neutral-300" %>
+      <%= form.datetime_local_field :ends_at, class: "w-full rounded p-2 text-neutral-600 dark:text-neutral-700" %>
+    </div>
+  </div>
+
+  <label class="flex min-h-8 cursor-pointer items-center gap-2 text-neutral-600 dark:text-neutral-300">
+    <%= form.check_box :published, class: "size-4 rounded" %>
+    <%= t("admin.site_announcements.published") %>
+  </label>
+
+  <div>
+    <%= render(
+          ButtonComponent.new(
+            title: site_announcement.persisted? ? t("edit") : t("create"),
+            form: form,
+            type: "submit",
+            contained: true
+          )
+        ) %>
+  </div>
+<% end %>

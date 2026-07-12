@@ -230,6 +230,41 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  def test_get_index_renders_visible_site_announcement
+    announcement = create(:site_announcement, message_en: 'Homepage news item', message_el: 'Νέα αρχικής')
+
+    get root_path
+
+    assert_response :success
+    assert_includes response.body, announcement.message_en
+    assert_includes response.body, 'id="site-announcements-region"'
+  end
+
+  def test_get_index_hides_unpublished_site_announcement
+    create(:site_announcement, :draft, message_en: 'Hidden draft news')
+
+    get root_path
+
+    assert_response :success
+    assert_not_includes response.body, 'Hidden draft news'
+  end
+
+  def test_get_privacy_renders_updated_cookies_body_in_english
+    get privacy_path(locale: :en)
+
+    assert_response :success
+    assert_includes response.body, I18n.t('privacy.cookies_body', locale: :en)
+    assert_includes response.body, I18n.t('privacy.rights_body', locale: :en)
+  end
+
+  def test_get_privacy_renders_updated_cookies_body_in_greek
+    get privacy_path(locale: :el)
+
+    assert_response :success
+    assert_includes response.body, I18n.t('privacy.cookies_body', locale: :el)
+    assert_includes response.body, I18n.t('privacy.rights_body', locale: :el)
+  end
+
   private
 
   def with_posthog_key(value)

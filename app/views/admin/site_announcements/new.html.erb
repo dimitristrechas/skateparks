@@ -1,0 +1,7 @@
+<h1 class="mb-8 text-3xl font-bold"><%= t("admin.site_announcements.new_announcement") %></h1>
+
+<%= render "form", site_announcement: @site_announcement %>
+
+<div class="flex">
+  <%= render(LinkComponent.new(title: t("admin.site_announcements.back_to_list"), url: admin_site_announcements_path)) %>
+</div>

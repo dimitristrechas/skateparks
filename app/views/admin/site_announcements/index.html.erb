@@ -1,0 +1,115 @@
+<p style="color: green"><%= notice %></p>
+
+<h1 class="mb-8 text-3xl font-bold"><%= t("admin.site_announcements.title") %></h1>
+
+<div class="my-4 flex flex-row-reverse">
+  <%= render(
+        LinkButtonComponent.new(
+          title: t("admin.site_announcements.new_announcement"),
+          url: new_admin_site_announcement_path,
+          contained: true
+        )
+      ) %>
+</div>
+
+<%= render(TableComponent.new) do |table| %>
+  <% table.with_header do %>
+    <th scope="col" class="px-6 py-3"><%= t("admin.site_announcements.position") %></th>
+    <th scope="col" class="px-6 py-3"><%= t("admin.site_announcements.message_en") %></th>
+    <th scope="col" class="px-6 py-3"><%= t("admin.site_announcements.published") %></th>
+    <th scope="col" class="px-6 py-3"><%= t("admin.site_announcements.schedule") %></th>
+    <th scope="col" class="px-6 py-3"></th>
+  <% end %>
+
+  <% if @site_announcements.empty? %>
+    <% table.with_row do %>
+      <td colspan="5" class="px-6 py-4 text-center"><%= t("admin.site_announcements.empty_state") %></td>
+    <% end %>
+  <% else %>
+    <% @site_announcements.each do |site_announcement| %>
+      <% table.with_row do %>
+        <td class="px-6 py-4">
+          <%= form_with model: site_announcement,
+                        url: admin_site_announcement_path(site_announcement),
+                        method: :patch,
+                        class: "flex items-center gap-2" do |form| %>
+            <%= form.number_field :position,
+                                  value: site_announcement.position,
+                                  class: "min-h-8 min-w-8 w-20 rounded p-1 text-neutral-600 dark:text-neutral-700" %>
+
+            <%= render(
+                  ButtonComponent.new(
+                    title: t("admin.site_announcements.update_position"),
+                    form: form,
+                    type: "submit",
+                    ghost: true
+                  )
+                ) %>
+          <% end %>
+        </td>
+
+        <th scope="row" class="max-w-xs truncate px-6 py-4 font-medium text-gray-900 dark:text-white">
+          <%= site_announcement.message_en %>
+        </th>
+
+        <td class="px-6 py-4">
+          <%= site_announcement.published? ? t("admin.site_announcements.published_yes") : t("admin.site_announcements.published_no") %>
+        </td>
+
+        <td class="px-6 py-4">
+          <% if site_announcement.starts_at.blank? && site_announcement.ends_at.blank? %>
+            <%= t("admin.site_announcements.schedule_always") %>
+          <% elsif site_announcement.starts_at.present? && site_announcement.ends_at.present? %>
+            <%= t(
+                  "admin.site_announcements.schedule_range",
+                  starts_at: l(site_announcement.starts_at, format: :short),
+                  ends_at: l(site_announcement.ends_at, format: :short)
+                ) %>
+          <% elsif site_announcement.starts_at.present? %>
+            <%= t(
+                  "admin.site_announcements.schedule_from",
+                  starts_at: l(site_announcement.starts_at, format: :short)
+                ) %>
+          <% else %>
+            <%= t(
+                  "admin.site_announcements.schedule_until",
+                  ends_at: l(site_announcement.ends_at, format: :short)
+                ) %>
+          <% end %>
+        </td>
+
+        <td class="flex gap-4 px-6 py-4">
+          <%= render(
+                LinkButtonComponent.new(
+                  title: t("edit"),
+                  url: edit_admin_site_announcement_path(site_announcement),
+                  ghost: true
+                )
+              ) %>
+
+          <%= form_with url: admin_site_announcement_path(site_announcement),
+                        method: :delete,
+                        data: { turbo_confirm: t("admin.site_announcements.destroy_confirm") } do |form| %>
+            <%= render(
+                  ButtonComponent.new(
+                    title: t("admin.site_announcements.destroy"),
+                    form: form,
+                    type: "submit",
+                    ghost: true,
+                    class: "text-red-600 dark:text-red-400"
+                  )
+                ) %>
+          <% end %>
+        </td>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>
+
+<%= render(
+      LinkComponent.new(
+        title: t("back_to_admin"),
+        url: admin_root_path,
+        classnames: "my-8 flex justify-end"
+      )
+    ) %>

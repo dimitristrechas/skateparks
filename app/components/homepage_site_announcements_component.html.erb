@@ -1,0 +1,30 @@
+<div
+  id="<%= region_id %>"
+  role="region"
+  aria-labelledby="<%= region_heading_id %>"
+  class="mt-16 flex flex-col gap-4 lg:mt-20"
+>
+  <h2 id="<%= region_heading_id %>" class="font-semibold sm:text-xl"><%= t('home.site_announcements.heading') %></h2>
+
+  <% @announcements.each do |announcement| %>
+    <article
+      aria-labelledby="<%= message_id_for(announcement) %>"
+      class="flex items-center justify-center rounded-2xl bg-green-700/5 px-10 py-2 text-center"
+    >
+      <div class="flex flex-row flex-wrap items-center justify-center gap-x-1 gap-y-0 sm:text-lg">
+        <p id="<%= message_id_for(announcement) %>" class="p-1"><%= announcement.message %></p>
+
+        <% if announcement.link_url.present? %>
+          <%= render(
+                LinkComponent.new(
+                  title: link_label_for(announcement),
+                  url: announcement.link_url,
+                  target: external_link?(announcement.link_url) ? '_blank' : '_self',
+                  classnames: 'font-semibold'
+                )
+              ) %>
+        <% end %>
+      </div>
+    </article>
+  <% end %>
+</div>

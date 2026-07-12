@@ -16,6 +16,7 @@ gem 'concurrent-ruby', '>= 1.3.7' # CVE-2026-54904, CVE-2026-54905, CVE-2026-549
 gem 'faraday', '>= 2.14.3' # CVE-2026-54297
 gem 'msgpack', '>= 1.8.2' # CVE-2026-54522
 gem 'nokogiri', '>= 1.19.4' # GHSA advisories through 1.19.3
+gem 'websocket-driver', '>= 0.8.2' # CVE-2026-54463, CVE-2026-54464, CVE-2026-54465, GHSA-2x63-gw47-w4mm
 
 # Use postgresql as the database for Active Record
 gem 'pg', '~> 1.1'
