@@ -61,3 +61,55 @@ params.expect(model: [:field])  # Not params.require().permit()
 ```javascript
 handleClick = (event) => {}; // Arrow functions for event handlers
 ```
+
+## Commit messages
+
+Follow **Conventional Commits** for every commit. This matches the established repository history (`git log`).
+
+### Format
+
+```text
+<type>[optional scope]: <subject>
+```
+
+- **`type`** (required): `feat`, `fix`, `chore`, `docs`, `refactor`, `test`, or `ci`
+- **`scope`** (optional): area in parentheses — e.g. `(deps)`, `(ci)`, `(SK8-98)` for a Linear issue, `(agents)` for AI agent/skill/config changes
+- **`subject`**: imperative mood, concise summary; **no trailing period**
+
+### Examples from this repo
+
+```text
+feat: Add homepage site announcements with admin CRUD (#103)
+fix: improve greek translations for suggestion feature
+feat(SK8-98): Anonymous video suggestions and admin moderation (#101)
+chore(deps): bump puma to 8.0.2 for PROXY protocol CVEs
+fix(ci): install pnpm before setup-node cache step
+agents: update and align structure
+chore(agents): simplify subagents to two routers and two OpenCode skills
+```
+
+### Do not use
+
+Unprefixed subjects (recent drift — not the project standard):
+
+```text
+Add counter bubbles to admin dashboard for pending videos.
+Refactor scripts.sh with CLI subcommands and faster parallel lint checks.
+Simplify AI subagents to two thin routers and two OpenCode skills.
+```
+
+### Type guide
+
+| Type | When |
+|------|------|
+| `feat` | New user-facing behavior or capability |
+| `fix` | Bug fix or correction |
+| `chore` | Tooling, deps, config, maintenance (use scope when helpful: `chore(deps)`, `chore(agents)`) |
+| `docs` | Documentation only |
+| `refactor` | Code structure change without behavior change |
+| `test` | Tests only |
+| `ci` | CI/CD workflow changes |
+
+For AI agent, skill, or `opencode.json` changes, use `chore(agents):` or `agents:` (both appear in history; prefer `chore(agents):` for consistency with scoped types).
+
+Merged PRs may append `(#123)` to the subject when applicable.

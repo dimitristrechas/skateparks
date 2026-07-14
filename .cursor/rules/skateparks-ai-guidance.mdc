@@ -10,4 +10,5 @@ alwaysApply: true
 - **Subagent prompts:** `.claude/agents/*.md` are the canonical role prompts (shared with Claude Code and OpenCode). `.cursor/agents/` contains symlinks to those files for Cursor discovery; edit `.claude/agents/`, not the symlinks.
 - **Skills:** `.claude/skills/*/SKILL.md` is the canonical skill format. `.cursor/skills/` contains symlinks for Cursor discovery; keep content consistent with `AGENTS.md` and testing docs.
 - **Cross-tool MCP:** When changing MCP integration, keep `opencode.json`, `.mcp.json`, and `.cursor/mcp.json` aligned. See [.agent-docs/ai-tooling.md](.agent-docs/ai-tooling.md) for env placeholder differences.
+- **Commit messages:** Conventional Commits only (`feat:`, `fix:`, `chore(scope):`, etc.) — never unprefixed subjects. See [AGENTS.md](AGENTS.md) and [.agent-docs/conventions.md](.agent-docs/conventions.md#commit-messages).
 - Do not add GitHub Copilot-specific instructions, agent files, or MCP endpoints back into this repository.
