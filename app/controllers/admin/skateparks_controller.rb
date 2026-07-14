@@ -88,7 +88,9 @@ module Admin
     # Only allow a list of trusted parameters through.
     def skatepark_params
       @skatepark_params ||= params.expect(skatepark: [:name_el, :name_en, :lat, :lng, :cover_image, :description_el,
-                                                      :description_en, :google_id, :status, :country_code, :state,
+                                                      :description_en, :meta_title_el, :meta_title_en,
+                                                      :meta_description_el, :meta_description_en,
+                                                      :google_id, :status, :country_code, :state,
                                                       { new_images: [] },
                                                       { new_image_positions: [] },
                                                       { new_video_urls: [] },

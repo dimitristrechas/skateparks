@@ -134,6 +134,21 @@
       <%= form.rich_text_area(:description_en, class: "bg-white text-neutral-600") %>
     </div>
 
+    <div class="col-span-2">
+      <h3 class="text-lg font-semibold"><%= t("admin.skateparks.form.seo_heading") %></h3>
+      <p class="mb-4 text-sm text-neutral-600 dark:text-neutral-400"><%= t("admin.skateparks.form.seo_hint") %></p>
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <%= render(TextFieldComponent.new(name: "meta_title_el", title: t("skatepark.meta_title_el"), form: form)) %>
+      <%= render(TextFieldComponent.new(name: "meta_description_el", title: t("skatepark.meta_description_el"), form: form)) %>
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <%= render(TextFieldComponent.new(name: "meta_title_en", title: t("skatepark.meta_title_en"), form: form)) %>
+      <%= render(TextFieldComponent.new(name: "meta_description_en", title: t("skatepark.meta_description_en"), form: form)) %>
+    </div>
+
     <div class="col-start-1">
       <%= form.label :cover_image,
                  t("skatepark.cover_image"),

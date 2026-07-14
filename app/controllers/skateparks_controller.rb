@@ -10,8 +10,8 @@ class SkateparksController < ApplicationController
   end
 
   def show
-    @title = "#{@skatepark.name} | Skateparks.gr"
-    @meta_description = @skatepark.description.to_plain_text
+    @title = @skatepark.seo_title
+    @meta_description = @skatepark.seo_description
     @meta_image = url_for(@skatepark.cover_image)
     @location_friendly_name = location_name
   end

@@ -1,9 +1,12 @@
+# rubocop:disable Metrics/ClassLength
 class Skatepark < ApplicationRecord
   extend Mobility
   include SkateparkVideoUrlUniqueness
 
   translates :name, type: :string
   translates :description, backend: :action_text
+  translates :meta_title, type: :string
+  translates :meta_description, type: :string
   has_many :skatepark_images, -> { order(:position, :id) }, dependent: :destroy, inverse_of: :skatepark
   accepts_nested_attributes_for :skatepark_images, allow_destroy: true
   has_many :skatepark_videos, -> { order(:position, :id) }, dependent: :destroy, inverse_of: :skatepark
@@ -68,6 +71,21 @@ class Skatepark < ApplicationRecord
     country.subdivisions[state]&.name if state.present?
   end
 
+  def seo_title
+    meta_title.presence || "#{name} | Skateparks.gr"
+  end
+
+  def seo_description
+    meta_description.presence || truncated_plain_description
+  end
+
+  def truncated_plain_description(max_length: 160)
+    text = description.to_plain_text.squish
+    return text if text.length <= max_length
+
+    text.truncate(max_length, separator: /\s/, omission: '…')
+  end
+
   private
 
   def minimum_skatepark_images
@@ -130,3 +148,4 @@ class Skatepark < ApplicationRecord
     Rails.cache.delete(Skatepark.homepage_popular_cache_key)
   end
 end
+# rubocop:enable Metrics/ClassLength
