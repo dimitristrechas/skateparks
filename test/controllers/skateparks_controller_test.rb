@@ -292,7 +292,7 @@ class SkateparksControllerTest < ActionDispatch::IntegrationTest
     get skatepark_path(@skatepark, locale: :en)
 
     assert_response :success
-    assert_includes response.body, %(rel="canonical" href="http://test.host/skateparks/#{@skatepark.to_param}?locale=en")
+    assert_includes response.body, %(rel="canonical" href="https://www.example.com/skateparks/#{@skatepark.to_param}?locale=en")
     assert_includes response.body, 'hreflang="en"'
     assert_includes response.body, 'hreflang="el"'
     assert_includes response.body, 'hreflang="x-default"'

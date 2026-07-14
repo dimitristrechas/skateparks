@@ -69,7 +69,7 @@ module Admin
         },
       }
 
-      assert_redirected_to admin_skatepark_path(@skatepark)
+      assert_redirected_to admin_skateparks_path
       @skatepark.reload
 
       assert_equal 'SEO Title EN', @skatepark.meta_title_en

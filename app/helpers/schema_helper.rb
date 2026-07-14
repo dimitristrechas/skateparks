@@ -77,7 +77,7 @@ module SchemaHelper
       '@context': 'https://schema.org',
       '@type': 'SportsActivityLocation',
       '@id': skatepark_url(skatepark, protocol: 'https'),
-      name: skatepark.name,
+      name: skatepark.seo_title,
       description: skatepark.seo_description,
       url: skatepark_url(skatepark, protocol: 'https'),
       image: skatepark_schema_images(skatepark),
