@@ -31,7 +31,7 @@ docker compose -f docker-compose.test.yml exec skateparks-web-test bin/rails tes
 docker compose -f docker-compose.test.yml exec skateparks-web-test bin/rails test -n test_method_name
 ```
 
-Container: `skateparks-web-test`. Start with `sh scripts.sh` -> "Start test server" if not running.
+Container: `skateparks-web-test`. Start with `sh scripts.sh` → **(6) Start / rebuild test server** if not running.
 
 ## Minitest Syntax (not RSpec)
 

@@ -38,7 +38,7 @@ docker compose -f docker-compose.test.yml exec skateparks-web-test bin/rails tes
 docker compose -f docker-compose.test.yml exec skateparks-web-test bin/rails test test/models/skatepark_test.rb -n test_requires_name_to_be_present
 ```
 
-The test container is `skateparks-web-test`. Must be running — start with `sh scripts.sh` → "Start test server" if not.
+The test container is `skateparks-web-test`. Must be running — start with `sh scripts.sh` → **(6) Start / rebuild test server** if not.
 
 ## Test Structure
 

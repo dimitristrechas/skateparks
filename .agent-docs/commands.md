@@ -1,12 +1,30 @@
 # Commands Reference
 
-`sh scripts.sh` is the preferred entry point for starting development and test servers and for common lint/format/test workflows. Use the direct commands below when `scripts.sh` does not cover the task or when automation needs a non-interactive command.
+`sh scripts.sh` is the preferred entry point for starting development and test servers and for common lint/format/test workflows. For automation, use non-interactive subcommands (see below). Use the direct commands when `scripts.sh` does not cover the task.
+
+## scripts.sh (non-interactive)
+
+```bash
+sh scripts.sh                              # Interactive menu
+sh scripts.sh test                           # All tests with coverage
+sh scripts.sh test --fast                    # All tests without coverage
+sh scripts.sh test test/models/foo_test.rb   # Single file or line
+sh scripts.sh lint                           # Fast linter checks (parallel RuboCop, Herb, Prettier)
+sh scripts.sh lint --full                    # Includes Zeitwerk check
+sh scripts.sh lint --fix                     # Auto-fix then re-check
+sh scripts.sh security                       # Brakeman, bundle-audit, pnpm audit (parallel)
+sh scripts.sh ci                             # Full CI parity (all checks in parallel)
+sh scripts.sh dev up                         # Start development server
+sh scripts.sh dev rebuild --force            # Rebuild development containers
+sh scripts.sh test-server up                 # Start test server
+sh scripts.sh test-server schema-load        # Reload test DB schema
+```
 
 ## Linting
 
 ```bash
-bundle exec rubocop                 # Check Ruby
-bundle exec rubocop -A              # Auto-fix Ruby
+bundle exec rubocop --force-exclusion       # Check Ruby
+bundle exec rubocop -A --force-exclusion    # Auto-fix Ruby
 pnpm herb:lint                      # Lint ERB
 pnpm herb:lint --fix                # Fix ERB lint
 pnpm herb:format                    # Format ERB

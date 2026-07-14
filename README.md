@@ -9,9 +9,9 @@
 5. `bundle install`
 6. `corepack enable && pnpm install`
 7. `lefthook install` (sets up pre-commit hooks)
-8. `./scripts.sh`, select option "Fresh build & start development server" to build the docker containers from scratch
+8. `./scripts.sh`, select option **(1) Start / rebuild development server** and choose rebuild to build containers from scratch (or `sh scripts.sh dev rebuild --force`)
 9. Open browser on `localhost:3002`
-10. Optionally seed the database with "Seed the database" option in `./scripts.sh`
+10. Optionally seed the database with option **(19) Seed the database** in `./scripts.sh`
 11. Optionally set MCP token environment variables in shell profile (~/.zshrc or ~/.bashrc):
     - `export GITHUB_MCP_TOKEN=<your-token>`
     - `export LINEAR_MCP_TOKEN=<your-token>`
@@ -23,7 +23,7 @@
 ### How to run tests
 
 1. `./scripts.sh`
-2. Select option "Fresh build & start test server" to build the docker containers from scratch
-3. Select option "Run tests" to run the test suite
+2. Select option **(6) Start / rebuild test server** and choose rebuild for a fresh build (or `sh scripts.sh test-server rebuild --force`)
+3. Select option **(7) Run all tests (with coverage)** or use `sh scripts.sh test --fast` for a quicker run
 
 **Note**: This project uses Minitest (Rails default). See [docs/minitest-implementation.md](docs/minitest-implementation.md) for detailed testing guide.

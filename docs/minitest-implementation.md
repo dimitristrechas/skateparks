@@ -437,10 +437,12 @@ docker compose -f docker-compose.test.yml exec skateparks-web-test bin/rails tes
 docker compose -f docker-compose.test.yml exec skateparks-web-test bin/rails test test/models/skatepark_test.rb -n test_requires_name_to_be_present
 ```
 
-Or use the interactive menu:
+Or use the interactive menu or CLI:
 
 ```bash
-./scripts.sh   # → "Run tests"
+./scripts.sh                    # → (7) Run all tests (with coverage)
+sh scripts.sh test --fast       # Without coverage
+sh scripts.sh test test/models/skatepark_test.rb
 ```
 
 ---

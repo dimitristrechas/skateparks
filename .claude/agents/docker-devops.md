@@ -58,7 +58,7 @@ docker compose -f docker-compose.test.yml exec skateparks-web-test bin/rails tes
 docker compose -f docker-compose.test.yml exec skateparks-web-test bin/rails test -n test_method_name
 ```
 
-**If test container isn't running**: `sh scripts.sh` → "Start test server" (or "Fresh build & start test server" if you need a clean build).
+**If test container isn't running**: `sh scripts.sh` → **(6) Start / rebuild test server** (choose rebuild for a clean build), or `sh scripts.sh test-server up`.
 
 ## Linting (runs locally, not via Docker)
 
@@ -81,7 +81,7 @@ cp .env.example .env && cp .env.example .env.test
 # Fill in .env and .env.test (RAILS_MASTER_KEY = contents of dev.key / test.key)
 bundle install && corepack enable && pnpm install
 lefthook install
-sh scripts.sh  # → "Fresh build & start development server"
+sh scripts.sh  # → (1) Start / rebuild development server
 ```
 
 ## Environment Files
@@ -150,7 +150,7 @@ If a pre-commit hook fails, the commit is blocked. Run `sh scripts.sh` or the in
 When adding new gems requiring native extensions, the Docker image needs to be rebuilt:
 
 ```bash
-sh scripts.sh  # → "Fresh build & start development server"
+sh scripts.sh  # → (1) Start / rebuild development server
 # or
 docker compose -f docker-compose.development.yml build
 ```
