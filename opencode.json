@@ -1,40 +1,16 @@
 {
   "agent": {
-    "frontend-expert": {
-      "description": "Use this agent when working on frontend tasks including: JavaScript/Stimulus controllers, Hotwire/Turbo functionality, HTML templates, CSS/Tailwind styling, ViewComponents, accessibility improvements, responsive design, or any client-side code. Canonical project rules: AGENTS.md.",
+    "rails-implementer": {
+      "description": "Feature implementation across Rails backend and Hotwire frontend (models, controllers, ViewComponents, Stimulus, Tailwind, i18n/a11y).",
       "mode": "subagent",
       "temperature": 0.1,
-      "prompt": "{file:./.claude/agents/frontend-expert.md}"
+      "prompt": "{file:./.claude/agents/rails-implementer.md}"
     },
-    "gem-dependency-manager": {
-      "description": "Use this agent when: adding/updating gems in Gemfile, reviewing security vulnerabilities, planning dependency updates, investigating outdated packages, or before production deployments to check dependency health. Canonical project rules: AGENTS.md.",
+    "devops": {
+      "description": "Docker, scripts.sh, CI/CD, credentials, environment setup, and deployment troubleshooting.",
       "mode": "subagent",
       "temperature": 0.1,
-      "prompt": "{file:./.claude/agents/gem-dependency-manager.md}"
-    },
-    "rails-backend-architect": {
-      "description": "Use this agent when: backend architecture decisions needed, database schema design/optimization, Rails model/controller/service implementation, background job setup, caching strategy, API design, performance optimization, SOLID violations, ActiveRecord queries, Redis integration, database migrations, test coverage for backend logic. Canonical project rules: AGENTS.md.",
-      "mode": "subagent",
-      "temperature": 0.1,
-      "prompt": "{file:./.claude/agents/rails-backend-architect.md}"
-    },
-    "minitest-test-writer": {
-      "description": "Use this agent when writing new Minitest tests, debugging failing tests, adding test coverage, setting up FactoryBot factories, implementing mocking/stubbing with Mocha, writing ViewComponent tests, or writing Capybara system tests. Canonical project rules: AGENTS.md.",
-      "mode": "subagent",
-      "temperature": 0.1,
-      "prompt": "{file:./.claude/agents/minitest-test-writer.md}"
-    },
-    "docker-devops": {
-      "description": "Use this agent when: managing Docker containers, debugging Docker build issues, running the test suite, setting up development environment, working with CI/CD pipeline, managing environment variables/credentials, or troubleshooting deployment issues. Canonical project rules: AGENTS.md.",
-      "mode": "subagent",
-      "temperature": 0.1,
-      "prompt": "{file:./.claude/agents/docker-devops.md}"
-    },
-    "rubocop-enforcer": {
-      "description": "Use this agent when checking Ruby/Rails code style, fixing RuboCop violations, requesting code quality analysis, or ensuring code follows project standards after implementing features. Canonical project rules: AGENTS.md.",
-      "mode": "subagent",
-      "temperature": 0.1,
-      "prompt": "{file:./.claude/agents/rubocop-enforcer.md}"
+      "prompt": "{file:./.claude/agents/devops.md}"
     }
   },
   "mcp": {
@@ -62,6 +38,9 @@
     "bash(git commit*)": "ask",
     "bash(git push*)": "ask",
     "bash(git reflog*)": "ask",
-    "bash(git reset*)": "ask"
+    "bash(git reset*)": "ask",
+    "skill": {
+      "*": "allow"
+    }
   }
 }

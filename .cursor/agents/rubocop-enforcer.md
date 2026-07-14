@@ -1,1 +1,0 @@
-../../.claude/agents/rubocop-enforcer.md

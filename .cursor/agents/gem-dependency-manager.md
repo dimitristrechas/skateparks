@@ -1,1 +1,0 @@
-../../.claude/agents/gem-dependency-manager.md
