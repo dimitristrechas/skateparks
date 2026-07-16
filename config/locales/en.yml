@@ -149,7 +149,7 @@ en:
     reset_text_body: "You can reset your password within the next 15 minutes on this password reset page:"
   application:
     title: "Skateparks in Greece & Worldwide — Find skateparks near you"
-    meta_description: "Discover skateparks across Greece and worldwide with detailed listings, interactive maps, photos, videos and more."
+    meta_description: "Discover skateparks across Greece and worldwide with detailed listings, interactive maps, photos, videos and more. Plan your next tour here!"
     not_authorized: "You are not authorized to perform this action."
   authentication:
     invalid_credentials: "Invalid email or password."

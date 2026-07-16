@@ -22,51 +22,15 @@ All public HTML pages share `app/views/layouts/application.html.erb`. SEO output
 
 ## Architecture
 
-```mermaid
-flowchart TD
-  subgraph controllers [Controllers]
-    HC[HomeController<br/>about / contact / privacy]
-    SC[SkateparksController#show]
-    IDX[SkateparksController#index]
-    ROOT[HomeController#index]
-  end
+Data flows from controllers and the `Skatepark` model into layout partials and helpers:
 
-  subgraph assigns [Instance variables]
-    T["@title"]
-    MD["@meta_description"]
-    MI["@meta_image"]
-  end
+1. **Controllers** set `@title`, `@meta_description`, and optionally `@meta_image` (or leave them unset for site defaults).
+2. **`Skatepark#show`** derives `@title` / `@meta_description` from `seo_title` / `seo_description` instead of setting them directly in the view.
+3. **Partials** (`_title.html.erb`, `_description.html.erb`) render the HTML head, falling back to `application.*` locale keys.
+4. **`SeoHelper`** builds canonical/hreflang URLs and social-meta fallbacks from the same controller assigns.
+5. **`SchemaHelper`** emits JSON-LD using those assigns (or skatepark-specific methods on show pages).
 
-  subgraph model [Skatepark]
-    MT[meta_title — Mobility]
-    MDesc[meta_description — Mobility]
-    ST[seo_title]
-    SD[seo_description]
-  end
-
-  subgraph layout [application.html.erb]
-    Title[_title.html.erb]
-    Desc[_description.html.erb]
-    OG[Open Graph + Twitter]
-    Canon[canonical + hreflang]
-    LD[json_ld_schema]
-  end
-
-  HC --> T & MD
-  SC --> ST & SD
-  ST --> T
-  SD --> MD
-  SC --> MI
-
-  ROOT --> I18n
-  IDX --> I18n
-
-  T --> Title & OG & LD
-  MD --> Desc & OG & LD
-  MI --> OG & LD
-
-  I18n["application.title<br/>application.meta_description"] --> Title & Desc & OG
-```
+Homepage and skateparks index skip step 1 and use site-wide defaults from `config/locales`.
 
 ### Fallback chain
 
@@ -306,7 +270,7 @@ Rendered only on **public** pages (`public_seo_page?` returns false for `/admin/
 
 `website_schema` includes a sitelinks search box target:
 
-```
+```text
 https://www.skateparks.gr/skateparks?search={search_term_string}
 ```
 
@@ -386,7 +350,7 @@ All keys exist in both `config/locales/en.yml` and `config/locales/el.yml`.
 
 **File:** `public/robots.txt`
 
-```
+```text
 User-agent: *
 Disallow: /admin/
 Sitemap: https://www.skateparks.gr/sitemap.xml.gz
