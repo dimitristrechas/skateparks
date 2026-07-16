@@ -50,6 +50,34 @@ module Admin
       assert_equal @skatepark, assigns(:skatepark)
     end
 
+    def test_get_edit_renders_seo_fields
+      get edit_admin_skatepark_path(@skatepark)
+
+      assert_response :success
+      assert_includes response.body, 'name="skatepark[meta_title_en]"'
+      assert_includes response.body, 'name="skatepark[meta_description_en]"'
+      assert_includes response.body, I18n.t('admin.skateparks.form.seo_heading')
+    end
+
+    def test_patch_update_persists_seo_fields
+      patch admin_skatepark_path(@skatepark), params: {
+        skatepark: {
+          meta_title_en: 'SEO Title EN',
+          meta_title_el: 'SEO Title EL',
+          meta_description_en: 'SEO description EN',
+          meta_description_el: 'SEO description EL',
+        },
+      }
+
+      assert_redirected_to admin_skateparks_path
+      @skatepark.reload
+
+      assert_equal 'SEO Title EN', @skatepark.meta_title_en
+      assert_equal 'SEO Title EL', @skatepark.meta_title_el
+      assert_equal 'SEO description EN', @skatepark.meta_description_en
+      assert_equal 'SEO description EL', @skatepark.meta_description_el
+    end
+
     def test_get_edit_renders_video_staging_input_without_native_url_validation
       get edit_admin_skatepark_path(@skatepark)
 

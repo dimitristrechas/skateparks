@@ -12,7 +12,7 @@ class HomeController < ApplicationController
   end
 
   def about
-    @title = t('about')
+    @title = t('about.title')
     @meta_description = t('about_details')
   end
 

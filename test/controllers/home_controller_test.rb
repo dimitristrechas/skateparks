@@ -140,7 +140,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
   def test_get_about_assigns_title_and_meta_description
     get about_path
 
-    assert_equal I18n.t('about'), assigns(:title)
+    assert_equal I18n.t('about.title'), assigns(:title)
     assert_equal I18n.t('about_details'), assigns(:meta_description)
   end
 

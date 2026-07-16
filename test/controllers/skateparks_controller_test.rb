@@ -275,8 +275,44 @@ class SkateparksControllerTest < ActionDispatch::IntegrationTest
     get skatepark_path(@skatepark)
 
     assert_equal "#{@skatepark.name} | Skateparks.gr", assigns(:title)
-    assert_equal @skatepark.description.to_plain_text, assigns(:meta_description)
+    assert_equal @skatepark.seo_description, assigns(:meta_description)
     assert_equal url_for(@skatepark.cover_image), assigns(:meta_image)
+  end
+
+  def test_get_show_sets_custom_seo_meta_tags
+    @skatepark.update!(meta_title_en: 'Custom Title', meta_description_en: 'Custom meta description.')
+
+    get skatepark_path(@skatepark)
+
+    assert_equal 'Custom Title', assigns(:title)
+    assert_equal 'Custom meta description.', assigns(:meta_description)
+  end
+
+  def test_get_show_renders_canonical_and_hreflang_tags
+    get skatepark_path(@skatepark, locale: :en)
+
+    assert_response :success
+    assert_includes response.body, %(rel="canonical" href="https://www.example.com/skateparks/#{@skatepark.to_param}?locale=en")
+    assert_includes response.body, 'hreflang="en"'
+    assert_includes response.body, 'hreflang="el"'
+    assert_includes response.body, 'hreflang="x-default"'
+  end
+
+  def test_get_show_renders_twitter_card_tags
+    get skatepark_path(@skatepark, locale: :en)
+
+    assert_response :success
+    assert_includes response.body, 'name="twitter:card" content="summary_large_image"'
+    assert_includes response.body, %(name="twitter:title" content="#{@skatepark.name} | Skateparks.gr")
+  end
+
+  def test_get_show_uses_greek_seo_overrides_with_el_locale
+    @skatepark.update!(meta_title_el: 'Προσαρμοσμένος τίτλος', meta_description_el: 'Προσαρμοσμένη περιγραφή.')
+
+    get skatepark_path(@skatepark, locale: :el)
+
+    assert_equal 'Προσαρμοσμένος τίτλος', assigns(:title)
+    assert_equal 'Προσαρμοσμένη περιγραφή.', assigns(:meta_description)
   end
 
   def test_get_show_redirects_to_homepage_when_skatepark_not_found

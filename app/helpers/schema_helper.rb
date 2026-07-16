@@ -24,7 +24,7 @@ module SchemaHelper
       '@type': 'Organization',
       name: 'skateparks.gr',
       url: root_url(protocol: 'https'),
-      description: t('application.meta_description', locale: :en),
+      description: t('application.meta_description'),
       sameAs: [
         # Social media URLs here
       ],
@@ -38,17 +38,23 @@ module SchemaHelper
       '@id': "#{root_url(protocol: 'https')}#website",
       name: 'skateparks.gr',
       url: root_url(protocol: 'https'),
-      description: t('application.meta_description', locale: :en),
+      description: t('application.meta_description'),
       inLanguage: %w[el en],
       potentialAction: {
         '@type': 'SearchAction',
         target: {
           '@type': 'EntryPoint',
-          urlTemplate: "#{skateparks_url(protocol: 'https')}?search={search_term_string}",
+          urlTemplate: search_action_url_template,
         },
         'query-input': 'required name=search_term_string',
       },
     }
+  end
+
+  def search_action_url_template
+    base = skateparks_url(protocol: 'https')
+    joiner = base.include?('?') ? '&' : '?'
+    "#{base}#{joiner}search={search_term_string}"
   end
 
   def webpage_schema(title: nil, meta_description: nil, meta_image: nil)
@@ -56,8 +62,8 @@ module SchemaHelper
       '@context': 'https://schema.org',
       '@type': 'WebPage',
       '@id': url_for(only_path: false, protocol: 'https'),
-      name: title.presence || t('application.title', locale: :en),
-      description: meta_description.presence || t('application.meta_description', locale: :en),
+      name: title.presence || t('application.title'),
+      description: meta_description.presence || t('application.meta_description'),
       image: meta_image.presence || image_url('logo-og.png'),
       url: url_for(only_path: false, protocol: 'https'),
       isPartOf: {
@@ -71,8 +77,8 @@ module SchemaHelper
       '@context': 'https://schema.org',
       '@type': 'SportsActivityLocation',
       '@id': skatepark_url(skatepark, protocol: 'https'),
-      name: skatepark.name,
-      description: skatepark.description&.to_plain_text,
+      name: skatepark.seo_title,
+      description: skatepark.seo_description,
       url: skatepark_url(skatepark, protocol: 'https'),
       image: skatepark_schema_images(skatepark),
     }
@@ -122,7 +128,7 @@ module SchemaHelper
       '@type': 'CollectionPage',
       '@id': skateparks_url(protocol: 'https'),
       name: 'Skateparks',
-      description: t('application.meta_description', locale: :en),
+      description: t('application.meta_description'),
       url: skateparks_url(protocol: 'https'),
       isPartOf: {
         '@id': "#{root_url(protocol: 'https')}#website",

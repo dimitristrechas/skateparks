@@ -146,4 +146,38 @@ class SkateparkTest < ActiveSupport::TestCase
       video.id == skatepark_video.id
     }, :marked_for_destruction?
   end
+
+  def test_seo_title_falls_back_to_name_and_site_suffix
+    skatepark = create(:skatepark, name_en: 'Bonn Park', name_el: 'Bonn Park')
+
+    I18n.with_locale(:en) do
+      assert_equal 'Bonn Park | Skateparks.gr', skatepark.seo_title
+    end
+  end
+
+  def test_seo_title_uses_meta_title_override
+    skatepark = create(:skatepark, meta_title_en: 'Custom SEO Title')
+
+    I18n.with_locale(:en) do
+      assert_equal 'Custom SEO Title', skatepark.seo_title
+    end
+  end
+
+  def test_seo_description_uses_meta_description_override_verbatim
+    skatepark = create(:skatepark, meta_description_en: 'Short custom description.')
+
+    I18n.with_locale(:en) do
+      assert_equal 'Short custom description.', skatepark.seo_description
+    end
+  end
+
+  def test_seo_description_truncates_long_body_copy
+    long_description = ('Word ' * 80).to_s
+    skatepark = create(:skatepark, description_en: long_description)
+
+    I18n.with_locale(:en) do
+      assert_operator skatepark.seo_description.length, :<=, 160
+      assert_not_equal skatepark.description.to_plain_text.squish, skatepark.seo_description
+    end
+  end
 end
