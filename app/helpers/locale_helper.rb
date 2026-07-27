@@ -13,6 +13,16 @@ module LocaleHelper
     end
   end
 
+  def locale_switch_url_options(locale)
+    options = {
+      country_code: params[:country_code],
+      state: params[:state],
+      page: params[:page],
+    }
+    options[:locale] = locale unless locale == I18n.default_locale
+    options.compact
+  end
+
   private
 
   def locale_list
@@ -22,7 +32,6 @@ module LocaleHelper
   end
 
   def locale_link(locale)
-    link_to LOCALES[locale],
-            { locale: locale, country_code: params[:country_code], state: params[:state], page: params[:page] }.compact
+    link_to LOCALES[locale], locale_switch_url_options(locale)
   end
 end

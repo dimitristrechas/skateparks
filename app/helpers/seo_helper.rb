@@ -6,9 +6,11 @@ module SeoHelper
   end
 
   def seo_page_url(locale:)
+    url_options = { only_path: false, protocol: 'https' }
+    url_options[:locale] = locale unless locale == I18n.default_locale
+
     url_for(
-      { only_path: false, protocol: 'https', locale: locale }
-        .merge(request.query_parameters.symbolize_keys.slice(*LOCALE_ALTERNATE_PARAMS))
+      url_options.merge(request.query_parameters.symbolize_keys.slice(*LOCALE_ALTERNATE_PARAMS))
     )
   end
 

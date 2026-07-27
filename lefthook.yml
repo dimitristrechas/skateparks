@@ -41,3 +41,5 @@ pre-push:
       run: bundle exec brakeman -q --no-pager
     bundler-audit:
       run: bundle exec bundle-audit check --update
+    pnpm-audit:
+      run: pnpm audit --audit-level moderate

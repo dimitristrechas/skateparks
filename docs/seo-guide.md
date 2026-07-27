@@ -101,7 +101,7 @@ Both methods resolve in the **current `I18n.locale`** via Mobility.
 ### URL slugs
 
 - `to_param` returns `"#{id}-#{slug}"` (e.g. `36-royal-square-skatepark-29`).
-- Slug is generated from `name_en.parameterize` — locale-neutral path; language is conveyed via `?locale=en|el`.
+- Slug is generated from `name_en.parameterize` — locale-neutral path; Greek uses `?locale=el`.
 - Stale slugs redirect to the homepage with a flash message (not a soft 404).
 - Only **published** skateparks are reachable on the public show action.
 
@@ -238,9 +238,10 @@ Rendered only on **public** pages (`public_seo_page?` returns false for `/admin/
 
 ### Locale URL model
 
-- Locale is a **query parameter** (`?locale=en` or `?locale=el`), not a path prefix.
-- `ApplicationController#default_url_options` adds `locale: I18n.locale` to all `url_for` / path helpers.
-- `x-default` hreflang points at `I18n.default_locale` (`:en`).
+- Locale is a **query parameter** (`?locale=el`) for non-default locales; the default locale (`en`) uses clean URLs without a locale param.
+- `ApplicationController#default_url_options` adds `locale: I18n.locale` only when the current locale is not the default.
+- Explicit `?locale=en` requests receive a **301 redirect** to the clean URL, consolidating duplicate English URLs for crawlers.
+- `x-default` hreflang points at the default-locale URL (no `locale` param).
 - Language switcher (`app/views/home/_locale_selector.html.erb`) and hreflang links preserve `country_code`, `state`, and `page` when present — keeping filtered index URLs consistent across locales.
 
 ---
@@ -360,28 +361,33 @@ Admin paths are blocked from crawling. Public admin pages still emit `index, fol
 
 ### Sitemap
 
-**Config:** `config/sitemap.rb`
+**Config:** `config/sitemap.rb` (with `lib/sitemap_locale_helper.rb`)
 
 ```ruby
 SitemapGenerator::Sitemap.default_host = 'https://www.skateparks.gr'
 
 SitemapGenerator::Sitemap.create do
-  add '/about'
-  add '/contact'
-  add '/privacy'
+  extend SitemapLocaleHelper
 
-  Skatepark.published.each do |skatepark|
-    add skatepark_path(skatepark), lastmod: skatepark.updated_at
+  add_localized '/'
+  add_localized '/skateparks'
+  add_localized '/about'
+  add_localized '/contact'
+  add_localized '/privacy'
+
+  Skatepark.published.find_each do |skatepark|
+    add_localized skatepark_path(skatepark), lastmod: skatepark.updated_at
   end
 end
 ```
 
+Each entry includes `xhtml:link` alternates for `en`, `el`, and `x-default`. English URLs omit the `locale` query param; Greek URLs use `?locale=el`.
+
 | Included | Not included |
 | -------- | ------------ |
-| `/about`, `/contact`, `/privacy` | Homepage (`/`) |
-| Published skatepark show pages | Skateparks index (`/skateparks`) |
-| | Locale variants (`?locale=`) |
-| | Filtered/paginated index URLs |
+| `/`, `/skateparks`, `/about`, `/contact`, `/privacy` | Filtered/paginated index URLs |
+| Published skatepark show pages (with hreflang alternates) | Admin pages |
+| | `?locale=en` variants (canonical English URLs have no locale param) |
 
 ### Sitemap generation schedule
 
@@ -483,6 +489,9 @@ SEO behavior is covered by Minitest across models, controllers, and helpers.
 | `seo_title` / `seo_description` fallbacks | `test/models/skatepark_test.rb` | Name suffix, overrides, truncation |
 | Show page meta assigns | `test/controllers/skateparks_controller_test.rb` | Default and custom EN/EL overrides |
 | Canonical + hreflang in HTML | `test/controllers/skateparks_controller_test.rb` | HTTPS canonical, all hreflang values |
+| Default-locale redirect | `test/controllers/application_controller_test.rb` | 301 from `?locale=en` to clean URL |
+| Canonical/hreflang URL helpers | `test/helpers/seo_helper_test.rb` | Default-locale omission, filter params |
+| Sitemap locale alternates | `test/lib/sitemap_locale_helper_test.rb` | `en`, `el`, `x-default` hreflang entries |
 | Twitter Cards in HTML | `test/controllers/skateparks_controller_test.rb` | Card type and title |
 | Static page assigns | `test/controllers/home_controller_test.rb` | About, contact, privacy |
 | Admin SEO form + persist | `test/controllers/admin/skateparks_controller_test.rb` | Field rendering, PATCH persistence |
@@ -496,9 +505,9 @@ Not currently tested (worth adding if SEO regressions are a concern):
 
 - Open Graph tags in rendered HTML
 - JSON-LD content in rendered HTML
-- `canonical_url` / `hreflang_link_tags` unit tests
+- `canonical_url` / `hreflang_link_tags` unit tests (partial — see `test/helpers/seo_helper_test.rb`)
 - `skatepark_schema` and `collection_page_schema` builders
-- Sitemap URL list contents
+- Sitemap XML output contents (helper covered in `test/lib/sitemap_locale_helper_test.rb`)
 - Homepage and skateparks index default metadata
 
 Run SEO-related tests:
@@ -515,12 +524,12 @@ sh scripts.sh test test/helpers/schema_helper_test.rb
 ## Known limitations and future improvements
 
 1. **Homepage and skateparks index** use only site-wide defaults — no controller-level `@title` / `@meta_description` overrides.
-2. **Sitemap** omits `/`, `/skateparks`, and per-locale URL variants.
+2. **Sitemap** omits filtered/paginated index URLs.
 3. **`contact_details`** is a minimal meta description ("Contact" / "Στοιχεία επικοινωνίας") — weak for SERP snippets.
 4. **Custom `meta_description`** overrides are not truncated or validated — long admin input can produce long SERP snippets.
 5. **`organization_schema` `sameAs`** is an empty array placeholder for future social profile URLs.
 6. **Filter query params** (`country_code`, `state`, `page`) are preserved in canonical/hreflang URLs on any page where they appear in the request — including show pages if bookmarked with index filters.
-7. **Slug is always derived from `name_en`** — URL path is locale-neutral; only `?locale=` differs between languages.
+7. **Slug is always derived from `name_en`** — URL path is locale-neutral; only `?locale=el` differs for Greek.
 
 ---
 
@@ -540,6 +549,7 @@ sh scripts.sh test test/helpers/schema_helper_test.rb
 | Admin SEO form | `app/views/admin/skateparks/_form.html.erb` |
 | Locale switcher | `app/views/home/_locale_selector.html.erb` |
 | Locale files | `config/locales/en.yml`, `config/locales/el.yml` |
+| Sitemap locale helper | `lib/sitemap_locale_helper.rb` |
 | Sitemap config | `config/sitemap.rb` |
 | Sitemap worker | `app/workers/sitemap_worker.rb` |
 | Deploy hook | `bin/release` |

@@ -7,8 +7,9 @@ Rails 8.1 skatepark directory app (Ruby 3.3.6, PostgreSQL 17, Hotwire, Tailwind 
 ## Rules
 
 - Do not commit unless explicitly instructed
-- All code must pass linting (RuboCop, Herb, Prettier)
+- All code must pass linting (RuboCop, Herb, Prettier) and CI parity checks (`sh scripts.sh ci`) before push
 - Prefer `sh scripts.sh` for development server, test server, lint, and formatter workflows whenever it supports the task. Fall back to direct `docker compose`, `bundle`, or `pnpm` commands only when `scripts.sh` does not cover the needed operation or automation requires a non-interactive command.
+- **Before commit/push:** Run `sh scripts.sh test --fast` (or `sh scripts.sh test` for coverage) and `sh scripts.sh ci`. Do not rely on `sh scripts.sh lint` or pre-commit hooks alone — CI also runs `pnpm audit --audit-level moderate`, which is only included in `sh scripts.sh ci` and `sh scripts.sh security`.
 - **Commit messages:** Use [Conventional Commits](https://www.conventionalcommits.org/) — see [.agent-docs/conventions.md](.agent-docs/conventions.md#commit-messages). Always include a `type` prefix and colon (e.g. `feat:`, `fix:`, `chore(agents):`). Do **not** use unprefixed subjects like `Add …` or `Refactor …`.
 
 ## Product quality (i18n, a11y, performance, UI)

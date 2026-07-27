@@ -13,7 +13,7 @@ sh scripts.sh lint                           # Fast linter checks (parallel Rubo
 sh scripts.sh lint --full                    # Includes Zeitwerk check
 sh scripts.sh lint --fix                     # Auto-fix then re-check
 sh scripts.sh security                       # Brakeman, bundle-audit, pnpm audit (parallel)
-sh scripts.sh ci                             # Full CI parity (all checks in parallel)
+sh scripts.sh ci                             # Full CI parity (all checks in parallel) — run before push/PR
 sh scripts.sh dev up                         # Start development server
 sh scripts.sh dev rebuild --force            # Rebuild development containers
 sh scripts.sh test-server up                 # Start test server
@@ -46,6 +46,17 @@ docker compose -f docker-compose.test.yml exec skateparks-web-test bin/rails tes
 
 - After changing **controllers** that load lists or show pages, run the relevant **controller tests** and watch for N+1 regressions; use `assert_queries` in a focused test when guarding a known-hot path (see minitest guide).
 - After changing **views/components**, run **component** and **helper** tests under `test/components` and `test/helpers`.
+
+## Pre-push / PR checklist
+
+Match GitHub Actions before pushing or opening a PR:
+
+```bash
+sh scripts.sh test --fast    # or sh scripts.sh test for coverage
+sh scripts.sh ci             # Zeitwerk, RuboCop, Prettier, Herb, Brakeman, bundle-audit, pnpm audit
+```
+
+`sh scripts.sh lint` and lefthook pre-commit hooks do **not** include `pnpm audit`. The `herb-prettier` CI job runs `pnpm audit --audit-level moderate`; use `sh scripts.sh ci` or `sh scripts.sh security` locally. Pre-push hook runs Brakeman, bundle-audit, and pnpm audit.
 
 ## Development
 

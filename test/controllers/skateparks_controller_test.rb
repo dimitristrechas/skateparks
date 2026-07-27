@@ -288,18 +288,26 @@ class SkateparksControllerTest < ActionDispatch::IntegrationTest
     assert_equal 'Custom meta description.', assigns(:meta_description)
   end
 
-  def test_get_show_renders_canonical_and_hreflang_tags
-    get skatepark_path(@skatepark, locale: :en)
+  def test_get_show_renders_canonical_url_without_default_locale_param
+    get skatepark_path(@skatepark)
 
     assert_response :success
-    assert_includes response.body, %(rel="canonical" href="https://www.example.com/skateparks/#{@skatepark.to_param}?locale=en")
-    assert_includes response.body, 'hreflang="en"'
-    assert_includes response.body, 'hreflang="el"'
-    assert_includes response.body, 'hreflang="x-default"'
+    assert_includes response.body, %(rel="canonical" href="https://www.example.com/skateparks/#{@skatepark.to_param}")
+  end
+
+  def test_get_show_renders_hreflang_alternate_links
+    get skatepark_path(@skatepark)
+
+    assert_response :success
+    base_url = "https://www.example.com/skateparks/#{@skatepark.to_param}"
+
+    assert_includes response.body, %(hreflang="en" href="#{base_url}")
+    assert_includes response.body, %(hreflang="el" href="#{base_url}?locale=el")
+    assert_includes response.body, %(hreflang="x-default" href="#{base_url}")
   end
 
   def test_get_show_renders_twitter_card_tags
-    get skatepark_path(@skatepark, locale: :en)
+    get skatepark_path(@skatepark)
 
     assert_response :success
     assert_includes response.body, 'name="twitter:card" content="summary_large_image"'
