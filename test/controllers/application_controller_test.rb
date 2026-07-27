@@ -28,4 +28,11 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
   end
+
+  def test_does_not_redirect_post_requests_with_default_locale_param
+    post session_path(locale: :en), params: { email_address: 'unknown@example.com', password: 'wrong' }
+
+    assert_response :redirect
+    assert_equal 302, response.status
+  end
 end

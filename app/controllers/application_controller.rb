@@ -23,9 +23,10 @@ class ApplicationController < ActionController::Base
     return if params[:locale].blank?
     return unless params[:locale].to_s == I18n.default_locale.to_s
 
-    query = request.query_parameters.except('locale')
-    target = query.present? ? "#{request.path}?#{query.to_query}" : request.path
+    destination = request.path_parameters.merge(
+      request.query_parameters.except('locale').symbolize_keys
+    )
 
-    redirect_to target, status: :moved_permanently
+    redirect_to url_for(destination), status: :moved_permanently, allow_other_host: false
   end
 end
