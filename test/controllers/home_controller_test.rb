@@ -54,7 +54,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
   end
 
   def test_get_index_renders_translated_header_logo_alt_per_locale
-    get root_path(locale: 'en')
+    get root_path
 
     assert_response :success
     assert_includes response.body, I18n.t('home.logo_alt', locale: 'en')
@@ -66,7 +66,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
   end
 
   def test_get_index_renders_translated_theme_toggle_aria_label_per_locale
-    get root_path(locale: 'en')
+    get root_path
 
     assert_response :success
     assert_includes response.body, I18n.t('home.theme_toggle_aria_label', locale: 'en')
@@ -250,7 +250,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
   end
 
   def test_get_privacy_renders_updated_cookies_body_in_english
-    get privacy_path(locale: :en)
+    get privacy_path
 
     assert_response :success
     assert_includes response.body, I18n.t('privacy.cookies_body', locale: :en)

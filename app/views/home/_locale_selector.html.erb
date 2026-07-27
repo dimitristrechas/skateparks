@@ -2,12 +2,7 @@
   <ul class="flex sm:gap-4">
     <% I18n.available_locales.each do |locale| %>
       <li>
-        <% locale_url = url_for({
-            locale: locale,
-            country_code: params[:country_code],
-            state: params[:state],
-            page: params[:page],
-          }.compact) %>
+        <% locale_url = url_for(locale_switch_url_options(locale)) %>
 
         <%= render LinkComponent.new(title: LOCALES[locale], url: locale_url, current: I18n.locale == locale) %>
       </li>

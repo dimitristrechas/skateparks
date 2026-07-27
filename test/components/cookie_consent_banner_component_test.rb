@@ -40,7 +40,7 @@ class CookieConsentBannerComponentTest < ViewComponent::TestCase
   def test_renders_learn_more_link_to_privacy_page
     render_inline(CookieConsentBannerComponent.new)
 
-    assert_selector "a[href='#{privacy_path(locale: I18n.locale)}']", text: I18n.t('cookie_consent.learn_more')
+    assert_selector "a[href='#{privacy_path}']", text: I18n.t('cookie_consent.learn_more')
   end
 
   def test_banner_is_hidden_by_default
