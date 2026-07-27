@@ -33,8 +33,10 @@ sh scripts.sh test --fast                  # All tests without coverage
 sh scripts.sh lint                         # Fast linter checks
 sh scripts.sh lint --fix                   # Auto-fix then re-check
 sh scripts.sh security                     # Brakeman, bundle-audit, pnpm audit
-sh scripts.sh ci                           # Full CI parity
+sh scripts.sh ci                           # Full CI parity — run before push/PR
 ```
+
+**Before push or opening a PR:** `sh scripts.sh test --fast` then `sh scripts.sh ci`. Lint-only checks miss `pnpm audit`, which fails the `herb-prettier` CI job when transitive JS advisories are present.
 
 ## Docker architecture
 

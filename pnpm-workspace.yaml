@@ -1,5 +1,5 @@
 overrides:
   dompurify: ">=3.4.9"
   picomatch: "^4.0.4"
-  postcss: ">=8.5.10"
+  postcss: ">=8.5.18"
   yaml: "^2.8.3"
