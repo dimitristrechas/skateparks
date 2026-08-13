@@ -3,7 +3,7 @@ source 'https://rubygems.org'
 ruby '3.3.6'
 
 # Pin Rails to the current 8.1 bugfix release, which includes the latest security fixes.
-gem 'rails', '8.1.3'
+gem 'rails', '8.1.3.1'
 
 # Use Propshaft, the new asset pipeline for Rails 8 [https://github.com/rails/propshaft]
 gem 'propshaft'
@@ -17,6 +17,7 @@ gem 'faraday', '>= 2.14.3' # CVE-2026-54297
 gem 'msgpack', '>= 1.8.2' # CVE-2026-54522
 gem 'nokogiri', '>= 1.19.4' # GHSA advisories through 1.19.3
 gem 'websocket-driver', '>= 0.8.2' # CVE-2026-54463, CVE-2026-54464, CVE-2026-54465, GHSA-2x63-gw47-w4mm
+gem 'json', '>= 2.21.2' # CVE-2026-71847
 
 # Use postgresql as the database for Active Record
 gem 'pg', '~> 1.1'
