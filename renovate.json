@@ -1,0 +1,29 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended", ":semanticCommits"],
+  "timezone": "Europe/Athens",
+  "schedule": ["before 6am on Sunday"],
+  "labels": ["dependencies"],
+  "packageRules": [
+    {
+      "matchManagers": ["bundler"],
+      "groupName": "Ruby gems"
+    },
+    {
+      "matchManagers": ["npm"],
+      "groupName": "npm packages"
+    },
+    {
+      "matchManagers": ["github-actions"],
+      "groupName": "GitHub Actions"
+    },
+    {
+      "matchManagers": ["dockerfile", "docker-compose"],
+      "groupName": "Docker images"
+    },
+    {
+      "matchPackageNames": ["renovatebot/github-action"],
+      "extends": ["schedule:weekly"]
+    }
+  ]
+}

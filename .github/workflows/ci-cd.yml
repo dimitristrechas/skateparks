@@ -28,7 +28,9 @@ permissions:
 env:
   RUBY_VERSION: 3.3.6
   NODE_VERSION: 24.14.0
+  # renovate: datasource=github-releases depName=rhysd/actionlint
   ACTIONLINT_VERSION: 1.7.11
+  # renovate: datasource=github-releases depName=hadolint/hadolint
   HADOLINT_VERSION: 2.14.0
   DOCKER_CACHE_SCOPE: application-image-arm64
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"

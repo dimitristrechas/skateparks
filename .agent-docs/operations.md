@@ -92,6 +92,18 @@ Seven jobs in `.github/workflows/ci-cd.yml`:
 
 The verification jobs (`workflow-lint`, `test`, `rubocop-brakeman`, `herb-prettier`) must pass before image validation or publish runs.
 
+## Renovate (dependency updates)
+
+Weekly self-hosted Renovate runs via `.github/workflows/renovate.yml` (Sunday 00:00 UTC, plus manual `workflow_dispatch`). Configuration: `.github/renovate-config.json5` (runner settings) and `renovate.json` (package rules).
+
+**One-time GitHub setup** (repository Settings):
+
+1. Create a classic PAT at https://github.com/settings/tokens with scopes `repo` and `workflow` (workflow scope is required to update `.github/workflows/*`).
+2. Add repository secret `RENOVATE_TOKEN` with the PAT value (Settings → Secrets and variables → Actions).
+3. Enable **Allow GitHub Actions to create and approve pull requests** (Settings → Actions → General → Workflow permissions).
+
+After merge, trigger the Renovate workflow manually once to verify before the weekly cron runs.
+
 ## Pre-commit hooks (Lefthook)
 
 Hooks defined in `lefthook.yml`:
