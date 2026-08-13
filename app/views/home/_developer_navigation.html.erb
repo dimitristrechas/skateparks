@@ -5,6 +5,7 @@
         <%= render LinkComponent.new(
           title: t("home.developer_navigation.admin"),
           url: admin_root_path,
+          classnames: "inline-flex items-center min-h-8 min-w-8",
           current: request.path.start_with?("/admin"),
         ) %>
       </li>
@@ -14,6 +15,7 @@
           <%= render LinkComponent.new(
             title: t("home.developer_navigation.lookbook"),
             url: lookbook_path,
+            classnames: "inline-flex items-center min-h-8 min-w-8",
             current: request.path.start_with?("/lookbook"),
           ) %>
         </li>
