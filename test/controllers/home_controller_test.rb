@@ -77,6 +77,25 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, I18n.t('home.theme_toggle_aria_label', locale: 'el')
   end
 
+  def test_get_index_renders_developer_navigation_outside_production
+    get root_path
+
+    assert_response :success
+    assert_includes response.body, I18n.t('home.developer_navigation.admin')
+    assert_includes response.body, admin_root_path
+    assert_not_includes response.body, I18n.t('home.developer_navigation.lookbook')
+  end
+
+  def test_get_index_hides_developer_navigation_in_production
+    Rails.env.stubs(:production?).returns(true)
+
+    get root_path
+
+    assert_response :success
+    assert_not_includes response.body, I18n.t('home.developer_navigation.admin')
+    assert_not_includes response.body, I18n.t('home.developer_navigation.lookbook')
+  end
+
   def test_get_index_assigns_skateparks_latest_from_cache
     get root_path
 

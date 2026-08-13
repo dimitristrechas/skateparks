@@ -26,7 +26,7 @@ module Skateparks
     config.i18n.available_locales = %i[en el]
     config.i18n.default_locale = :en
 
-    config.view_component.previews.paths << Rails.root.join('spec/components/previews')
+    config.view_component.previews.paths << Rails.root.join('test/components/previews')
     config.view_component.previews.default_layout = 'component_preview'
     config.lookbook.preview_layout = 'component_preview' if defined?(Lookbook)
   end
