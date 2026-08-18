@@ -96,6 +96,8 @@ The verification jobs (`workflow-lint`, `test`, `rubocop-brakeman`, `herb-pretti
 
 Weekly self-hosted Renovate runs via `.github/workflows/renovate.yml` (Sunday 00:00 UTC, plus manual `workflow_dispatch`). Configuration: `.github/renovate-config.json5` (runner settings) and `renovate.json` (package rules).
 
+PR strategy: one grouped PR for all non-major updates each week, plus separate grouped PRs for major updates by ecosystem (Ruby, npm, GitHub Actions, Docker). `prHourlyLimit` is disabled so the Sunday run can open every group in one pass. Use the Dependency Dashboard issue to force rate-limited or pending branches if needed.
+
 **One-time GitHub setup** (repository Settings):
 
 1. Create a classic PAT at https://github.com/settings/tokens with scopes `repo` and `workflow` (workflow scope is required to update `.github/workflows/*`).

@@ -1,25 +1,44 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended", ":semanticCommits"],
+  "extends": ["config:recommended", ":semanticCommits", "group:allNonMajor"],
   "timezone": "Europe/Athens",
   "schedule": ["before 6am on Sunday"],
   "labels": ["dependencies"],
+  "prHourlyLimit": 0,
+  "prConcurrentLimit": 5,
   "packageRules": [
     {
-      "matchManagers": ["bundler"],
-      "groupName": "Ruby gems"
+      "description": "One weekly PR for all minor/patch/pin/digest updates across gems, npm, Actions, and Docker",
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "groupName": "all non-major dependencies",
+      "groupSlug": "all-non-major"
     },
     {
-      "matchManagers": ["npm"],
-      "groupName": "npm packages"
+      "description": "Group major Ruby updates (gems, .ruby-version, Ruby Docker tags)",
+      "matchUpdateTypes": ["major"],
+      "matchManagers": ["bundler", "ruby-version", "dockerfile"],
+      "matchPackageNames": ["ruby"],
+      "groupName": "Ruby (major)",
+      "groupSlug": "major-ruby"
     },
     {
+      "matchUpdateTypes": ["major"],
+      "matchManagers": ["npm", "nodenv", "nvm"],
+      "groupName": "npm packages (major)",
+      "groupSlug": "major-npm-packages"
+    },
+    {
+      "matchUpdateTypes": ["major"],
       "matchManagers": ["github-actions"],
-      "groupName": "GitHub Actions"
+      "groupName": "GitHub Actions (major)",
+      "groupSlug": "major-github-actions"
     },
     {
-      "matchManagers": ["dockerfile", "docker-compose"],
-      "groupName": "Docker images"
+      "matchUpdateTypes": ["major"],
+      "matchManagers": ["docker-compose", "dockerfile"],
+      "excludePackageNames": ["ruby"],
+      "groupName": "Docker images (major)",
+      "groupSlug": "major-docker-images"
     },
     {
       "matchPackageNames": ["renovatebot/github-action"],
