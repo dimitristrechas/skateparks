@@ -44,13 +44,13 @@ Three files define MCP servers for different clients. **Keep the same servers, U
 
 | File               | Client      | Notes                                                                                                                  |
 | ------------------ | ----------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `opencode.json`    | OpenCode    | Uses `{env:VAR}` for environment substitution. Both servers use `type: remote` with `oauth: false` and Bearer headers. |
-| `.mcp.json`        | Claude Code | Uses `${VAR}` (shell-style) for env substitution. Both servers use `type: http` (Streamable HTTP).                     |
-| `.cursor/mcp.json` | Cursor      | Remote Streamable HTTP. GitHub headers use `${env:VAR}`; Linear headers use `{env:VAR}` (Cursor convention).           |
+| `opencode.json`    | OpenCode    | Uses `{env:VAR}` for environment substitution. All servers use `type: remote` with `oauth: false`. Bearer auth headers. |
+| `.mcp.json`        | Claude Code | Uses `${VAR}` (shell-style) for env substitution. All servers use `type: http` (Streamable HTTP).                       |
+| `.cursor/mcp.json` | Cursor      | Remote Streamable HTTP. Bearer auth headers use `${env:VAR}` (Cursor convention).                                      |
 
-**Required env vars:** `LINEAR_MCP_TOKEN`, `GITHUB_MCP_TOKEN` — names must stay consistent; only the **placeholder syntax** differs per file format.
+**Required env vars:** `LINEAR_MCP_TOKEN`, `GITHUB_MCP_TOKEN`, `CONTEXT7_API_KEY` — names must stay consistent; only the **placeholder syntax** differs per file format.
 
-**Servers:** [GitHub MCP](https://github.com/github/github-mcp-server) remote at `https://api.githubcopilot.com/mcp/`; [Linear MCP](https://linear.app/docs/mcp) at `https://mcp.linear.app/mcp`. The deprecated npm package `@modelcontextprotocol/server-github` is not used.
+**Servers:** [GitHub MCP](https://github.com/github/github-mcp-server) remote at `https://api.githubcopilot.com/mcp/`; [Linear MCP](https://linear.app/docs/mcp) at `https://mcp.linear.app/mcp`; [Exa MCP](https://docs.exa.ai/reference/mcp) at `https://mcp.exa.ai/mcp`; [Context7 MCP](https://github.com/upstash/context7) at `https://mcp.context7.com/mcp`. The deprecated npm package `@modelcontextprotocol/server-github` is not used.
 
 **Node / `npx`:** [`bin/mcp-npx`](../bin/mcp-npx) remains available for any future stdio MCP servers that need `npx` with a login-shell `PATH` (common with nvm/fnm).
 
