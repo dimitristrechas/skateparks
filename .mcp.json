@@ -13,6 +13,17 @@
       "headers": {
         "Authorization": "Bearer ${LINEAR_MCP_TOKEN}"
       }
+    },
+    "exa": {
+      "type": "http",
+      "url": "https://mcp.exa.ai/mcp"
+    },
+    "context7": {
+      "type": "http",
+      "url": "https://mcp.context7.com/mcp",
+      "headers": {
+        "Authorization": "Bearer ${CONTEXT7_API_KEY}"
+      }
     }
   }
 }
