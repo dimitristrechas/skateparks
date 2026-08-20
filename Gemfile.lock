@@ -147,9 +147,9 @@ GEM
       multipart-post (~> 2)
     faraday-net_http (3.4.4)
       net-http (~> 0.5)
-    ffi (1.17.0-aarch64-linux-gnu)
-    ffi (1.17.0-arm64-darwin)
-    ffi (1.17.0-x86_64-linux-gnu)
+    ffi (1.17.4-aarch64-linux-gnu)
+    ffi (1.17.4-arm64-darwin)
+    ffi (1.17.4-x86_64-linux-gnu)
     foreman (0.88.1)
     fugit (1.11.1)
       et-orbi (~> 1, >= 1.2.11)
@@ -452,6 +452,7 @@ GEM
 PLATFORMS
   aarch64-linux
   arm64-darwin-23
+  arm64-darwin-25
   x86_64-linux
 
 DEPENDENCIES
@@ -514,7 +515,7 @@ DEPENDENCIES
   websocket-driver (>= 0.8.2)
 
 RUBY VERSION
-   ruby 3.3.6p108
+   ruby 3.4.10p104
 
 BUNDLED WITH
    2.7.1
