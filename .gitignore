@@ -52,3 +52,4 @@ node_modules
 /spec/examples.txt
 .DS_Store
 /.sisyphus/
+/.pnpm-store/

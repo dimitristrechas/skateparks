@@ -1,7 +1,7 @@
 {
   "agent": {
     "rails-implementer": {
-      "description": "Feature implementation across Rails backend and Hotwire frontend (models, controllers, ViewComponents, Stimulus, Tailwind, i18n/a11y).",
+      "description": "Implement or refactor Rails app code — models, controllers, jobs, ViewComponents, Stimulus, Tailwind. Use for feature work spanning backend and UI.",
       "mode": "subagent",
       "temperature": 0.1,
       "prompt": "{file:./.claude/agents/rails-implementer.md}"
@@ -30,6 +30,21 @@
       "oauth": false,
       "headers": {
         "Authorization": "Bearer {env:LINEAR_MCP_TOKEN}"
+      }
+    },
+    "exa": {
+      "type": "remote",
+      "url": "https://mcp.exa.ai/mcp",
+      "enabled": true,
+      "oauth": false
+    },
+    "context7": {
+      "type": "remote",
+      "url": "https://mcp.context7.com/mcp",
+      "enabled": true,
+      "oauth": false,
+      "headers": {
+        "Authorization": "Bearer {env:CONTEXT7_API_KEY}"
       }
     }
   },

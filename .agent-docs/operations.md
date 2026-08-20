@@ -74,9 +74,16 @@ Store in `.secrets/` (gitignored):
 mkdir .secrets
 echo "your-token" > .secrets/github-mcp-token
 echo "your-token" > .secrets/linear-token
+echo "your-token" > .secrets/context7-api-key
 ```
 
-Then in shell profile: `export GITHUB_MCP_TOKEN=$(cat ~/path/to/.secrets/github-mcp-token)`
+Then in shell profile:
+
+```bash
+export GITHUB_MCP_TOKEN=$(cat ~/path/to/.secrets/github-mcp-token)
+export LINEAR_MCP_TOKEN=$(cat ~/path/to/.secrets/linear-token)
+export CONTEXT7_API_KEY=$(cat ~/path/to/.secrets/context7-api-key)
+```
 
 ## CI/CD pipeline
 

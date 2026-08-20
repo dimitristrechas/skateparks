@@ -7,7 +7,7 @@ module Admin
 
     # GET /skateparks or /skateparks.json
     def index
-      @skateparks = Skatepark.i18n.order(:name).includes(:skatepark_images)
+      @skateparks = Skatepark.i18n.order(:name).includes(:skatepark_images, :skatepark_videos)
     end
 
     # GET /skateparks/1 or /skateparks/1.json

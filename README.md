@@ -16,6 +16,7 @@
 12. Optionally set MCP token environment variables in shell profile (~/.zshrc or ~/.bashrc):
     - `export GITHUB_MCP_TOKEN=<your-token>`
     - `export LINEAR_MCP_TOKEN=<your-token>`
+    - `export CONTEXT7_API_KEY=<your-token>`
 
     All AI tools (Cursor, Claude Code, OpenCode) read these env vars. Config files that must stay in sync: `opencode.json`, `.mcp.json`, and `.cursor/mcp.json`. See [.agent-docs/ai-tooling.md](.agent-docs/ai-tooling.md).
 
