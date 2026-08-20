@@ -3,6 +3,7 @@ module Admin
     renders_one :fields
     renders_one :preview
     renders_one :subtitle
+    renders_one :status
 
     def initialize(resource_type:, index: nil, destroyed: false)
       super()
@@ -19,7 +20,9 @@ module Admin
 
     def item_classes
       class_names(
-        'flex flex-col gap-3 bg-white p-3 sm:flex-row sm:items-center dark:bg-gray-900',
+        'grid grid-cols-1 gap-3 bg-white p-3 sm:items-center dark:bg-gray-900',
+        ('sm:grid-cols-[auto_auto_1fr_minmax(auto,12rem)_auto]' if status?),
+        ('sm:grid-cols-[auto_auto_1fr_auto]' unless status?),
         'hidden' => @destroyed
       )
     end

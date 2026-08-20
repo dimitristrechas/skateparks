@@ -7,38 +7,36 @@
 >
   <%= fields if fields? %>
 
-  <div class="flex items-center gap-3">
-    <button
-      type="button"
-      class="
-        inline-flex size-11 shrink-0 cursor-grab items-center justify-center rounded-lg text-neutral-400 transition
-        hover:outline hover:outline-offset-1 hover:outline-neutral-700 focus-visible:outline
-        focus-visible:outline-offset-1 focus-visible:outline-neutral-700 dark:text-neutral-500
-        hover:dark:outline-neutral-200 dark:focus-visible:outline-neutral-200
-      "
-      data-sort-handle
-      aria-label="<%= handle_label %>"
-      aria-roledescription="sortable"
+  <button
+    type="button"
+    class="
+      inline-flex size-11 shrink-0 cursor-grab items-center justify-center rounded-lg text-neutral-400 transition
+      hover:outline hover:outline-offset-1 hover:outline-neutral-700 focus-visible:outline
+      focus-visible:outline-offset-1 focus-visible:outline-neutral-700 dark:text-neutral-500
+      hover:dark:outline-neutral-200 dark:focus-visible:outline-neutral-200
+    "
+    data-sort-handle
+    aria-label="<%= handle_label %>"
+    aria-roledescription="sortable"
+  >
+    <span class="sr-only"><%= t("admin.skateparks.form.drag_to_reorder") %></span>
+
+    <svg
+      aria-hidden="true"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      stroke-width="1.75"
+      class="size-5"
     >
-      <span class="sr-only"><%= t("admin.skateparks.form.drag_to_reorder") %></span>
+      <path stroke-linecap="round" stroke-linejoin="round" d="M8 6h8M8 12h8M8 18h8" />
+    </svg>
+  </button>
 
-      <svg
-        aria-hidden="true"
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        stroke-width="1.75"
-        class="size-5"
-      >
-        <path stroke-linecap="round" stroke-linejoin="round" d="M8 6h8M8 12h8M8 18h8" />
-      </svg>
-    </button>
+  <%= preview if preview? %>
 
-    <%= preview if preview? %>
-  </div>
-
-  <div class="min-w-0 flex-1">
+  <div class="min-w-0">
     <p class="font-medium text-neutral-700 dark:text-neutral-200">
       <%= resource_label %>
       <span data-position-label><%= position_label %></span>
@@ -46,6 +44,8 @@
 
     <%= subtitle if subtitle? %>
   </div>
+
+  <%= status if status? %>
 
   <div class="flex flex-wrap items-center gap-2 sm:justify-end">
     <button

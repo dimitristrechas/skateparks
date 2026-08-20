@@ -371,13 +371,15 @@
                 <%= video_fields.hidden_field :_destroy,
                                          value: (marked_for_destruction ? 1 : 0),
                                          data: { destroy_field: true } %>
+              <% end %>
 
+              <% item.with_status do %>
                 <%= video_fields.select :status,
                                     SkateparkVideo.statuses.keys.map { |status|
                                       [t("admin.skateparks.form.video_statuses.#{status}"), status]
                                     },
                                     {},
-                                    class: "mt-2 w-full rounded border-neutral-300 p-1 text-sm text-neutral-600 sm:max-w-xs dark:border-neutral-600 dark:bg-gray-800 dark:text-neutral-200" %>
+                                    class: "w-full rounded border-neutral-300 p-1 text-sm text-neutral-600 dark:border-neutral-600 dark:bg-gray-800 dark:text-neutral-200" %>
               <% end %>
 
               <% item.with_preview do %>

@@ -56,5 +56,20 @@ module Admin
       assert_selector 'img.test-preview'
       assert_selector 'p.test-subtitle', text: 'Info text'
     end
+
+    def test_renders_status_slot_in_grid
+      rendered = render_inline(Admin::SortableListItemComponent.new(resource_type: :video)) do |item|
+        item.with_status { '<select class="test-status">'.html_safe }
+      end
+
+      assert_selector 'select.test-status'
+      assert_includes rendered.to_html, 'sm:grid-cols-[auto_auto_1fr_minmax(auto,12rem)_auto]'
+    end
+
+    def test_omits_status_grid_column_when_no_status_slot
+      rendered = render_inline(Admin::SortableListItemComponent.new(resource_type: :image))
+
+      assert_includes rendered.to_html, 'sm:grid-cols-[auto_auto_1fr_auto]'
+    end
   end
 end
