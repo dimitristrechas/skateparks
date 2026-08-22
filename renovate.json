@@ -36,9 +36,9 @@
     {
       "matchUpdateTypes": ["major"],
       "matchManagers": ["docker-compose", "dockerfile"],
-      "excludePackageNames": ["ruby"],
       "groupName": "Docker images (major)",
-      "groupSlug": "major-docker-images"
+      "groupSlug": "major-docker-images",
+      "matchPackageNames": ["!ruby"]
     },
     {
       "matchPackageNames": ["renovatebot/github-action"],
