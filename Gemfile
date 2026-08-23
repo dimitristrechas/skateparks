@@ -111,7 +111,7 @@ gem 'sitemap_generator'
 gem 'activestorage-cloudinary-service'
 gem 'cloudinary'
 
-gem 'connection_pool', '~> 2.5'
+gem 'connection_pool', '~> 3.0'
 gem 'redis', '~> 6.0'
 gem 'sidekiq'
 gem 'sidekiq-cron'
