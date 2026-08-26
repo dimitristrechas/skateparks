@@ -502,6 +502,7 @@ DEPENDENCIES
   rubocop-minitest
   rubocop-performance
   rubocop-rails
+  ruby-vips (~> 2.0)
   sidekiq
   sidekiq-cron
   simplecov
