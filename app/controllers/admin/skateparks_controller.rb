@@ -82,7 +82,7 @@ module Admin
         :skatepark_videos,
         cover_image_attachment: :blob,
         skatepark_images: { image_attachment: :blob }
-      ).find(params[:id])
+      ).find(params.expect(:id))
     end
 
     # Only allow a list of trusted parameters through.

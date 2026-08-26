@@ -1,4 +1,4 @@
-# rubocop:disable Metrics/ClassLength
+# rubocop:disable-next Metrics/ClassLength
 class Skatepark < ApplicationRecord
   extend Mobility
   include SkateparkVideoUrlUniqueness
@@ -148,4 +148,3 @@ class Skatepark < ApplicationRecord
     Rails.cache.delete(Skatepark.homepage_popular_cache_key)
   end
 end
-# rubocop:enable Metrics/ClassLength

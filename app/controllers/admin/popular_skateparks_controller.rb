@@ -42,7 +42,7 @@ module Admin
     private
 
     def set_popular_skatepark
-      @popular_skatepark = PopularSkatepark.find(params[:id])
+      @popular_skatepark = PopularSkatepark.find(params.expect(:id))
     end
 
     def popular_skatepark_params

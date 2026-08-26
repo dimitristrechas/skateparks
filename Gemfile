@@ -116,7 +116,7 @@ gem 'redis', '~> 5.0'
 gem 'sidekiq'
 gem 'sidekiq-cron'
 
-gem 'foreman', '~> 0.88.1'
+gem 'foreman', '~> 0.90.0'
 
 gem 'countries', '~> 8.0'
 

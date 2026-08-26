@@ -38,7 +38,7 @@ module Admin
     private
 
     def set_video_suggestion
-      @video_suggestion = SkateparkVideo.pending_review.find(params[:id])
+      @video_suggestion = SkateparkVideo.pending_review.find(params.expect(:id))
     end
 
     def activate_params
