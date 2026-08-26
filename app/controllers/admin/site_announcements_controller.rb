@@ -40,7 +40,7 @@ module Admin
     private
 
     def set_site_announcement
-      @site_announcement = SiteAnnouncement.find(params[:id])
+      @site_announcement = SiteAnnouncement.find(params.expect(:id))
     end
 
     def site_announcement_params

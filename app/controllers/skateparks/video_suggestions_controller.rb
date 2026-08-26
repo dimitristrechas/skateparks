@@ -32,7 +32,7 @@ module Skateparks
     private
 
     def set_skatepark
-      @skatepark = Skatepark.published.find(params[:skatepark_id])
+      @skatepark = Skatepark.published.find(params.expect(:skatepark_id))
     end
 
     def video_suggestion_params
@@ -44,7 +44,7 @@ module Skateparks
     end
 
     def respond_to_rate_limit
-      @skatepark ||= Skatepark.published.find_by(id: params[:skatepark_id])
+      @skatepark = Skatepark.published.find_by(id: params[:skatepark_id]) unless defined?(@skatepark)
 
       respond_to do |format|
         format.turbo_stream do

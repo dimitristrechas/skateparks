@@ -1,5 +1,5 @@
 class SelectComponent < ViewComponent::Base
-  # rubocop:disable Metrics/ParameterLists
+  # rubocop:disable-next Metrics/ParameterLists
   def initialize(name:, options:, selected: nil, disabled: false, large: false,
                  id: nil, required: false, aria: {}, **html_options)
     super()
@@ -13,7 +13,6 @@ class SelectComponent < ViewComponent::Base
     @aria = aria
     @html_options = html_options
   end
-  # rubocop:enable Metrics/ParameterLists
 
   private
 
