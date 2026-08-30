@@ -3,7 +3,7 @@
     "@rails/actiontext": "8.1.301",
     "@tailwindcss/forms": "^0.5.10",
     "@tailwindcss/typography": "^0.5.16",
-    "flowbite": "2.5.2",
+    "flowbite": "4.0.2",
     "trix": "2.1.19"
   },
   "devDependencies": {
@@ -12,7 +12,7 @@
     "prettier": "^3.6.2",
     "tailwindcss": "^4.1.0"
   },
-  "packageManager": "pnpm@10.34.5",
+  "packageManager": "pnpm@11.24.0",
   "scripts": {
     "herb:lint": "herb-lint",
     "herb:lint:fix": "herb-lint --fix",
