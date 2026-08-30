@@ -101,9 +101,9 @@ The verification jobs (`workflow-lint`, `test`, `rubocop-brakeman`, `herb-pretti
 
 ## Renovate (dependency updates)
 
-Weekly self-hosted Renovate runs via `.github/workflows/renovate.yml` (Sunday 00:00 UTC, plus manual `workflow_dispatch`). Configuration: `.github/renovate-config.json5` (runner settings) and `renovate.json` (package rules).
+Self-hosted Renovate runs via `.github/workflows/renovate.yml` on a daily cron (`0 0 * * *`, 00:00 UTC), plus manual `workflow_dispatch`. GitHub Actions may delay scheduled runs by several hours; Renovate has no separate PR schedule, so every successful workflow run can open PRs. Configuration: `.github/renovate-config.json5` (runner settings) and `renovate.json` (package rules).
 
-PR strategy: one grouped PR for all non-major updates each week, plus separate grouped PRs for major updates by ecosystem (Ruby, npm, GitHub Actions, Docker). `prHourlyLimit` is disabled so the Sunday run can open every group in one pass. Use the Dependency Dashboard issue to force rate-limited or pending branches if needed.
+PR strategy: one grouped PR for all non-major updates, plus separate grouped PRs for major updates by ecosystem (Ruby, npm, GitHub Actions, Docker). `prHourlyLimit` is disabled so a scheduled run can open every group in one pass. Use the Dependency Dashboard issue to force rate-limited or pending branches if needed.
 
 **One-time GitHub setup** (repository Settings):
 
@@ -111,7 +111,7 @@ PR strategy: one grouped PR for all non-major updates each week, plus separate g
 2. Add repository secret `RENOVATE_TOKEN` with the PAT value (Settings → Secrets and variables → Actions).
 3. Enable **Allow GitHub Actions to create and approve pull requests** (Settings → Actions → General → Workflow permissions).
 
-After merge, trigger the Renovate workflow manually once to verify before the weekly cron runs.
+After merge, trigger the Renovate workflow manually once to verify before the next scheduled run.
 
 ## Pre-commit hooks (Lefthook)
 
