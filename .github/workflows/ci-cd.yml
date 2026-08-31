@@ -26,8 +26,9 @@ permissions:
   contents: read
 
 env:
-  RUBY_VERSION: 3.4.10
-  NODE_VERSION: 24.14.0
+  # renovate: datasource=docker depName=ruby
+  RUBY_VERSION: 4.0.6
+  NODE_VERSION: 24.20.0
   # renovate: datasource=github-releases depName=rhysd/actionlint
   ACTIONLINT_VERSION: 1.7.11
   # renovate: datasource=github-releases depName=hadolint/hadolint

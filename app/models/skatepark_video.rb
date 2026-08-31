@@ -1,4 +1,3 @@
-require 'cgi'
 require 'uri'
 
 class SkateparkVideo < ApplicationRecord # rubocop:disable Metrics/ClassLength
@@ -62,7 +61,7 @@ class SkateparkVideo < ApplicationRecord # rubocop:disable Metrics/ClassLength
   def self.extract_youtube_dot_com_video_id(path_segments, query)
     case path_segments.first
     when 'watch'
-      CGI.parse(query.to_s)['v']&.first
+      URI.decode_www_form(String(query)).assoc('v')&.last
     when 'shorts', 'embed', 'v'
       path_segments.second
     end
