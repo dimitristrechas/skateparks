@@ -83,7 +83,7 @@ GEM
     bcrypt (3.1.22)
     bigdecimal (4.1.2)
     bindex (0.8.1)
-    bootsnap (1.25.0)
+    bootsnap (1.26.0)
       msgpack (~> 1.5)
     brakeman (8.0.6)
       racc
@@ -398,7 +398,7 @@ GEM
       fugit (~> 1.8, >= 1.11.1)
       globalid (>= 1.0.1)
       sidekiq (>= 6.5.0)
-    simplecov (1.1.1)
+    simplecov (1.2.0)
     sitemap_generator (7.1.1)
       builder (~> 3.0)
     ssrf_filter (1.5.0)

@@ -41,6 +41,12 @@
     {
       "matchPackageNames": ["renovatebot/github-action"],
       "extends": ["schedule:weekly"]
+    },
+    {
+      "description": "Ignore nokogiri platform-variant false positives (same semver, different gem platform)",
+      "matchManagers": ["bundler"],
+      "matchPackageNames": ["nokogiri"],
+      "extractVersion": "^(?<version>\\d+\\.\\d+\\.\\d+)"
     }
   ]
 }
