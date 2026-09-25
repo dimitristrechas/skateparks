@@ -47,7 +47,7 @@
       "matchManagers": ["bundler"],
       "matchPackageNames": ["nokogiri"],
       "matchCurrentVersion": "/^\\d+\\.\\d+\\.\\d+-/",
-      "matchNewVersion": "/^\\d+\\.\\d+\\.\\d+$/",
+      "matchNewValue": "/^\\d+\\.\\d+\\.\\d+$/",
       "enabled": false
     }
   ]
