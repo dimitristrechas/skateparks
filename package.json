@@ -1,18 +1,18 @@
 {
   "dependencies": {
-    "@rails/actiontext": "8.1.301",
+    "@rails/actiontext": "8.1.400",
     "@tailwindcss/forms": "^0.5.10",
     "@tailwindcss/typography": "^0.5.16",
     "flowbite": "4.0.2",
     "trix": "2.1.19"
   },
   "devDependencies": {
-    "@herb-tools/formatter": "^0.10.0",
-    "@herb-tools/linter": "^0.10.0",
+    "@herb-tools/formatter": "^0.11.0",
+    "@herb-tools/linter": "^0.11.0",
     "prettier": "^3.6.2",
     "tailwindcss": "^4.1.0"
   },
-  "packageManager": "pnpm@12.3.4",
+  "packageManager": "pnpm@12.6.0",
   "scripts": {
     "herb:lint": "herb-lint",
     "herb:lint:fix": "herb-lint --fix",
