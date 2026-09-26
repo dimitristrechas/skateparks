@@ -4,6 +4,26 @@
   "labels": ["dependencies"],
   "prHourlyLimit": 0,
   "prConcurrentLimit": 0,
+  "customManagers": [
+    {
+      "description": "Update `# renovate:` annotated *_VERSION env vars in GitHub Actions workflows (e.g. RUBY_VERSION, NODE_VERSION)",
+      "customType": "regex",
+      "managerFilePatterns": ["/^\\.github/workflows/[^/]+\\.ya?ml$/"],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>[a-z0-9-]+) depName=(?<depName>\\S+?)(?: versioning=(?<versioning>[a-z0-9-]+))?\\n\\s*[A-Z_]+_VERSION: (?<currentValue>\\S+)"
+      ],
+      "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}"
+    },
+    {
+      "description": "Update `# renovate:` annotated *_VERSION ARG defaults in Dockerfiles (e.g. RUBY_VERSION, NODE_VERSION)",
+      "customType": "regex",
+      "managerFilePatterns": ["/(^|/|\\.)Dockerfile$/", "/(^|/)Dockerfile\\.[^/]*$/"],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>[a-z0-9-]+) depName=(?<depName>\\S+?)(?: versioning=(?<versioning>[a-z0-9-]+))?\\nARG [A-Z_]+_VERSION=(?<currentValue>\\S+)"
+      ],
+      "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}"
+    }
+  ],
   "packageRules": [
     {
       "description": "One weekly PR for all minor/patch/pin/digest updates across gems, npm, Actions, and Docker",

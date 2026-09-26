@@ -1,7 +1,9 @@
 # syntax = docker/dockerfile:1
 
-# Make sure RUBY_VERSION matches the Ruby version in .ruby-version and Gemfile
+# Keep these in sync with .ruby-version, .node-version and the Gemfile.
+# renovate: datasource=ruby-version depName=ruby versioning=ruby
 ARG RUBY_VERSION=4.0.6
+# renovate: datasource=node-version depName=node versioning=node
 ARG NODE_VERSION=24.20.0
 ARG BUNDLER_VERSION=2.7.1
 
