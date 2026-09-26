@@ -189,12 +189,7 @@
     </div>
 
     <div class="col-span-2 space-y-4">
-      <div
-        class="sr-only"
-        aria-live="polite"
-        aria-atomic="true"
-        data-admin--skateparks--form-target="announcement"
-      ></div>
+      <div class="sr-only" aria-live="polite" aria-atomic="true" data-admin--skateparks--form-target="announcement"></div>
 
       <div
         class="
@@ -260,12 +255,7 @@
       <template data-admin--skateparks--form-target="newImageTemplate">
         <%= render(Admin::SortableListItemComponent.new(resource_type: :image)) do |item| %>
           <% item.with_fields do %>
-            <input
-              type="hidden"
-              name="skatepark[new_image_positions][]"
-              value=""
-              data-position-field
-            >
+            <input type="hidden" name="skatepark[new_image_positions][]" value="" data-position-field>
           <% end %>
 
           <% item.with_preview do %>
@@ -410,19 +400,9 @@
       <template data-admin--skateparks--form-target="newVideoTemplate">
         <%= render(Admin::SortableListItemComponent.new(resource_type: :video)) do |item| %>
           <% item.with_fields do %>
-            <input
-              type="hidden"
-              name="skatepark[new_video_urls][]"
-              value=""
-              data-video-url-field
-            >
+            <input type="hidden" name="skatepark[new_video_urls][]" value="" data-video-url-field>
 
-            <input
-              type="hidden"
-              name="skatepark[new_video_positions][]"
-              value=""
-              data-position-field
-            >
+            <input type="hidden" name="skatepark[new_video_positions][]" value="" data-position-field>
           <% end %>
 
           <% item.with_preview do %>

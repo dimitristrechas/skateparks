@@ -27,9 +27,9 @@ permissions:
 
 env:
   # renovate: datasource=ruby-version depName=ruby versioning=ruby
-  RUBY_VERSION: 4.0.6
+  RUBY_VERSION: 4.0.7
   # renovate: datasource=node-version depName=node versioning=node
-  NODE_VERSION: 24.20.0
+  NODE_VERSION: 24.21.0
   # renovate: datasource=github-releases depName=rhysd/actionlint versioning=semver
   ACTIONLINT_VERSION: 1.7.11
   # renovate: datasource=github-releases depName=hadolint/hadolint versioning=semver

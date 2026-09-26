@@ -29,13 +29,7 @@
           data-action="click->skatepark-video-suggestion#close"
           aria-label="<%= t('skateparks.video_suggestion.close_dialog') %>"
         >
-          <svg
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            class="size-5"
-          >
+          <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="size-5">
             <path
               stroke="currentColor"
               stroke-linecap="round"
@@ -90,12 +84,7 @@
         ></p>
       </div>
 
-      <div
-        class="mb-4"
-        aria-live="polite"
-        aria-atomic="true"
-        data-skatepark-video-suggestion-target="announcer"
-      >
+      <div class="mb-4" aria-live="polite" aria-atomic="true" data-skatepark-video-suggestion-target="announcer">
         <%= render "skateparks/video_suggestion_feedback", skatepark: skatepark %>
       </div>
 
