@@ -31,9 +31,9 @@ env:
   # renovate: datasource=node-version depName=node versioning=node
   NODE_VERSION: 24.21.0
   # renovate: datasource=github-releases depName=rhysd/actionlint versioning=semver
-  ACTIONLINT_VERSION: 1.7.11
+  ACTIONLINT_VERSION: 1.7.12
   # renovate: datasource=github-releases depName=hadolint/hadolint versioning=semver
-  HADOLINT_VERSION: 2.14.0
+  HADOLINT_VERSION: 2.15.1
   DOCKER_CACHE_SCOPE: application-image-arm64
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
@@ -58,8 +58,8 @@ jobs:
       - name: Install hadolint
         run: |
           curl -sSLO "https://github.com/hadolint/hadolint/releases/download/v${HADOLINT_VERSION}/hadolint-linux-x86_64"
-          curl -sSLO "https://github.com/hadolint/hadolint/releases/download/v${HADOLINT_VERSION}/hadolint-linux-x86_64.sha256"
-          sha256sum --check hadolint-linux-x86_64.sha256
+          curl -sSLO "https://github.com/hadolint/hadolint/releases/download/v${HADOLINT_VERSION}/checksums.sha256"
+          grep " \*hadolint-linux-x86_64$" checksums.sha256 | sha256sum --check
           chmod +x hadolint-linux-x86_64
 
       - name: Run hadolint
