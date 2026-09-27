@@ -63,10 +63,10 @@
       "extends": ["schedule:weekly"]
     },
     {
-      "description": "Ignore nokogiri platform-variant false positives (bare ruby gem when lockfile has platform-specific version)",
+      "description": "Ignore nokogiri platform-variant false positives (bare ruby gem when lockfile has platform-specific value)",
       "matchManagers": ["bundler"],
       "matchPackageNames": ["nokogiri"],
-      "matchCurrentVersion": "/^\\d+\\.\\d+\\.\\d+-/",
+      "matchCurrentValue": "/^\\d+\\.\\d+\\.\\d+-/",
       "matchNewValue": "/^\\d+\\.\\d+\\.\\d+$/",
       "enabled": false
     }
