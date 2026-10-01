@@ -12,7 +12,7 @@
     "prettier": "^3.6.2",
     "tailwindcss": "^4.1.0"
   },
-  "packageManager": "pnpm@12.6.0",
+  "packageManager": "pnpm@12.8.1",
   "scripts": {
     "herb:lint": "herb-lint",
     "herb:lint:fix": "herb-lint --fix",
