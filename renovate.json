@@ -61,14 +61,6 @@
     {
       "matchPackageNames": ["renovatebot/github-action"],
       "extends": ["schedule:weekly"]
-    },
-    {
-      "description": "Ignore nokogiri platform-variant false positives (bare ruby gem when lockfile has platform-specific value)",
-      "matchManagers": ["bundler"],
-      "matchPackageNames": ["nokogiri"],
-      "matchCurrentValue": "/^\\d+\\.\\d+\\.\\d+-/",
-      "matchNewValue": "/^\\d+\\.\\d+\\.\\d+$/",
-      "enabled": false
     }
   ]
 }
