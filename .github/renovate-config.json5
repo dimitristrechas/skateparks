@@ -4,4 +4,5 @@
   requireConfig: "optional",
   platform: "github",
   semanticCommits: "enabled",
+  osvVulnerabilityAlerts: true,
 }
