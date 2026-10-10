@@ -74,8 +74,10 @@ jobs:
           full_sha="$(git rev-parse "$INPUT_SHA")"
           short_sha="$(git rev-parse --short "$full_sha")"
           echo "Rolling back to $full_sha ($short_sha)"
-          echo "full=$full_sha" >> "$GITHUB_OUTPUT"
-          echo "short=$short_sha" >> "$GITHUB_OUTPUT"
+          {
+            echo "full=$full_sha"
+            echo "short=$short_sha"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Verify rollback image exists
         env:
@@ -151,9 +153,11 @@ jobs:
           logs="$(api "$DOKPLOY_API_URL/deployment.readLogs?batch=1&input=$log_input" | jq -r '.[0].result.data.json')"
           echo "$logs"
           echo "$logs" | grep -q "Command executed successfully" || { echo "Reversal command failed" >&2; exit 1; }
-          echo "reversed<<EOF" >> "$GITHUB_OUTPUT"
-          echo "$versions" >> "$GITHUB_OUTPUT"
-          echo "EOF" >> "$GITHUB_OUTPUT"
+          {
+            echo "reversed<<EOF"
+            echo "$versions"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Repoint latest at target image
         env:
