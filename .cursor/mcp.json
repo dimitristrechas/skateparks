@@ -20,6 +20,24 @@
       "headers": {
         "Authorization": "Bearer ${env:CONTEXT7_API_KEY}"
       }
+    },
+    "cloudflare-api": {
+      "url": "https://mcp.cloudflare.com/mcp",
+      "headers": {
+        "Authorization": "Bearer ${env:CLOUDFLARE_API_TOKEN}"
+      }
+    },
+    "cloudflare-docs": {
+      "url": "https://docs.mcp.cloudflare.com/mcp"
+    },
+    "dokploy": {
+      "command": "npx",
+      "args": ["-y", "@dokploy/mcp@latest"],
+      "env": {
+        "DOKPLOY_URL": "${env:DOKPLOY_URL}",
+        "DOKPLOY_API_KEY": "${env:DOKPLOY_API_KEY}",
+        "DOKPLOY_TOOL_PRESET": "deploy"
+      }
     }
   }
 }

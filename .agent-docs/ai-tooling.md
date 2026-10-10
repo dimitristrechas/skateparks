@@ -42,19 +42,19 @@ Thin agents should instruct loading skills via the `skill` tool (e.g. `rails-imp
 
 Three files define MCP servers for different clients. **Keep the same servers, URLs, and env var names** across all three.
 
-| File               | Client      | Notes                                                                                                                  |
-| ------------------ | ----------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `opencode.json`    | OpenCode    | Uses `{env:VAR}` for environment substitution. All servers use `type: remote` with `oauth: false`. Bearer auth headers. |
-| `.mcp.json`        | Claude Code | Uses `${VAR}` (shell-style) for env substitution. All servers use `type: http` (Streamable HTTP).                       |
-| `.cursor/mcp.json` | Cursor      | Remote Streamable HTTP. Bearer auth headers use `${env:VAR}` (Cursor convention).                                      |
+| File               | Client      | Notes                                                                                                                                                                 |
+| ------------------ | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `opencode.json`    | OpenCode    | Uses `{env:VAR}` for environment substitution. Remote servers use `type: remote` with `oauth: false`; `dokploy` is `type: local` via `npx`, gated by `dokploy*: ask`; `cloudflare-api` is gated by `cloudflare-api*: ask` (write access to DNS/R2). |
+| `.mcp.json`        | Claude Code | Uses `${VAR}` (shell-style) for env substitution. Remote servers use `type: http` (Streamable HTTP); `dokploy` is stdio via `npx`.                                    |
+| `.cursor/mcp.json` | Cursor      | Remote Streamable HTTP. Bearer auth headers use `${env:VAR}` (Cursor convention); `dokploy` is stdio via `npx`.                                                       |
 
-**Required env vars:** `LINEAR_MCP_TOKEN`, `GITHUB_MCP_TOKEN`, `CONTEXT7_API_KEY` — names must stay consistent; only the **placeholder syntax** differs per file format.
+**Required env vars:** `LINEAR_MCP_TOKEN`, `GITHUB_MCP_TOKEN`, `CONTEXT7_API_KEY`, `CLOUDFLARE_API_TOKEN`, `DOKPLOY_URL`, `DOKPLOY_API_KEY` — names must stay consistent; only the **placeholder syntax** differs per file format.
 
-**Servers:** [GitHub MCP](https://github.com/github/github-mcp-server) remote at `https://api.githubcopilot.com/mcp/`; [Linear MCP](https://linear.app/docs/mcp) at `https://mcp.linear.app/mcp`; [Exa MCP](https://docs.exa.ai/reference/mcp) at `https://mcp.exa.ai/mcp`; [Context7 MCP](https://github.com/upstash/context7) at `https://mcp.context7.com/mcp`. The deprecated npm package `@modelcontextprotocol/server-github` is not used.
+**Servers:** [GitHub MCP](https://github.com/github/github-mcp-server) remote at `https://api.githubcopilot.com/mcp/`; [Linear MCP](https://linear.app/docs/mcp) at `https://mcp.linear.app/mcp`; [Exa MCP](https://docs.exa.ai/reference/mcp) at `https://mcp.exa.ai/mcp`; [Context7 MCP](https://github.com/upstash/context7) at `https://mcp.context7.com/mcp`; [Cloudflare API MCP](https://github.com/cloudflare/mcp) at `https://mcp.cloudflare.com/mcp` (Bearer `CLOUDFLARE_API_TOKEN`; covers DNS, R2, Email Routing, Registrar via Code Mode) + [Cloudflare Docs MCP](https://github.com/cloudflare/mcp-server-cloudflare) at `https://docs.mcp.cloudflare.com/mcp` (no auth); [Dokploy MCP](https://github.com/Dokploy/mcp) stdio via `npx -y @dokploy/mcp@latest` with `DOKPLOY_TOOL_PRESET=deploy`. The deprecated npm package `@modelcontextprotocol/server-github` is not used.
 
 **Node / `npx`:** [`bin/mcp-npx`](../bin/mcp-npx) remains available for any future stdio MCP servers that need `npx` with a login-shell `PATH` (common with nvm/fnm).
 
-**Optional local storage:** store raw tokens in `.secrets/` (gitignored) and export them to the env vars above in your shell profile. See [README.md](../README.md) setup step 11.
+**Optional local storage:** export the tokens above in your shell profile (`~/.zshrc` or `~/.bashrc`). See [README.md](../README.md) setup step 12.
 
 Do not add GitHub Copilot-specific MCP endpoints or agent files to this repository.
 

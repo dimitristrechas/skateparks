@@ -3,6 +3,7 @@ name: rails-devops
 description: >-
   Docker, scripts.sh, CI/CD, credentials, and environment setup for this Rails app.
   Use for container issues, dev/test server workflows, and deployment troubleshooting.
+  Covers Dokploy production inspection via the dokploy MCP server.
 compatibility: opencode
 ---
 
@@ -51,8 +52,19 @@ Codebase is volume-mounted — code changes apply without rebuilds. Native-exten
 
 Seven jobs in `.github/workflows/ci-cd.yml`: `workflow-lint`, `test`, `rubocop-brakeman`, `herb-prettier`, `docker-validate`, `docker-publish`, `deploy`. Verification jobs must pass before image validation or publish. See `.agent-docs/operations.md` for details.
 
+## Dokploy MCP (production inspection)
+
+Production runs on Dokploy as application `web` (`ghcr.io/.../skateparks:latest`, Dokploy-managed Postgres + Redis). Deploys ship via the CI `deploy` job (push to `main` → GHCR publish → Dokploy webhook trigger) — never by editing compose on the server.
+
+The `dokploy` MCP server (`npx -y @dokploy/mcp@latest`, `deploy` preset) exposes the Dokploy API for live inspection: application status, deployment history/logs, domains, and server metrics. Use read-only calls instead of asking the user to paste dashboard output.
+
+- Credentials come from the shell environment: `DOKPLOY_URL` (instance base URL only, no `/api`) and `DOKPLOY_API_KEY`. Never commit them; export them in your shell profile like the other MCP tokens.
+- Confirm with the user before destructive/write tools (`deploy`, `redeploy`, `delete`, `remove`, `create`, `update`, `stop`, `start`, `save*`). State the impact and which application is affected. A `git push` to `main` triggers auto-deploy, so treat merging/pushing as a deploy action.
+- The MCP operates the remote instance only; it does not edit this repo. Keep `DOKPLOY_REDACT_ENV=true` (default) so secrets stay redacted.
+- If the server shows no tools / fails to start: confirm both vars are exported in the shell that launched the harness and `DOKPLOY_URL` has no trailing `/api`. On 401/403, regenerate the key in Dokploy Settings → API/CLI.
+
 ## What NOT to do
 
 - Never run `bin/rails test` locally — tests require the Docker DB/Redis
 - Never `docker compose down -v` in production (destroys named volumes)
-- Never commit `.env`, `.env.test`, `*.key` files, or `.secrets/` contents
+- Never commit `.env`, `.env.test`, or `*.key` files

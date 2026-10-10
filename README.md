@@ -17,10 +17,11 @@
     - `export GITHUB_MCP_TOKEN=<your-token>`
     - `export LINEAR_MCP_TOKEN=<your-token>`
     - `export CONTEXT7_API_KEY=<your-token>`
+    - `export CLOUDFLARE_API_TOKEN=<your-token>` (Cloudflare dashboard → Profile → API Tokens; needs Account Resources: Read plus Zone DNS, R2, Email Routing scopes you use)
+    - `export DOKPLOY_URL=<dokploy-base-url>` (base URL only, no `/api`)
+    - `export DOKPLOY_API_KEY=<your-token>` (Dokploy Settings → API/CLI)
 
     All AI tools (Cursor, Claude Code, OpenCode) read these env vars. Config files that must stay in sync: `opencode.json`, `.mcp.json`, and `.cursor/mcp.json`. See [.agent-docs/ai-tooling.md](.agent-docs/ai-tooling.md).
-
-    **Optional:** store raw tokens in `.secrets/` (gitignored) and export from there, e.g. `export GITHUB_MCP_TOKEN=$(cat .secrets/github-mcp-token)`.
 
 ### How to run tests
 

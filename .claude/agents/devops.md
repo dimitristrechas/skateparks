@@ -2,7 +2,7 @@
 name: devops
 description: >-
   Docker, scripts.sh, CI/CD, credentials, environment setup, and deployment
-  troubleshooting.
+  troubleshooting. Covers Dokploy production inspection via the dokploy MCP server.
 color: blue
 ---
 
@@ -13,6 +13,9 @@ Follow [AGENTS.md](AGENTS.md). Read linked docs before acting; do not duplicate 
 ## Ops workflows
 
 **Load the `rails-devops` skill** before running Docker, CI, or environment commands.
+Use the `dokploy` MCP server for live production inspection (app status,
+deployments, logs, domains); confirm with the user before any write/destructive
+MCP action.
 
 ## Read first
 

@@ -7,7 +7,7 @@
       "prompt": "{file:./.claude/agents/rails-implementer.md}"
     },
     "devops": {
-      "description": "Docker, scripts.sh, CI/CD, credentials, environment setup, and deployment troubleshooting.",
+      "description": "Docker, scripts.sh, CI/CD, credentials, environment setup, and deployment troubleshooting. Covers Dokploy production inspection via the dokploy MCP server.",
       "mode": "subagent",
       "temperature": 0.1,
       "prompt": "{file:./.claude/agents/devops.md}"
@@ -46,6 +46,31 @@
       "headers": {
         "Authorization": "Bearer {env:CONTEXT7_API_KEY}"
       }
+    },
+    "cloudflare-api": {
+      "type": "remote",
+      "url": "https://mcp.cloudflare.com/mcp",
+      "enabled": true,
+      "oauth": false,
+      "headers": {
+        "Authorization": "Bearer {env:CLOUDFLARE_API_TOKEN}"
+      }
+    },
+    "cloudflare-docs": {
+      "type": "remote",
+      "url": "https://docs.mcp.cloudflare.com/mcp",
+      "enabled": true,
+      "oauth": false
+    },
+    "dokploy": {
+      "type": "local",
+      "command": ["npx", "-y", "@dokploy/mcp@latest"],
+      "enabled": true,
+      "environment": {
+        "DOKPLOY_URL": "{env:DOKPLOY_URL}",
+        "DOKPLOY_API_KEY": "{env:DOKPLOY_API_KEY}",
+        "DOKPLOY_TOOL_PRESET": "deploy"
+      }
     }
   },
   "$schema": "https://opencode.ai/config.json",
@@ -54,6 +79,8 @@
     "bash(git push*)": "ask",
     "bash(git reflog*)": "ask",
     "bash(git reset*)": "ask",
+    "dokploy*": "ask",
+    "cloudflare-api*": "ask",
     "skill": {
       "*": "allow"
     }

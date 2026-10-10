@@ -64,25 +64,18 @@ sh scripts.sh dev up
 - `config/credentials/test.key` — test master key (gitignored)
 - `config/credentials/production.key` — production master key (gitignored)
 
-Never commit `.env`, `.env.test`, `*.key` files, or `.secrets/` contents.
+Never commit `.env`, `.env.test`, or `*.key` files.
 
 ## MCP tokens
 
-Store in `.secrets/` (gitignored):
+Export in shell profile (`~/.zshrc` or `~/.bashrc`):
 
 ```bash
-mkdir .secrets
-echo "your-token" > .secrets/github-mcp-token
-echo "your-token" > .secrets/linear-token
-echo "your-token" > .secrets/context7-api-key
-```
-
-Then in shell profile:
-
-```bash
-export GITHUB_MCP_TOKEN=$(cat ~/path/to/.secrets/github-mcp-token)
-export LINEAR_MCP_TOKEN=$(cat ~/path/to/.secrets/linear-token)
-export CONTEXT7_API_KEY=$(cat ~/path/to/.secrets/context7-api-key)
+export GITHUB_MCP_TOKEN=<your-token>
+export LINEAR_MCP_TOKEN=<your-token>
+export CONTEXT7_API_KEY=<your-token>
+export DOKPLOY_URL=<dokploy-base-url> # base URL only, no /api
+export DOKPLOY_API_KEY=<your-token> # Dokploy Settings → API/CLI
 ```
 
 ## CI/CD pipeline
@@ -98,6 +91,10 @@ Seven jobs in `.github/workflows/ci-cd.yml`:
 7. **deploy** — push-to-`main` Dokploy webhook trigger
 
 The verification jobs (`workflow-lint`, `test`, `rubocop-brakeman`, `herb-prettier`) must pass before image validation or publish runs.
+
+## Rollback (manual)
+
+`.github/workflows/rollback.yml` (manual `workflow_dispatch` only) rolls production back to a target commit: it re-tags the existing `sha-<short>` image as `:latest`, reverses migrations applied after the target via the `ops-rollback-migrations` Dokploy schedule (auto-created on first use), re-triggers the Dokploy webhook, and polls `/healthcheck`. Empty `sha` input defaults to the previous successful Dokploy deployment. Requires the `DOKPLOY_API_KEY` repository secret (Settings → Secrets and variables → Actions); the schedule executes `db:migrate:down` inside the running production container. GHCR keeps ~10 recent publishes (`cleanup-ghcr.yml`), which bounds how far back a rollback can reach.
 
 ## Renovate (dependency updates)
 

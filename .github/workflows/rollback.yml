@@ -1,0 +1,218 @@
+name: Rollback production
+
+on:
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: "Target commit SHA (short or full) to roll back to. Empty = previous successful Dokploy deployment."
+        required: false
+        default: ""
+      skip_migrations:
+        description: "Skip migration reversal (image-only rollback)"
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  IMAGE_NAME: ghcr.io/dimitristrechas/skateparks
+  DOKPLOY_API_URL: https://admin.dimitristrechas.com/api/trpc
+  DOKPLOY_APP_ID: mZVliPIPGSjp_84TtBI5R
+  ROLLBACK_SCHEDULE_NAME: ops-rollback-migrations
+  HEALTHCHECK_URL: https://skateparks.gr/healthcheck
+
+jobs:
+  rollback:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Resolve target SHA
+        id: target
+        env:
+          INPUT_SHA: ${{ inputs.sha }}
+          DOKPLOY_API_KEY: ${{ secrets.DOKPLOY_API_KEY }}
+        run: |
+          set -euo pipefail
+          if [ -z "$INPUT_SHA" ]; then
+            if [ -z "$DOKPLOY_API_KEY" ]; then
+              echo "DOKPLOY_API_KEY secret is not set and no sha input was given" >&2
+              exit 1
+            fi
+            head_sha="$(git rev-parse --short HEAD)"
+            query="$(jq -n --arg app "$DOKPLOY_APP_ID" \
+              '{"0":{"json":{"applicationId":$app}}}' | jq -sRr @uri)"
+            deployments="$(curl -sS -H "x-api-key: $DOKPLOY_API_KEY" \
+              "$DOKPLOY_API_URL/deployment.all?batch=1&input=$query")"
+            target_hash="$(echo "$deployments" | jq -r --arg head "$head_sha" '
+              .[0].result.data.json
+              | [.[] | select(.status == "done") | .description // "" | scan("Hash: ([0-9a-f]+)") | .[0]]
+              | map(select(. != $head))
+              | first // empty')"
+            if [ -z "$target_hash" ]; then
+              echo "Could not determine previous successful deployment" >&2
+              exit 1
+            fi
+            INPUT_SHA="$target_hash"
+          fi
+          full_sha="$(git rev-parse "$INPUT_SHA")"
+          short_sha="$(git rev-parse --short "$full_sha")"
+          echo "Rolling back to $full_sha ($short_sha)"
+          echo "full=$full_sha" >> "$GITHUB_OUTPUT"
+          echo "short=$short_sha" >> "$GITHUB_OUTPUT"
+
+      - name: Verify rollback image exists
+        env:
+          SHORT_SHA: ${{ steps.target.outputs.short }}
+        run: |
+          set -euo pipefail
+          docker buildx imagetools inspect "$IMAGE_NAME:sha-$SHORT_SHA" > /dev/null
+          echo "Found $IMAGE_NAME:sha-$SHORT_SHA"
+
+      - name: Reverse migrations applied after target
+        id: migrations
+        if: ${{ !inputs.skip_migrations }}
+        env:
+          TARGET_SHA: ${{ steps.target.outputs.full }}
+          DOKPLOY_API_KEY: ${{ secrets.DOKPLOY_API_KEY }}
+        run: |
+          set -euo pipefail
+          if [ -z "$DOKPLOY_API_KEY" ]; then
+            echo "DOKPLOY_API_KEY secret is not set" >&2
+            exit 1
+          fi
+          versions="$(git diff --name-only --diff-filter=A "$TARGET_SHA...HEAD" -- db/migrate/ \
+            | grep -oE '^db/migrate/[0-9]+' | grep -oE '[0-9]+$' | sort -ru || true)"
+          if [ -z "$versions" ]; then
+            echo "No migrations to reverse"
+            echo "reversed=none" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "Reversing versions (newest first):"
+          echo "$versions"
+          command="$(echo "$versions" | awk '{if (NR > 1) printf " && "; printf "bundle exec rake db:migrate:down VERSION=%s", $0}')"
+          echo "Schedule command: $command"
+
+          api() { curl -sS -H "x-api-key: $DOKPLOY_API_KEY" -H 'Content-Type: application/json' "$@"; }
+          get_input="$(jq -n --arg app "$DOKPLOY_APP_ID" \
+            '{"0":{"json":{"id":$app,"scheduleType":"application"}}}' | jq -sRr @uri)"
+          schedules="$(api "$DOKPLOY_API_URL/schedule.list?batch=1&input=$get_input")"
+          schedule_id="$(echo "$schedules" | jq -r --arg name "$ROLLBACK_SCHEDULE_NAME" '
+            .[0].result.data.json | map(select(.name == $name)) | first.scheduleId // empty')"
+          if [ -z "$schedule_id" ]; then
+            echo "Creating $ROLLBACK_SCHEDULE_NAME schedule"
+            created="$(api -X POST "$DOKPLOY_API_URL/schedule.create?batch=1" -d "$(jq -n \
+              --arg name "$ROLLBACK_SCHEDULE_NAME" --arg app "$DOKPLOY_APP_ID" --arg cmd "$command" \
+              '{"0":{"json":{"name":$name,"scheduleType":"application","applicationId":$app,"command":$cmd,"cronExpression":"0 0 1 1 *","shellType":"sh"}}}' )")"
+            schedule_id="$(echo "$created" | jq -r '.[0].result.data.json.scheduleId // empty')"
+            [ -n "$schedule_id" ] || { echo "Schedule creation failed: $created" >&2; exit 1; }
+          else
+            api -X POST "$DOKPLOY_API_URL/schedule.update?batch=1" -d "$(jq -n \
+              --arg id "$schedule_id" --arg name "$ROLLBACK_SCHEDULE_NAME" --arg cmd "$command" \
+              '{"0":{"json":{"scheduleId":$id,"name":$name,"command":$cmd}}}' )" > /dev/null
+          fi
+
+          run="$(api -X POST "$DOKPLOY_API_URL/schedule.runManually?batch=1" -d "$(jq -n \
+            --arg id "$schedule_id" '{"0":{"json":{"scheduleId":$id}}}' )")"
+          deployment_id="$(echo "$run" | jq -r '.[0].result.data.json.deploymentId // empty')"
+          [ -n "$deployment_id" ] || { echo "Manual run failed: $run" >&2; exit 1; }
+          echo "Schedule execution: $deployment_id"
+
+          for _ in $(seq 1 30); do
+            sleep 10
+            poll_input="$(jq -n --arg id "$schedule_id" \
+              '{"0":{"json":{"id":$id,"type":"schedule"}}}' | jq -sRr @uri)"
+            status="$(api "$DOKPLOY_API_URL/deployment.allByType?batch=1&input=$poll_input" | jq -r \
+              --arg dep "$deployment_id" '.[0].result.data.json | map(select(.deploymentId == $dep)) | first.status // empty')"
+            echo "Execution status: ${status:-pending}"
+            [ "$status" = "done" ] && break
+            [ "$status" = "error" ] && { echo "Migration reversal failed" >&2; exit 1; }
+          done
+          [ "$status" = "done" ] || { echo "Timed out waiting for migration reversal" >&2; exit 1; }
+
+          log_input="$(jq -n --arg dep "$deployment_id" \
+            '{"0":{"json":{"deploymentId":$dep,"tail":30}}}' | jq -sRr @uri)"
+          logs="$(api "$DOKPLOY_API_URL/deployment.readLogs?batch=1&input=$log_input" | jq -r '.[0].result.data.json')"
+          echo "$logs"
+          echo "$logs" | grep -q "Command executed successfully" || { echo "Reversal command failed" >&2; exit 1; }
+          echo "reversed<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$versions" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+      - name: Repoint latest at target image
+        env:
+          SHORT_SHA: ${{ steps.target.outputs.short }}
+        run: |
+          set -euo pipefail
+          target_raw="$(docker buildx imagetools inspect "$IMAGE_NAME:sha-$SHORT_SHA" --raw | sha256sum | cut -d' ' -f1)"
+          docker buildx imagetools create --tag "$IMAGE_NAME:latest" "$IMAGE_NAME:sha-$SHORT_SHA"
+          latest_raw="$(docker buildx imagetools inspect "$IMAGE_NAME:latest" --raw | sha256sum | cut -d' ' -f1)"
+          [ "$latest_raw" = "$target_raw" ] || { echo "Digest mismatch after re-tag" >&2; exit 1; }
+          echo "latest now points at the $SHORT_SHA image"
+
+      - name: Trigger Dokploy redeploy webhook
+        env:
+          DOKPLOY_WEBHOOK_KEY: ${{ secrets.DOKPLOY_WEBHOOK_KEY }}
+          SHORT_SHA: ${{ steps.target.outputs.short }}
+        run: |
+          set -euo pipefail
+          if [ -z "$DOKPLOY_WEBHOOK_KEY" ]; then
+            echo "DOKPLOY_WEBHOOK_KEY secret is not set" >&2
+            exit 1
+          fi
+          payload="$(jq -n --arg id "$SHORT_SHA" \
+            '{ref: "refs/heads/main", head_commit: {id: $id, message: ("Rollback to \($id) via rollback.yml")}}')"
+          response_body="$(mktemp)"
+          trap 'rm -f "$response_body"' EXIT
+          http_code="$(curl -sS -o "$response_body" -w "%{http_code}" -X POST \
+            "https://admin.dimitristrechas.com/api/deploy/$DOKPLOY_WEBHOOK_KEY" \
+            -H 'Content-Type: application/json' \
+            -H 'X-GitHub-Event: push' \
+            -d "$payload")"
+          if [ "$http_code" -lt 200 ] || [ "$http_code" -ge 300 ]; then
+            echo "Dokploy redeploy failed with HTTP status $http_code" >&2
+            cat "$response_body"
+            exit 1
+          fi
+          echo "Dokploy redeploy triggered"
+
+      - name: Wait for healthy production
+        run: |
+          set -euo pipefail
+          for _ in $(seq 1 60); do
+            if curl -fsS --max-time 10 "$HEALTHCHECK_URL" > /dev/null; then
+              echo "Production is healthy"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "Production did not become healthy in time" >&2
+          exit 1
+
+      - name: Write summary
+        if: always()
+        env:
+          SHORT_SHA: ${{ steps.target.outputs.short }}
+          REVERSED: ${{ steps.migrations.outputs.reversed }}
+        run: |
+          {
+            echo "## Rollback to \`$SHORT_SHA\`"
+            echo ""
+            echo "Migrations reversed: ${REVERSED:-skipped}"
+          } >> "$GITHUB_STEP_SUMMARY"
