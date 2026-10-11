@@ -71,6 +71,29 @@ Test-server commands: `up`, `rebuild`, `down`, `logs`, `console`, `bash`, `schem
 
 Destructive non-interactive commands require `--force`: `dev rebuild`, `dev reset`, and `test-server rebuild`.
 
+### How to roll back production
+
+Production deploys from `main` via GHCR + Dokploy. To revert a bad deploy, use the manual `Rollback production` workflow (`.github/workflows/rollback.yml`). It re-tags an existing `sha-<short>` image as `:latest`, reverses migrations added after the target, re-triggers Dokploy, and polls `https://skateparks.gr/healthcheck`.
+
+1. Find the target: `git log --oneline -15`, or Dokploy → application `web` → Deployments, or GHCR package tags. GHCR keeps ~10 recent images, so you can only go back that far.
+2. GitHub → Actions → `Rollback production` → `Run workflow` (leave branch on `main`).
+3. `Target commit SHA`: leave empty for the previous successful Dokploy deployment, or paste a short/full SHA.
+4. `Skip migration reversal`: leave unchecked unless the bad deploy had no migrations or you already reversed them manually.
+5. `Run workflow` and watch the run: resolve target → verify image → reverse migrations (`ops-rollback-migrations` schedule) → re-tag `:latest` → Dokploy redeploy → healthcheck (up to ~10 min).
+6. Verify: run is green, `https://skateparks.gr/healthcheck` is 200, Dokploy shows `Rollback to <sha> via rollback.yml`.
+
+Requires repo secrets `DOKPLOY_API_KEY` and `DOKPLOY_WEBHOOK_KEY`. The workflow moves the `:latest` tag only — `main` history is unchanged, so follow up with `git revert` + push if the bad commit must be permanently undone. Note: `git revert` of a migration commit does not run `db:migrate:down` automatically — the file is deleted but the schema change stays. Reverse migrations first (via this workflow), or write a new migration that undoes the change.
+
+### How to restore production database from R2 backup
+
+Production Postgres (`postgres:17`, db `skateparks`) is backed up by Dokploy daily at midnight UTC to Cloudflare R2 (destination `R2-skateparks`, bucket `skateparks`, prefix `postgres/`). These are full daily dumps, not point-in-time recovery — you can restore to a daily boundary only.
+
+1. Dokploy → Postgres service `postgres` → Backups: confirm the target date exists and shows `done` (e.g. the dump from before the bad deploy).
+2. Stop or scale down app traffic if possible — everything written after the backup timestamp will be lost on restore.
+3. Restore the selected backup from the Dokploy dashboard (or download the `postgres/...` file from the R2 `skateparks` bucket and `pg_restore` manually).
+4. Restart/redeploy the app if needed and verify `https://skateparks.gr/healthcheck` returns 200 plus spot-check data.
+5. If the bad deploy also included migrations, align code + schema: either run the `Rollback production` workflow above or `db:migrate:down VERSION=...` (newest first) before restoring, so the restored schema matches the running image.
+
 **Further reading:**
 
 - [.agent-docs/commands.md](.agent-docs/commands.md) — full command reference and direct Docker fallbacks
