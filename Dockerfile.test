@@ -4,7 +4,7 @@
 # renovate: datasource=ruby-version depName=ruby versioning=ruby
 ARG RUBY_VERSION=4.0.7
 # renovate: datasource=node-version depName=node versioning=node
-ARG NODE_VERSION=24.21.0
+ARG NODE_VERSION=24.22.0
 ARG BUNDLER_VERSION=2.7.1
 
 FROM ruby:$RUBY_VERSION-slim AS base
