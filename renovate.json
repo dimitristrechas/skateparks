@@ -26,10 +26,13 @@
   ],
   "packageRules": [
     {
-      "description": "One weekly PR for all minor/patch/pin/digest updates across gems, npm, Actions, and Docker",
+      "description": "One weekly PR for all minor/patch/pin/digest updates across gems, npm, Actions, and Docker (auto-merge when checks pass)",
       "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
       "groupName": "all non-major dependencies",
-      "groupSlug": "all-non-major"
+      "groupSlug": "all-non-major",
+      "automerge": true,
+      "automergeType": "pr",
+      "platformAutomerge": true
     },
     {
       "description": "Group major Ruby updates (gems, .ruby-version, Ruby Docker tags)",
