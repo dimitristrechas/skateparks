@@ -463,7 +463,120 @@ class SkateparksControllerTest < ActionDispatch::IntegrationTest
     assert_equal [], assigns(:states)
   end
 
+  def test_index_renders_styled_pagination_on_the_first_page
+    paginate_index_with_one_per_page
+    create(:skatepark)
+
+    get skateparks_path
+
+    assert_response :success
+    assert_select "nav[aria-label='#{I18n.t('views.pagination.aria_label')}']"
+    assert_select "[aria-current='page']", text: '1'
+    assert_select 'a[rel=next]'
+    assert_select 'a[rel=prev]', count: 0
+  end
+
+  def test_index_pagination_nav_is_a_focusable_skip_link_target
+    paginate_index_with_one_per_page
+    create(:skatepark)
+
+    get skateparks_path
+
+    assert_select 'nav#skatepark-pagination[tabindex="-1"]'
+  end
+
+  def test_index_leaves_room_for_focus_rings_inside_pagination
+    paginate_index_with_one_per_page
+    create(:skatepark)
+
+    get skateparks_path
+
+    assert_select 'nav ul.gap-2.p-2'
+  end
+
+  def test_index_renders_skip_link_to_pagination
+    paginate_index_with_one_per_page
+    create(:skatepark)
+
+    get skateparks_path
+
+    assert_select 'a.skip-link[href="#skatepark-pagination"]', text: I18n.t('skip_to_pagination')
+  end
+
+  def test_index_renders_greek_skip_link_to_pagination
+    paginate_index_with_one_per_page
+    create(:skatepark)
+
+    get skateparks_path(locale: :el)
+
+    assert_select 'a.skip-link[href="#skatepark-pagination"]', text: I18n.t('skip_to_pagination', locale: :el)
+  end
+
+  def test_index_omits_skip_link_when_results_fit_on_one_page
+    get skateparks_path
+
+    assert_response :success
+    assert_select 'a.skip-link', count: 0
+  end
+
+  def test_index_disables_previous_control_on_the_first_page
+    paginate_index_with_one_per_page
+    create(:skatepark)
+
+    get skateparks_path
+
+    assert_select "button[disabled][aria-label='#{I18n.t('views.pagination.previous')}']"
+    assert_select "[aria-current='page'].bg-white"
+    assert_select 'nav ul.rounded-lg.border'
+  end
+
+  def test_index_links_previous_and_next_on_a_middle_page
+    paginate_index_with_one_per_page
+    create_list(:skatepark, 2)
+
+    get skateparks_path(page: 2)
+
+    assert_response :success
+    assert_select 'a[rel=prev]'
+    assert_select 'a[rel=next]'
+    assert_select "[aria-current='page']", text: '2'
+  end
+
+  def test_index_disables_next_control_on_the_last_page
+    paginate_index_with_one_per_page
+    create(:skatepark)
+
+    get skateparks_path(page: 2)
+
+    assert_select 'a[rel=prev]'
+    assert_select 'a[rel=next]', count: 0
+    assert_select "button[disabled][aria-label='#{I18n.t('views.pagination.next')}']"
+    assert_select "[aria-current='page']", text: '2'
+  end
+
+  def test_index_omits_pagination_when_results_fit_on_one_page
+    get skateparks_path
+
+    assert_response :success
+    assert_select "nav[aria-label='#{I18n.t('views.pagination.aria_label')}']", count: 0
+  end
+
+  def test_index_pagination_uses_greek_labels_and_keeps_locale
+    paginate_index_with_one_per_page
+    create(:skatepark)
+
+    get skateparks_path(locale: :el)
+
+    assert_select "nav[aria-label='#{I18n.t('views.pagination.aria_label', locale: :el)}']"
+    assert_select "a[rel=next][href*='locale=el']"
+    assert_select "button[disabled][aria-label='#{I18n.t('views.pagination.previous', locale: :el)}']"
+  end
+
   private
+
+  def paginate_index_with_one_per_page
+    Kaminari.config.stubs(:default_per_page).returns(1)
+  end
 
   def create_us_skatepark(name:, lat:, lng:, state: 'CA')
     create(

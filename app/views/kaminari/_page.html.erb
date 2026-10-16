@@ -1,0 +1,18 @@
+<% if page.current? %>
+  <span
+    aria-current="page"
+    aria-label="<%= t("views.pagination.page", page: page) %>"
+    class="<%= pagination_current_page_classes %>"
+  >
+    <%= page %>
+  </span>
+<% else %>
+  <% link_options = {
+       aria: { label: t("views.pagination.page", page: page) },
+       class: pagination_page_link_classes,
+     } %>
+  <% link_options[:rel] = page.rel if page.rel %>
+  <% link_options[:remote] = remote if remote %>
+
+  <%= link_to page, url, link_options %>
+<% end %>
