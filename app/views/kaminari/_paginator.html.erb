@@ -1,0 +1,34 @@
+<%= paginator.render do %>
+  <nav
+    id="skatepark-pagination"
+    tabindex="-1"
+    class="<%= class_names(pagination_nav_classes, "outline-none") %>"
+    aria-label="<%= t("views.pagination.aria_label") %>"
+  >
+    <ul class="<%= pagination_list_classes %>">
+      <li>
+        <% if current_page.first? %>
+          <%= pagination_disabled_control(t("views.pagination.previous"), :previous) %>
+        <% else %>
+          <%= prev_page_tag %>
+        <% end %>
+      </li>
+
+      <% each_page do |page| %>
+        <% if page.display_tag? %>
+          <li><%= page_tag page %></li>
+        <% elsif !page.was_truncated? %>
+          <li aria-hidden="true"><%= gap_tag %></li>
+        <% end %>
+      <% end %>
+
+      <li>
+        <% if current_page.last? || current_page.out_of_range? %>
+          <%= pagination_disabled_control(t("views.pagination.next"), :next) %>
+        <% else %>
+          <%= next_page_tag %>
+        <% end %>
+      </li>
+    </ul>
+  </nav>
+<% end %>

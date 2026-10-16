@@ -1,0 +1,7 @@
+<%= link_to url,
+            rel: "next",
+            remote: remote,
+            aria: { label: t("views.pagination.next") },
+            class: pagination_page_link_classes do %>
+  <%= render "kaminari/chevron", direction: :next %>
+<% end %>

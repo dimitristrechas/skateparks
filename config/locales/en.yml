@@ -105,6 +105,14 @@ en:
   new: "New"
   popular: "Popular"
   cancel: "Cancel"
+  skip_to_pagination: "Skip to pagination"
+  views:
+    pagination:
+      aria_label: "Pagination"
+      previous: "Previous page"
+      next: "Next page"
+      page: "Page %{page}"
+      truncate: "…"
   cookie_consent:
     aria_label: "Cookie consent"
     message: "We use cookies and local storage on this site. With your consent, we also use analytics cookies to collect anonymised usage statistics and session recordings, so we can understand how skateparks.gr is used and improve it. Analytics cookies are not essential—you can use this site without them. You can withdraw your consent at any time."

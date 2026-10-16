@@ -1,0 +1,7 @@
+<%= link_to url,
+            rel: "prev",
+            remote: remote,
+            aria: { label: t("views.pagination.previous") },
+            class: pagination_page_link_classes do %>
+  <%= render "kaminari/chevron", direction: :previous %>
+<% end %>

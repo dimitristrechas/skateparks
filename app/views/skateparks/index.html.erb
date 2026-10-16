@@ -1,11 +1,15 @@
 <div id="skateparks">
   <%= render "skatepark_filters", countries: @countries, states: @states %>
 
+  <% if @skateparks.total_pages > 1 %>
+    <%= link_to t("skip_to_pagination"), "#skatepark-pagination", class: "skip-link" %>
+  <% end %>
+
   <div class="grid grid-cols-1 place-items-center gap-8 lg:grid-cols-2">
     <% @skateparks.each do |skatepark| %>
       <%= render "skatepark_result", skatepark: skatepark %>
     <% end %>
   </div>
 
-  <%= paginate @skateparks %>
+  <%= paginate @skateparks, window: 1, outer_window: 1 %>
 </div>
