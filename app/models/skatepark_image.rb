@@ -6,8 +6,7 @@ class SkateparkImage < ApplicationRecord
 
   validates :image, presence: true
 
-  after_destroy :clear_homepage_caches
-  after_save :clear_homepage_caches
+  after_commit :clear_homepage_caches, on: %i[create update destroy]
 
   private
 

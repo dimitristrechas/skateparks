@@ -51,9 +51,8 @@ class SkateparkImageTest < ActiveSupport::TestCase
   end
 
   def test_clears_homepage_caches_when_created_updated_and_destroyed
-    write_homepage_caches
-
     skatepark = create(:skatepark)
+    write_homepage_caches
     skatepark_image = create(:skatepark_image, skatepark: skatepark, position: 3)
 
     assert_homepage_caches_cleared
