@@ -98,6 +98,20 @@ class SkateparkTest < ActiveSupport::TestCase
     assert_equal 'updated-name', skatepark.slug
   end
 
+  def test_location_name_combines_state_and_country
+    skatepark = build(:skatepark)
+
+    assert_equal 'Attica, Greece', skatepark.location_name
+  end
+
+  def test_location_name_localizes_state_and_country
+    skatepark = build(:skatepark)
+
+    I18n.with_locale(:el) do
+      assert_equal 'Αττική, Ελλάδα', skatepark.location_name
+    end
+  end
+
   def test_returns_correct_format_in_to_param
     skatepark = create(:skatepark, :us_location,
                        name_en: 'Chicago Skate Park',
