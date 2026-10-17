@@ -253,6 +253,15 @@ module Admin
       assert_not_includes remaining_ids, second_image.id
     end
 
+    def test_patch_update_full_replace_without_new_positions_assigns_contiguous_positions
+      first_image, second_image = @skatepark.skatepark_images.to_a
+
+      patch admin_skatepark_path(@skatepark), params: full_replace_params(first_image, second_image)
+
+      assert_redirected_to admin_skateparks_url
+      assert_full_gallery_replaced(@skatepark.reload.skatepark_images.order(:position), first_image, second_image)
+    end
+
     def test_patch_update_reorders_skatepark_videos
       first_video = create(:skatepark_video, skatepark: @skatepark, position: 1, youtube_url: valid_video_urls.first)
       second_video = create(:skatepark_video, skatepark: @skatepark, position: 2, youtube_url: valid_video_urls.second)
@@ -430,6 +439,30 @@ module Admin
       assert_equal first_image_id, ordered_images.first.id
       assert_equal 'inserted_sample_image1.jpg', ordered_images.second.image.filename.to_s
       assert_equal second_image_id, ordered_images.third.id
+    end
+
+    def full_replace_params(first_image, second_image)
+      {
+        skatepark: {
+          skatepark_images_attributes: {
+            '0' => { id: first_image.id, _destroy: '1' },
+            '1' => { id: second_image.id, _destroy: '1' },
+          },
+          new_images: [
+            uploaded_image('sample_image1.jpg', 'full_replace_image1.jpg'),
+            uploaded_image('sample_image3.jpg', 'full_replace_image3.jpg'),
+          ],
+        },
+      }
+    end
+
+    def assert_full_gallery_replaced(images, first_image, second_image)
+      filenames = images.map { |image| image.image.filename.to_s }
+
+      assert_equal [1, 2], images.pluck(:position)
+      assert_not_includes images.map(&:id), first_image.id
+      assert_not_includes images.map(&:id), second_image.id
+      assert_equal %w[full_replace_image1.jpg full_replace_image3.jpg], filenames
     end
 
     def uploaded_image(image_fixture, original_filename)

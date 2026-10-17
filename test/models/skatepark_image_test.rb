@@ -49,4 +49,34 @@ class SkateparkImageTest < ActiveSupport::TestCase
 
     assert_equal [1, 2, 3], skatepark.reload.skatepark_images.limit(3).pluck(:position)
   end
+
+  def test_clears_homepage_caches_when_created_updated_and_destroyed
+    skatepark = create(:skatepark)
+    write_homepage_caches
+    skatepark_image = create(:skatepark_image, skatepark: skatepark, position: 3)
+
+    assert_homepage_caches_cleared
+
+    write_homepage_caches
+    skatepark_image.update!(position: skatepark_image.position + 1)
+
+    assert_homepage_caches_cleared
+
+    write_homepage_caches
+    skatepark_image.destroy!
+
+    assert_homepage_caches_cleared
+  end
+
+  private
+
+  def write_homepage_caches
+    Rails.cache.write(Skatepark.homepage_latest_cache_key, ['latest'])
+    Rails.cache.write(Skatepark.homepage_popular_cache_key, ['popular'])
+  end
+
+  def assert_homepage_caches_cleared
+    assert_nil Rails.cache.read(Skatepark.homepage_latest_cache_key)
+    assert_nil Rails.cache.read(Skatepark.homepage_popular_cache_key)
+  end
 end

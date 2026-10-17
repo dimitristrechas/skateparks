@@ -165,8 +165,7 @@ class SkateparkVideo < ApplicationRecord # rubocop:disable Metrics/ClassLength
   end
 
   def clear_homepage_caches
-    Rails.cache.delete(Skatepark.homepage_latest_cache_key)
-    Rails.cache.delete(Skatepark.homepage_popular_cache_key)
+    Skatepark.clear_homepage_caches
   end
 
   def sync_skatepark_active_videos_count
