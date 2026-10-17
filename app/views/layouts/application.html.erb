@@ -22,6 +22,12 @@
 
     <meta property="og:type" content="website">
 
+    <meta property="og:locale" content="<%= og_locale %>">
+
+    <% og_locale_alternates.each do |alternate| %>
+      <meta property="og:locale:alternate" content="<%= alternate %>">
+    <% end %>
+
     <meta property="og:image" content="<%= social_image %>">
 
     <meta

@@ -163,6 +163,18 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_equal I18n.t('about_details'), assigns(:meta_description)
   end
 
+  def test_get_about_renders_default_locale_social_tags_with_el_locale
+    get about_path(locale: :el)
+
+    assert_response :success
+    english_title = CGI.escapeHTML(I18n.t('about.title', locale: :en))
+    english_description = CGI.escapeHTML(I18n.t('about_details', locale: :en))
+
+    assert_includes response.body, %(property="og:title" content="#{english_title}")
+    assert_includes response.body, %(property="og:description" content="#{english_description}")
+    assert_includes response.body, 'property="og:locale" content="en_US"'
+  end
+
   def test_get_contact_returns_success
     get contact_path
 
