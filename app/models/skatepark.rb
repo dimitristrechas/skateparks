@@ -44,6 +44,11 @@ class Skatepark < ApplicationRecord
     [:skateparks_popular, homepage_cache_version]
   end
 
+  def self.clear_homepage_caches
+    Rails.cache.delete(homepage_latest_cache_key)
+    Rails.cache.delete(homepage_popular_cache_key)
+  end
+
   validates :name, presence: true
   validates :cover_image, presence: true
   validates :lat, presence: true
@@ -144,7 +149,6 @@ class Skatepark < ApplicationRecord
   def clear_skateparks_latest_cache
     return unless saved_change_to_country_code? || saved_change_to_status?
 
-    Rails.cache.delete(Skatepark.homepage_latest_cache_key)
-    Rails.cache.delete(Skatepark.homepage_popular_cache_key)
+    self.class.clear_homepage_caches
   end
 end

@@ -253,6 +253,26 @@ module Admin
       assert_not_includes remaining_ids, second_image.id
     end
 
+    def test_patch_update_full_replace_without_new_positions_assigns_contiguous_positions
+      first_image, second_image = @skatepark.skatepark_images.to_a
+
+      patch admin_skatepark_path(@skatepark), params: {
+        skatepark: {
+          skatepark_images_attributes: {
+            '0' => { id: first_image.id, _destroy: '1' },
+            '1' => { id: second_image.id, _destroy: '1' },
+          },
+          new_images: [
+            uploaded_image('sample_image1.jpg', 'full_replace_image1.jpg'),
+            uploaded_image('sample_image3.jpg', 'full_replace_image3.jpg'),
+          ],
+        },
+      }
+
+      assert_redirected_to admin_skateparks_url
+      assert_equal [1, 2], @skatepark.reload.skatepark_images.order(:position).pluck(:position)
+    end
+
     def test_patch_update_reorders_skatepark_videos
       first_video = create(:skatepark_video, skatepark: @skatepark, position: 1, youtube_url: valid_video_urls.first)
       second_video = create(:skatepark_video, skatepark: @skatepark, position: 2, youtube_url: valid_video_urls.second)
