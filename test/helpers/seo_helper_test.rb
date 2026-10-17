@@ -3,18 +3,64 @@ require 'test_helper'
 class SeoHelperTest < ActionView::TestCase
   tests SeoHelper
 
-  def test_social_title_falls_back_to_application_title
-    assert_equal I18n.t('application.title'), social_title
+  def test_social_title_falls_back_to_default_locale_application_title
+    I18n.with_locale(:el) do
+      assert_equal I18n.t('application.title', locale: I18n.default_locale), social_title
+    end
   end
 
-  def test_social_title_uses_assigned_title
+  def test_social_title_ignores_localized_page_title_assign
     controller.stubs(:view_assigns).returns({ 'title' => 'Bonn | Skateparks.gr' })
 
-    assert_equal 'Bonn | Skateparks.gr', social_title
+    assert_equal I18n.t('application.title', locale: I18n.default_locale), social_title
   end
 
-  def test_social_description_falls_back_to_application_meta_description
-    assert_equal I18n.t('application.meta_description'), social_description
+  def test_social_title_uses_skatepark_default_locale_seo_title
+    skatepark = create(:skatepark, meta_title_en: 'English Title', meta_title_el: 'Ελληνικός Τίτλος')
+    controller.stubs(:view_assigns).returns({ 'skatepark' => skatepark })
+
+    I18n.with_locale(:el) do
+      assert_equal 'English Title', social_title
+    end
+  end
+
+  def test_social_description_falls_back_to_default_locale_meta_description
+    I18n.with_locale(:el) do
+      assert_equal I18n.t('application.meta_description', locale: I18n.default_locale), social_description
+    end
+  end
+
+  def test_social_description_uses_skatepark_default_locale_seo_description
+    skatepark = create(
+      :skatepark,
+      meta_description_en: 'English description.',
+      meta_description_el: 'Ελληνική περιγραφή.'
+    )
+    controller.stubs(:view_assigns).returns({ 'skatepark' => skatepark })
+
+    I18n.with_locale(:el) do
+      assert_equal 'English description.', social_description
+    end
+  end
+
+  def test_social_copy_uses_default_locale_for_static_about_page
+    stubs(:controller_name).returns('home')
+    stubs(:action_name).returns('about')
+
+    I18n.with_locale(:el) do
+      assert_equal I18n.t('about.title', locale: I18n.default_locale), social_title
+      assert_equal I18n.t('about_details', locale: I18n.default_locale), social_description
+    end
+  end
+
+  def test_og_locale_uses_default_locale
+    I18n.with_locale(:el) do
+      assert_equal 'en_US', og_locale
+    end
+  end
+
+  def test_og_locale_alternates_exclude_default_locale
+    assert_equal ['el_GR'], og_locale_alternates
   end
 
   def test_social_image_falls_back_to_logo
