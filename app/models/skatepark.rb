@@ -76,6 +76,10 @@ class Skatepark < ApplicationRecord
     country.subdivisions[state]&.name if state.present?
   end
 
+  def location_name
+    "#{translated_state_name}, #{translated_country_name}"
+  end
+
   def seo_title
     meta_title.presence || "#{name} | Skateparks.gr"
   end
@@ -92,6 +96,16 @@ class Skatepark < ApplicationRecord
   end
 
   private
+
+  def translated_state_name
+    subdivision = country&.subdivisions&.[](state)
+
+    subdivision&.translations&.[](I18n.locale) || state_name
+  end
+
+  def translated_country_name
+    country&.translation(I18n.locale) || country_code
+  end
 
   def minimum_skatepark_images
     valid_images_count = skatepark_images.reject(&:marked_for_destruction?).count do |skatepark_image|

@@ -9,10 +9,10 @@
 <%= render(TableComponent.new) do |table| %>
   <% table.with_header do %>
     <th scope="col" class="px-6 py-3"><%= t("skatepark.name") %></th>
+    <th scope="col" class="px-6 py-3"><%= t("admin.skateparks.location") %></th>
     <th scope="col" class="px-6 py-3"><%= t("skatepark.images") %></th>
     <th scope="col" class="px-6 py-3"><%= t("skatepark.videos") %></th>
     <th scope="col" class="px-6 py-3"><%= t("skatepark.status") %></th>
-    <th scope="col" class="px-6 py-3"><%= t("skatepark.google_id") %></th>
     <th scope="col" class="px-6 py-3"></th>
   <% end %>
 
@@ -22,10 +22,10 @@
         <%= skatepark.name %>
       </th>
 
+      <td class="px-6 py-4"><%= skatepark.location_name %></td>
       <td class="px-6 py-4"><%= skatepark.skatepark_images.size %></td>
       <td class="px-6 py-4"><%= skatepark.skatepark_videos.size %></td>
-      <td class="px-6 py-4"><%= skatepark.status %></td>
-      <td class="px-6 py-4"><%= skatepark.google_id.present? %></td>
+      <td class="px-6 py-4"><%= render StatusBadgeComponent.new(status: skatepark.status) %></td>
 
       <td class="flex gap-4 px-6 py-4">
         <%= render(LinkButtonComponent.new(title: t("edit"), url: edit_admin_skatepark_path(skatepark), ghost: true)) %>

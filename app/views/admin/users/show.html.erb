@@ -18,15 +18,7 @@
       <dt class="font-semibold text-gray-700 dark:text-gray-300"><%= t('admin.users.status') %></dt>
 
       <dd>
-        <% if @user.banned? %>
-          <span class="rounded bg-red-100 px-2 py-1 text-xs font-medium text-red-800 dark:bg-red-900 dark:text-red-300">
-            <%= t('admin.users.banned') %>
-          </span>
-        <% else %>
-          <span class="rounded bg-green-100 px-2 py-1 text-xs font-medium text-green-800 dark:bg-green-900 dark:text-green-300">
-            <%= t('admin.users.active') %>
-          </span>
-        <% end %>
+        <%= render StatusBadgeComponent.new(status: @user.banned? ? :banned : :active) %>
       </dd>
     </div>
 
