@@ -9,9 +9,12 @@ sh scripts.sh                              # Interactive menu
 sh scripts.sh test                           # All tests with coverage
 sh scripts.sh test --fast                    # All tests without coverage
 sh scripts.sh test test/models/foo_test.rb   # Single file or line
+sh scripts.sh test-changed [--base main]     # Targeted tests for changed files; falls back to test --fast
 sh scripts.sh lint                           # Fast linter checks (parallel RuboCop, Herb, Prettier)
 sh scripts.sh lint --full                    # Includes Zeitwerk check
 sh scripts.sh lint --fix                     # Auto-fix then re-check
+sh scripts.sh lint-changed [--base main]     # Linters on changed files only
+sh scripts.sh gate-quick [--base main]       # lint-changed + test-changed (WIP commits)
 sh scripts.sh security                       # Brakeman, bundle-audit, pnpm audit (parallel)
 sh scripts.sh ci                             # Full CI parity (all checks in parallel) — run before push/PR
 sh scripts.sh dev up                         # Start development server
@@ -49,12 +52,18 @@ docker compose -f docker-compose.test.yml exec skateparks-web-test bin/rails tes
 
 ## Pre-push / PR checklist
 
-Match GitHub Actions before pushing or opening a PR:
+Tiered: fast path for WIP commits, full gates once before push/PR.
 
 ```bash
-sh scripts.sh test --fast    # or sh scripts.sh test for coverage
-sh scripts.sh ci             # Zeitwerk, RuboCop, Prettier, Herb, Brakeman, bundle-audit, pnpm audit
+sh scripts.sh gate-quick    # WIP commits: lint-changed + test-changed vs main
+sh scripts.sh test --fast    # or sh scripts.sh test for coverage (before push/PR)
+sh scripts.sh ci             # Zeitwerk, RuboCop, Prettier, Herb, Brakeman, bundle-audit, pnpm audit (before push/PR)
 ```
+
+`test-changed` maps `app/models|controllers|components|helpers|jobs|mailers/*.rb` to the
+conventional `test/**/*_test.rb` and runs only those files. It falls back to `test --fast` when
+the diff touches migrations, `db/schema.rb`, `Gemfile*`, `test/test_helper.rb`, `test/support/*`,
+`test/factories/*`, or more than 10 files. View/locale/CSS-only changes run lint only.
 
 `sh scripts.sh lint` and lefthook pre-commit hooks do **not** include `pnpm audit`. The `herb-prettier` CI job runs `pnpm audit --audit-level moderate`; use `sh scripts.sh ci` or `sh scripts.sh security` locally. Pre-push hook runs Brakeman, bundle-audit, and pnpm audit.
 

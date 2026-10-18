@@ -280,6 +280,176 @@ interactive_run_single_test() {
     run_single_test "$target"
 }
 
+# --- Changed-file helpers (fast path for simple commits) ---
+
+# List worktree + branch changes vs base (default: main), one path per line.
+changed_files_list() {
+    local base="${1:-main}"
+
+    if git rev-parse --verify --quiet "$base" > /dev/null; then
+        git diff --name-only "$base"...HEAD 2>/dev/null
+    fi
+    git diff --name-only 2>/dev/null
+    git diff --cached --name-only 2>/dev/null
+    git ls-files --others --exclude-standard 2>/dev/null
+}
+
+# Dedupe stdin lines, drop empties.
+dedupe_lines() {
+    sort -u | grep -v '^$' || true
+}
+
+# Map app Ruby files to their conventional test file (echo if it exists).
+map_app_file_to_test() {
+    local file="$1"
+    local candidate=""
+
+    case "$file" in
+        test/*_test.rb)
+            candidate="$file"
+            ;;
+        app/models/*.rb|app/controllers/*.rb|app/components/*.rb|app/helpers/*.rb|app/jobs/*.rb|app/mailers/*.rb)
+            candidate="test/${file#app/}"
+            candidate="${candidate%.rb}_test.rb"
+            ;;
+    esac
+
+    if [ -n "$candidate" ] && [ -f "$candidate" ]; then
+        echo "$candidate"
+    fi
+}
+
+# Returns 0 when the change set needs a full suite (migrations, schema,
+# Gemfile, factories, test helpers, or too many files to target).
+needs_full_suite() {
+    local file="$1"
+
+    case "$file" in
+        Gemfile|Gemfile.lock|db/schema.rb|db/migrate/*|config/application.rb|config/environments/test.rb|Dockerfile.test|docker-compose.test.yml|test/test_helper.rb|test/support/*|test/factories/*)
+            return 0
+            ;;
+    esac
+    return 1
+}
+
+run_tests_changed() {
+    local base="main"
+    if [ "${1:-}" = "--base" ] && [ -n "${2:-}" ]; then
+        base="$2"
+    elif [ -n "${1:-}" ] && [ "${1#-}" = "$1" ]; then
+        base="$1"
+    fi
+
+    local files
+    files=$(changed_files_list "$base" | dedupe_lines)
+
+    if [ -z "$files" ]; then
+        echo -e "${YELLOW}No changed files vs ${base}; nothing to test.${NC}"
+        return 0
+    fi
+
+    local count
+    count=$(printf '%s\n' "$files" | wc -l | tr -d ' ')
+    if [ "$count" -gt 10 ]; then
+        echo -e "${YELLOW}${count} changed files — falling back to full fast suite.${NC}"
+        run_tests_fast
+        return $?
+    fi
+
+    local tests=""
+    local file
+    while IFS= read -r file; do
+        if needs_full_suite "$file"; then
+            echo -e "${YELLOW}${file} requires full suite — falling back to test --fast.${NC}"
+            run_tests_fast
+            return $?
+        fi
+        mapped=$(map_app_file_to_test "$file")
+        if [ -n "$mapped" ]; then
+            tests=$(printf '%s\n%s' "$tests" "$mapped" | grep -v '^$' | sort -u)
+        fi
+    done <<< "$files"
+
+    if [ -z "$tests" ]; then
+        echo -e "${YELLOW}No mappable tests for changed files (views/locales/CSS only). Lint covers this; skipping targeted tests.${NC}"
+        return 0
+    fi
+
+    echo -e "${GREEN}Running targeted tests:${NC}"
+    echo "$tests"
+    # shellcheck disable=SC2086
+    test_compose exec "$TEST_SERVICE_NAME" bash -c "DISABLE_SIMPLECOV=1 bin/rails test $tests"
+}
+
+run_lint_changed() {
+    local base="main"
+    if [ "${1:-}" = "--base" ] && [ -n "${2:-}" ]; then
+        base="$2"
+    elif [ -n "${1:-}" ] && [ "${1#-}" = "$1" ]; then
+        base="$1"
+    fi
+
+    local files
+    files=$(changed_files_list "$base" | dedupe_lines)
+
+    if [ -z "$files" ]; then
+        echo -e "${YELLOW}No changed files vs ${base}; nothing to lint.${NC}"
+        return 0
+    fi
+
+    local rb_files=""
+    local erb_files=""
+    local prettier_files=""
+    local file
+    while IFS= read -r file; do
+        [ -f "$file" ] || continue
+        case "$file" in
+            *.rb)
+                rb_files="$rb_files $file"
+                ;;
+            *.erb)
+                erb_files="$erb_files $file"
+                ;;
+            *.js|*.ts|*.json|*.css)
+                prettier_files="$prettier_files $file"
+                ;;
+        esac
+    done <<< "$files"
+
+    if [ -z "$rb_files$erb_files$prettier_files" ]; then
+        echo -e "${YELLOW}No lintable changed files (no rb/erb/js/ts/json/css).${NC}"
+        return 0
+    fi
+
+    local -a specs=()
+    # shellcheck disable=SC2086
+    [ -n "$rb_files" ] && specs+=("RuboCop changed::bundle exec rubocop --force-exclusion --parallel $rb_files")
+    # shellcheck disable=SC2086
+    [ -n "$erb_files" ] && specs+=("Herb lint changed::pnpm exec herb-lint $erb_files")
+    # shellcheck disable=SC2086
+    [ -n "$erb_files" ] && specs+=("Herb format changed::pnpm exec herb-format --check $erb_files")
+    # shellcheck disable=SC2086
+    [ -n "$prettier_files" ] && specs+=("Prettier changed::pnpm exec prettier --check $prettier_files")
+
+    echo -e "${GREEN}Running changed-file linters...${NC}"
+    if run_checks_parallel "${specs[@]}"; then
+        echo -e "${GREEN}✅ Changed-file linters passed${NC}"
+    else
+        echo -e "${RED}❌ Changed-file linters failed${NC}"
+        return 1
+    fi
+}
+
+run_gate_quick() {
+    local base="${1:-main}"
+    if [ "${1:-}" = "--base" ]; then
+        base="${2:-main}"
+    fi
+
+    run_lint_changed "$base" || return 1
+    run_tests_changed "$base"
+}
+
 # --- Linting & security ---
 
 RUBOCOP_CMD="bundle exec rubocop --force-exclusion --parallel"
@@ -512,7 +682,10 @@ Skateparks.gr Development Toolkit
 Usage:
   scripts.sh                         Interactive menu
   scripts.sh test [--fast] [path]    Run tests (coverage, fast, or single file/line)
+  scripts.sh test-changed [--base main]  Targeted tests for changed files (fast path)
   scripts.sh lint [--fix] [--full]       Run linters (fast by default; --full adds Zeitwerk)
+  scripts.sh lint-changed [--base main]  Linters on changed files only (fast path)
+  scripts.sh gate-quick [--base main]    lint-changed + test-changed (fast path for WIP commits)
   scripts.sh security                  Run all security audits
   scripts.sh ci                        Run all CI parity checks in parallel
   scripts.sh dev <command>             Development server commands
@@ -601,11 +774,22 @@ run_cli() {
             shift
             run_tests_cli "$@"
             ;;
+        test-changed)
+            shift
+            run_tests_changed "$@"
+            ;;
         lint)
             shift
             run_linters_cli "$@"
             ;;
-        security)
+        lint-changed)
+            shift
+            run_lint_changed "$@"
+            ;;
+        gate-quick)
+            shift
+            run_gate_quick "$@"
+            ;;        security)
             run_security_audits
             ;;
         ci)
