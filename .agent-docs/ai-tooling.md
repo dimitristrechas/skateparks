@@ -1,10 +1,11 @@
-# AI tooling across Cursor, Claude Code, and OpenCode
+# AI tooling across Cursor, Claude Code, OpenCode, and Codex
 
 ## Canonical guidance
 
 - **`AGENTS.md`** — canonical project instructions and product-quality expectations.
 - **`.cursor/rules/*.mdc`** — Cursor-specific application of the same rules (e.g. always-on reminders).
 - **`CLAUDE.md`** — Claude Code entry point; defers to `AGENTS.md`.
+- **Codex** reads `AGENTS.md` natively; `.codex/` holds its MCP + agent layers, `.agents/skills/` holds symlinks to the canonical skills.
 
 Claude Code subagents (`.claude/agents/*.md`), skills (`.claude/skills/*/SKILL.md`), and OpenCode’s `opencode.json` should **mirror** `AGENTS.md`, not introduce conflicting policies.
 
@@ -15,8 +16,9 @@ Claude Code subagents (`.claude/agents/*.md`), skills (`.claude/skills/*/SKILL.m
 | **Cursor**      | `AGENTS.md` + `.cursor/rules/*.mdc` | `.claude/agents/` (canonical); `.cursor/agents/` symlinks for Cursor discovery | `.claude/skills/` (canonical); `.cursor/skills/` symlinks for Cursor discovery | `.cursor/mcp.json`          | —                                              |
 | **Claude Code** | `CLAUDE.md` → `AGENTS.md`           | `.claude/agents/` (auto-discovered)                                            | `.claude/skills/` (auto-discovered)                                            | `.mcp.json`                 | `.claude/settings.local.json` gitignored       |
 | **OpenCode**    | `AGENTS.md` (via agent prompts)     | `opencode.json` → `{file:./.claude/agents/...}`                                | `.claude/skills/*/SKILL.md` (auto-discovered via native `skill` tool)          | `opencode.json` `mcp` block | `permission` block (git safety + skill access) |
+| **Codex**       | `AGENTS.md` (native)                | `.codex/agents/*.toml` (mirrors `.claude/agents/` descriptions)                | `.claude/skills/` (canonical); `.agents/skills/` symlinks for Codex discovery  | `.codex/config.toml`        | Project layer loads on trusted projects only   |
 
-**Canonical source for subagents and skills:** `.claude/agents/` and `.claude/skills/`. Cursor symlinks under `.cursor/agents/` and `.cursor/skills/` point at those paths so official Cursor discovery works without duplicating content.
+**Canonical source for subagents and skills:** `.claude/agents/` and `.claude/skills/`. Cursor symlinks under `.cursor/agents/` and `.cursor/skills/` point at those paths so official Cursor discovery works without duplicating content. Codex symlinks under `.agents/skills/` point at the same canonical skills (Codex scans `.agents/skills` up to the repo root); `.codex/agents/*.toml` mirrors the canonical agent descriptions because Codex requires TOML (`name`, `description`, `developer_instructions`).
 
 ## OpenCode
 
@@ -40,15 +42,16 @@ Thin agents should instruct loading skills via the `skill` tool (e.g. `rails-imp
 
 ## MCP configuration alignment
 
-Three files define MCP servers for different clients. **Keep the same servers, URLs, and env var names** across all three.
+Four files define MCP servers for different clients. **Keep the same servers, URLs, and env var names** across all four.
 
-| File               | Client      | Notes                                                                                                                                                                 |
-| ------------------ | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `opencode.json`    | OpenCode    | Uses `{env:VAR}` for environment substitution. Remote servers use `type: remote` with `oauth: false`; `dokploy` is `type: local` via `npx`, gated by `dokploy*: ask`; `cloudflare-api` is gated by `cloudflare-api*: ask` (write access to DNS/R2). |
-| `.mcp.json`        | Claude Code | Uses `${VAR}` (shell-style) for env substitution. Remote servers use `type: http` (Streamable HTTP); `dokploy` is stdio via `npx`.                                    |
-| `.cursor/mcp.json` | Cursor      | Remote Streamable HTTP. Bearer auth headers use `${env:VAR}` (Cursor convention); `dokploy` is stdio via `npx`.                                                       |
+| File                 | Client      | Notes                                                                                                                                                                                                                                               |
+| -------------------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `opencode.json`      | OpenCode    | Uses `{env:VAR}` for environment substitution. Remote servers use `type: remote` with `oauth: false`; `dokploy` is `type: local` via `npx`, gated by `dokploy*: ask`; `cloudflare-api` is gated by `cloudflare-api*: ask` (write access to DNS/R2). |
+| `.mcp.json`          | Claude Code | Uses `${VAR}` (shell-style) for env substitution. Remote servers use `type: http` (Streamable HTTP); `dokploy` is stdio via `npx`.                                                                                                                  |
+| `.cursor/mcp.json`   | Cursor      | Remote Streamable HTTP. Bearer auth headers use `${env:VAR}` (Cursor convention); `dokploy` is stdio via `npx`.                                                                                                                                     |
+| `.codex/config.toml` | Codex       | TOML `[mcp_servers.<name>]` tables (project layer, trusted projects only). Remote servers use `url` + `bearer_token_env_var = "VAR"`; `dokploy` is stdio via `npx` with `env_vars` forwarding plus a static `[mcp_servers.dokploy.env]` preset.     |
 
-**Required env vars:** `LINEAR_MCP_TOKEN`, `GITHUB_MCP_TOKEN`, `CONTEXT7_API_KEY`, `CLOUDFLARE_API_TOKEN`, `DOKPLOY_URL`, `DOKPLOY_API_KEY` — names must stay consistent; only the **placeholder syntax** differs per file format.
+**Required env vars:** `LINEAR_MCP_TOKEN`, `GITHUB_MCP_TOKEN`, `CONTEXT7_API_KEY`, `CLOUDFLARE_API_TOKEN`, `DOKPLOY_URL`, `DOKPLOY_API_KEY` — names must stay consistent; only the **placeholder syntax** differs per file format (`{env:VAR}`, `${VAR}`, `${env:VAR}`, `"VAR"` via `bearer_token_env_var`/`env_vars`).
 
 **Servers:** [GitHub MCP](https://github.com/github/github-mcp-server) remote at `https://api.githubcopilot.com/mcp/`; [Linear MCP](https://linear.app/docs/mcp) at `https://mcp.linear.app/mcp`; [Exa MCP](https://docs.exa.ai/reference/mcp) at `https://mcp.exa.ai/mcp`; [Context7 MCP](https://github.com/upstash/context7) at `https://mcp.context7.com/mcp`; [Cloudflare API MCP](https://github.com/cloudflare/mcp) at `https://mcp.cloudflare.com/mcp` (Bearer `CLOUDFLARE_API_TOKEN`; covers DNS, R2, Email Routing, Registrar via Code Mode) + [Cloudflare Docs MCP](https://github.com/cloudflare/mcp-server-cloudflare) at `https://docs.mcp.cloudflare.com/mcp` (no auth); [Dokploy MCP](https://github.com/Dokploy/mcp) stdio via `npx -y @dokploy/mcp@latest` with `DOKPLOY_TOOL_PRESET=deploy`. The deprecated npm package `@modelcontextprotocol/server-github` is not used.
 
@@ -64,18 +67,18 @@ When adding or changing an agent, skill, or MCP server:
 
 1. Edit `AGENTS.md` if behavior or policy changes.
 2. Add or update `.claude/agents/<name>.md` or `.claude/skills/<name>/SKILL.md`.
-3. Register new subagents in `opencode.json` (`description`, `mode: subagent`, `{file:./.claude/agents/<name>.md}` prompt). Skills do not need `opencode.json` entries.
-4. Update all three MCP files (`opencode.json`, `.mcp.json`, `.cursor/mcp.json`) when servers or env var names change.
-5. Add matching symlinks under `.cursor/agents/` or `.cursor/skills/` when adding agents or skills.
+3. Register new subagents in `opencode.json` (`description`, `mode: subagent`, `{file:./.claude/agents/<name>.md}` prompt) and in `.codex/agents/<name>.toml` (`name`, `description`, `developer_instructions`). Skills do not need `opencode.json` entries.
+4. Update all four MCP files (`opencode.json`, `.mcp.json`, `.cursor/mcp.json`, `.codex/config.toml`) when servers or env var names change.
+5. Add matching symlinks under `.cursor/agents/`, `.cursor/skills/`, and `.agents/skills/` when adding agents or skills.
 
 ## Verification checklist
 
 Quick manual audit after changes:
 
-- Agent filenames in `.claude/agents/` match keys in `opencode.json` `agent`.
+- Agent filenames in `.claude/agents/` match keys in `opencode.json` `agent` and files in `.codex/agents/` (TOML `name` matches too).
 - Skill directory names match `name` in each `SKILL.md` frontmatter.
-- MCP server names and env var names are identical across `opencode.json`, `.mcp.json`, and `.cursor/mcp.json`.
+- MCP server names and env var names are identical across `opencode.json`, `.mcp.json`, `.cursor/mcp.json`, and `.codex/config.toml`.
 - Agent and skill bodies do not contradict `AGENTS.md` (i18n, a11y, commit policy, etc.).
 - `opencode.json` includes `permission.skill` if OpenCode should list project skills.
 - README env var names match this document.
-- `.cursor/agents/` and `.cursor/skills/` symlinks resolve to `.claude/` counterparts.
+- `.cursor/agents/`, `.cursor/skills/`, and `.agents/skills/` symlinks resolve to `.claude/` counterparts.

@@ -1,0 +1,35 @@
+# Project-scoped Codex configuration (trusted projects only).
+# Keep the same servers and env var names as opencode.json, .mcp.json,
+# and .cursor/mcp.json. See .agent-docs/ai-tooling.md.
+# Required env vars: GITHUB_MCP_TOKEN, LINEAR_MCP_TOKEN, CONTEXT7_API_KEY,
+# CLOUDFLARE_API_TOKEN, DOKPLOY_URL, DOKPLOY_API_KEY.
+
+[mcp_servers.github]
+url = "https://api.githubcopilot.com/mcp/"
+bearer_token_env_var = "GITHUB_MCP_TOKEN"
+
+[mcp_servers.linear]
+url = "https://mcp.linear.app/mcp"
+bearer_token_env_var = "LINEAR_MCP_TOKEN"
+
+[mcp_servers.exa]
+url = "https://mcp.exa.ai/mcp"
+
+[mcp_servers.context7]
+url = "https://mcp.context7.com/mcp"
+bearer_token_env_var = "CONTEXT7_API_KEY"
+
+[mcp_servers.cloudflare-api]
+url = "https://mcp.cloudflare.com/mcp"
+bearer_token_env_var = "CLOUDFLARE_API_TOKEN"
+
+[mcp_servers.cloudflare-docs]
+url = "https://docs.mcp.cloudflare.com/mcp"
+
+[mcp_servers.dokploy]
+command = "npx"
+args = ["-y", "@dokploy/mcp@latest"]
+env_vars = ["DOKPLOY_URL", "DOKPLOY_API_KEY"]
+
+[mcp_servers.dokploy.env]
+DOKPLOY_TOOL_PRESET = "deploy"

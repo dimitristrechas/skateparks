@@ -21,7 +21,7 @@
     - `export DOKPLOY_URL=<dokploy-base-url>` (base URL only, no `/api`)
     - `export DOKPLOY_API_KEY=<your-token>` (Dokploy Settings → API/CLI)
 
-    All AI tools (Cursor, Claude Code, OpenCode) read these env vars. Config files that must stay in sync: `opencode.json`, `.mcp.json`, and `.cursor/mcp.json`. See [.agent-docs/ai-tooling.md](.agent-docs/ai-tooling.md).
+    All AI tools (Cursor, Claude Code, OpenCode, Codex) read these env vars. Config files that must stay in sync: `opencode.json`, `.mcp.json`, `.cursor/mcp.json`, and `.codex/config.toml`. See [.agent-docs/ai-tooling.md](.agent-docs/ai-tooling.md).
 
 ### How to run tests
 

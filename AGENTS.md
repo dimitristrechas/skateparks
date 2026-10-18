@@ -2,7 +2,7 @@
 
 Rails 8.1 skatepark directory app (Ruby 4.0.6, PostgreSQL 17, Hotwire, Tailwind 4.0).
 
-**This file is the canonical source for project instructions and quality expectations.** Cursor rules under `.cursor/rules/` extend it for editor-specific behavior. Claude Code agents (`.claude/agents/`) and OpenCode (`opencode.json`) should mirror this contract, not replace it.
+**This file is the canonical source for project instructions and quality expectations.** Cursor rules under `.cursor/rules/` extend it for editor-specific behavior. Claude Code agents (`.claude/agents/`), OpenCode (`opencode.json`), and Codex (`.codex/`, `.agents/skills/`) should mirror this contract, not replace it.
 
 ## Rules
 
