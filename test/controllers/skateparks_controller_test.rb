@@ -323,6 +323,45 @@ class SkateparksControllerTest < ActionDispatch::IntegrationTest
     assert_equal 'Προσαρμοσμένη περιγραφή.', assigns(:meta_description)
   end
 
+  def test_get_show_renders_default_locale_social_copy_with_el_locale
+    @skatepark.update!(
+      meta_title_en: 'English SEO Title',
+      meta_title_el: 'Προσαρμοσμένος τίτλος',
+      meta_description_en: 'English SEO description.',
+      meta_description_el: 'Προσαρμοσμένη περιγραφή.'
+    )
+
+    get skatepark_path(@skatepark, locale: :el)
+    body = response.body
+
+    assert_response :success
+    assert_includes body, 'property="og:title" content="English SEO Title"'
+    assert_includes body, 'property="og:description" content="English SEO description."'
+    assert_includes body, 'name="twitter:description" content="English SEO description."'
+  end
+
+  def test_get_show_keeps_localized_title_with_default_locale_social_locale_tags
+    @skatepark.update!(meta_title_el: 'Προσαρμοσμένος τίτλος')
+
+    get skatepark_path(@skatepark, locale: :el)
+    body = response.body
+
+    assert_response :success
+    assert_includes body, 'Προσαρμοσμένος τίτλος'
+    assert_includes body, 'property="og:locale" content="en_US"'
+    assert_includes body, 'property="og:locale:alternate" content="el_GR"'
+  end
+
+  def test_get_index_renders_default_locale_social_tags_with_el_locale
+    get skateparks_path(locale: :el)
+
+    assert_response :success
+    english_description = CGI.escapeHTML(I18n.t('application.meta_description', locale: :en))
+
+    assert_includes response.body, %(property="og:description" content="#{english_description}")
+    assert_includes response.body, 'property="og:locale" content="en_US"'
+  end
+
   def test_get_show_redirects_to_homepage_when_skatepark_not_found
     get skatepark_path('nonexistent-id')
 
