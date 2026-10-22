@@ -38,7 +38,7 @@ module SkateparkVisitTracking
   end
 
   def prefetch_request?
-    purpose = request.headers['Sec-Purpose'].to_s.downcase
+    purpose = [request.headers['Sec-Purpose'], request.headers['X-Sec-Purpose']].join(' ').downcase
     moz = request.headers['X-Moz'].to_s.downcase
     purpose.include?('prefetch') || purpose.include?('preview') || moz == 'prefetch'
   end

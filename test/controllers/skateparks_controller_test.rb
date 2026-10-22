@@ -410,6 +410,12 @@ class SkateparksControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  def test_get_show_does_not_increment_visits_count_for_turbo_prefetch_requests
+    assert_no_difference -> { @skatepark.reload.visits_count } do
+      get skatepark_path(@skatepark), headers: { 'X-Sec-Purpose' => 'prefetch' }
+    end
+  end
+
   def test_get_show_does_not_increment_visits_count_for_head_requests
     assert_no_difference -> { @skatepark.reload.visits_count } do
       head skatepark_path(@skatepark)
