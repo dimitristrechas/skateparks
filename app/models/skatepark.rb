@@ -31,6 +31,8 @@ class Skatepark < ApplicationRecord
 
   scope :latest, -> { published.order(created_at: :desc).limit(3) }
   scope :popular, -> { joins(:popular_skatepark).merge(PopularSkatepark.all) }
+  scope :most_popular, -> { order(visits_count: :desc).i18n.order(:name).order(id: :asc) }
+  scope :newest, -> { order(created_at: :desc, id: :desc) }
 
   def self.homepage_cache_version
     connection_pool.migration_context.current_version

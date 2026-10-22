@@ -26,4 +26,10 @@ class LocaleHelperTest < ActionView::TestCase
 
     assert_equal({ country_code: 'GR', locale: :el }, locale_switch_url_options(:el))
   end
+
+  def test_locale_switch_url_options_preserves_sort_param
+    stubs(:params).returns(ActionController::Parameters.new(country_code: 'GR', sort: 'popular', page: '2'))
+
+    assert_equal({ country_code: 'GR', sort: 'popular', page: '2', locale: :el }, locale_switch_url_options(:el))
+  end
 end

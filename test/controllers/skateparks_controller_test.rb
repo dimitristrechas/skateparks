@@ -89,6 +89,111 @@ class SkateparksControllerTest < ActionDispatch::IntegrationTest
     assert_equal names.sort, names
   end
 
+  def test_get_index_sorts_by_popular_visits_count_desc_with_alphabetical_tie_break
+    @skatepark.update!(name_en: 'Zeta Park', name_el: 'Zeta Park', visits_count: 5)
+    alpha_tied = create(:skatepark, name_en: 'Alpha Park', name_el: 'Alpha Park', visits_count: 5)
+    most_visited = create(:skatepark, name_en: 'Middle Park', name_el: 'Middle Park', visits_count: 20)
+
+    get skateparks_path(sort: 'popular')
+
+    assert_equal [most_visited.id, alpha_tied.id, @skatepark.id], assigns(:skateparks).map(&:id)
+  end
+
+  def test_get_index_sorts_by_newest_created_at_desc
+    @skatepark.update!(created_at: 3.days.ago)
+    middle_park = create(:skatepark, created_at: 2.days.ago)
+    newest_park = create(:skatepark, created_at: 1.day.ago)
+
+    get skateparks_path(sort: 'newest')
+
+    assert_equal [newest_park.id, middle_park.id, @skatepark.id], assigns(:skateparks).map(&:id)
+  end
+
+  def test_get_index_falls_back_to_alphabetical_order_when_sort_param_is_invalid
+    create(:skatepark, name_en: 'Zebra Park', name_el: 'Zebra Park', visits_count: 50)
+    create(:skatepark, name_en: 'Alpha Park', name_el: 'Alpha Park', visits_count: 1)
+
+    get skateparks_path(sort: 'invalid')
+    names = assigns(:skateparks).map(&:name)
+
+    assert_equal names.sort, names
+  end
+
+  def test_get_index_combines_country_filter_with_popular_sort
+    us_popular = create(:skatepark, :us_location, name_en: 'US Popular', name_el: 'US Popular', visits_count: 30)
+    us_less = create(:skatepark, :us_location, name_en: 'US Less', name_el: 'US Less', visits_count: 5)
+    create(:skatepark, country_code: 'GR', visits_count: 100)
+
+    get skateparks_path(country_code: 'US', sort: 'popular')
+
+    assert_equal [us_popular.id, us_less.id], assigns(:skateparks).map(&:id)
+  end
+
+  def test_get_index_combines_distance_filter_with_popular_sort
+    near_less_popular = create_us_skatepark(name: 'Near Park', lat: 0.0, lng: 0.05)
+    near_less_popular.update!(visits_count: 3)
+    farther_more_popular = create_us_skatepark(name: 'Farther Popular Park', lat: 0.0, lng: 0.1)
+    farther_more_popular.update!(visits_count: 25)
+    outside_radius = create_us_skatepark(name: 'Outside Park', lat: 0.0, lng: 0.5)
+    outside_radius.update!(visits_count: 100)
+
+    get skateparks_path(country_code: 'US', lat: 0, lng: 0, distance: 25, sort: 'popular')
+
+    assert_equal [farther_more_popular.id, near_less_popular.id], assigns(:skateparks).map(&:id)
+  end
+
+  def test_get_index_combines_distance_filter_with_newest_sort
+    older_near = create_us_skatepark(name: 'Older Near Park', lat: 0.0, lng: 0.05)
+    older_near.update!(created_at: 2.days.ago)
+    newer_farther = create_us_skatepark(name: 'Newer Farther Park', lat: 0.0, lng: 0.1)
+    newer_farther.update!(created_at: 1.day.ago)
+
+    get skateparks_path(country_code: 'US', lat: 0, lng: 0, distance: 25, sort: 'newest')
+
+    assert_equal [newer_farther.id, older_near.id], assigns(:skateparks).map(&:id)
+  end
+
+  def test_get_index_renders_sort_segmented_control_with_selected_option
+    get skateparks_path(sort: 'popular')
+
+    assert_response :success
+    assert_select 'details input[name="sort"][type="radio"]', count: 0
+    assert_select 'input#sort_popular[type="radio"][name="sort"][value="popular"][checked="checked"]'
+    assert_select 'input#sort_nearest[data-action="change->skateparks--geolocation#selectNearestSort"]'
+    assert_select 'input[name="sort"][type="radio"][data-action="change->skateparks--filters#submitForm"]', count: 3
+  end
+
+  def test_get_index_sorts_by_nearest_without_distance_filter_when_coordinates_present
+    nearest_skatepark = create_us_skatepark(name: 'Zebra Near Park', lat: 0.0, lng: 0.05)
+    farthest_skatepark = create_us_skatepark(name: 'Alpha Far Park', lat: 0.0, lng: 0.5)
+
+    get skateparks_path(country_code: 'US', lat: 0, lng: 0, sort: 'nearest')
+
+    assert_equal [nearest_skatepark.id, farthest_skatepark.id], assigns(:skateparks).map(&:id)
+    assert_select 'input#sort_nearest[checked="checked"]'
+  end
+
+  def test_get_index_falls_back_to_alphabetical_when_sort_nearest_has_no_coordinates
+    create_us_skatepark(name: 'Zebra Park', lat: 0.0, lng: 0.05)
+    create_us_skatepark(name: 'Alpha Park', lat: 0.0, lng: 0.5)
+
+    get skateparks_path(country_code: 'US', sort: 'nearest')
+    names = assigns(:skateparks).map(&:name)
+
+    assert_equal names.sort, names
+    assert_select 'input#sort_alphabetical[checked="checked"]'
+  end
+
+  def test_get_index_combines_distance_filter_with_alphabetical_sort
+    zebra_near = create_us_skatepark(name: 'Zebra Near Park', lat: 0.0, lng: 0.05)
+    alpha_farther = create_us_skatepark(name: 'Alpha Farther Park', lat: 0.0, lng: 0.1)
+
+    get skateparks_path(country_code: 'US', lat: 0, lng: 0, distance: 25, sort: 'alphabetical')
+
+    assert_equal [alpha_farther.id, zebra_near.id], assigns(:skateparks).map(&:id)
+    assert_select 'input#sort_alphabetical[checked="checked"]'
+  end
+
   def test_get_index_filters_by_distance
     nearby_skatepark = create_us_skatepark(name: 'Nearby Park', lat: 0.0, lng: 0.05)
     faraway_skatepark = create_us_skatepark(name: 'Faraway Park', lat: 0.0, lng: 0.5)
@@ -224,6 +329,36 @@ class SkateparksControllerTest < ActionDispatch::IntegrationTest
     assert_operator count_matching_queries(queries, /FROM "skatepark_images"/), :<=, 1
   end
 
+  def test_get_index_with_popular_sort_avoids_n_plus_one_queries_for_listing_fields
+    create(:skatepark, visits_count: 10)
+    create(:skatepark, visits_count: 20)
+    create(:skatepark, visits_count: 30)
+
+    queries = capture_sql_queries do
+      get skateparks_path(sort: 'popular')
+    end
+
+    assert_operator count_matching_queries(queries, /FROM "mobility_string_translations"/), :<=, 1
+    assert_operator count_matching_queries(queries, /active_storage_attachments/), :<=, 1
+    assert_operator count_matching_queries(queries, /active_storage_blobs/), :<=, 1
+    assert_operator count_matching_queries(queries, /FROM "skatepark_images"/), :<=, 1
+  end
+
+  def test_get_index_with_alphabetical_sort_avoids_n_plus_one_queries_for_listing_fields
+    create(:skatepark, name_en: 'Alpha Park', name_el: 'Alpha Park')
+    create(:skatepark, name_en: 'Beta Park', name_el: 'Beta Park')
+    create(:skatepark, name_en: 'Gamma Park', name_el: 'Gamma Park')
+
+    queries = capture_sql_queries do
+      get skateparks_path
+    end
+
+    assert_operator count_matching_queries(queries, /FROM "mobility_string_translations"/), :<=, 1
+    assert_operator count_matching_queries(queries, /active_storage_attachments/), :<=, 1
+    assert_operator count_matching_queries(queries, /active_storage_blobs/), :<=, 1
+    assert_operator count_matching_queries(queries, /FROM "skatepark_images"/), :<=, 1
+  end
+
   def test_get_index_assigns_countries_from_cache
     Rails.cache.clear
     create(:skatepark, country_code: 'GR')
@@ -251,6 +386,40 @@ class SkateparksControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_equal @skatepark, assigns(:skatepark)
+  end
+
+  def test_get_show_increments_visits_count_once_per_session
+    assert_difference -> { @skatepark.reload.visits_count }, 1 do
+      get skatepark_path(@skatepark)
+    end
+
+    assert_no_difference -> { @skatepark.reload.visits_count } do
+      get skatepark_path(@skatepark)
+    end
+  end
+
+  def test_get_show_does_not_increment_visits_count_for_bot_user_agent
+    assert_no_difference -> { @skatepark.reload.visits_count } do
+      get skatepark_path(@skatepark), headers: { 'HTTP_USER_AGENT' => 'Mozilla/5.0 (compatible; Googlebot/2.1)' }
+    end
+  end
+
+  def test_get_show_does_not_increment_visits_count_for_prefetch_requests
+    assert_no_difference -> { @skatepark.reload.visits_count } do
+      get skatepark_path(@skatepark), headers: { 'Sec-Purpose' => 'prefetch' }
+    end
+  end
+
+  def test_get_show_does_not_increment_visits_count_for_turbo_prefetch_requests
+    assert_no_difference -> { @skatepark.reload.visits_count } do
+      get skatepark_path(@skatepark), headers: { 'X-Sec-Purpose' => 'prefetch' }
+    end
+  end
+
+  def test_get_show_does_not_increment_visits_count_for_head_requests
+    assert_no_difference -> { @skatepark.reload.visits_count } do
+      head skatepark_path(@skatepark)
+    end
   end
 
   def test_get_show_redirects_to_homepage_for_draft_skatepark

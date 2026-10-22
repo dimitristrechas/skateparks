@@ -83,10 +83,12 @@ class SeoHelperTest < ActionView::TestCase
   end
 
   def test_seo_page_url_preserves_filter_query_params
-    stubs(:request).returns(stub(query_parameters: { 'country_code' => 'GR', 'page' => '2', 'search' => 'bowl' }))
-    stubs(:url_for).with({ only_path: false, protocol: 'https', country_code: 'GR', page: '2' })
-                   .returns('https://www.skateparks.gr/skateparks?country_code=GR&page=2')
+    stubs(:request).returns(
+      stub(query_parameters: { 'country_code' => 'GR', 'sort' => 'popular', 'page' => '2', 'search' => 'bowl' })
+    )
+    stubs(:url_for).with({ only_path: false, protocol: 'https', country_code: 'GR', sort: 'popular', page: '2' })
+                   .returns('https://www.skateparks.gr/skateparks?country_code=GR&page=2&sort=popular')
 
-    assert_equal 'https://www.skateparks.gr/skateparks?country_code=GR&page=2', seo_page_url(locale: :en)
+    assert_equal 'https://www.skateparks.gr/skateparks?country_code=GR&page=2&sort=popular', seo_page_url(locale: :en)
   end
 end

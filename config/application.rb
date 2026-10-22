@@ -26,7 +26,9 @@ module Skateparks
     config.i18n.available_locales = %i[en el]
     config.i18n.default_locale = :en
 
-    config.view_component.previews.paths << Rails.root.join('test/components/previews')
+    # `to_s`: ViewComponent copies these into ActiveSupport::Dependencies.autoload_paths,
+    # and Rails' file watchers require String paths (Pathname raises NoMethodError on #start_with?).
+    config.view_component.previews.paths << Rails.root.join('test/components/previews').to_s
     config.view_component.previews.default_layout = 'component_preview'
     config.lookbook.preview_layout = 'component_preview' if defined?(Lookbook)
   end

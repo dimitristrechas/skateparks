@@ -1,7 +1,18 @@
 import { Controller } from "@hotwired/stimulus";
 
 export default class extends Controller {
-  static targets = ["distanceRadio", "latitude", "longitude", "message"];
+  static targets = [
+    "distanceRadio",
+    "latitude",
+    "longitude",
+    "message",
+    "nearestSortRadio",
+    "sortRadio",
+    "sortForm",
+    "sortLatitude",
+    "sortLongitude",
+    "filterSort",
+  ];
 
   static values = {
     defaultDistance: Number,
@@ -12,12 +23,64 @@ export default class extends Controller {
 
   connect() {
     this.pendingDistanceValue = null;
+    this.pendingNearestSort = false;
+    this.previousSortValue = this.currentSortValue;
     this.syncFormState();
+    this.checkGrantedPermission();
+  }
+
+  checkGrantedPermission() {
+    if (!navigator.permissions?.query) return;
+
+    navigator.permissions
+      .query({ name: "geolocation" })
+      .then((status) => {
+        this.applyPermissionState(status.state);
+        status.onchange = () => this.applyPermissionState(status.state);
+      })
+      .catch(() => {});
+  }
+
+  applyPermissionState(state) {
+    if (state === "granted") {
+      this.hideMessage();
+      if (!this.hasCoordinates) {
+        this.requestSilentLocation();
+      }
+      return;
+    }
+
+    if (state === "denied") {
+      this.setCoordinates("", "");
+      this.selectDistanceValue("");
+      if (this.hasNearestSortRadioTarget && this.nearestSortRadioTarget.checked) {
+        this.restorePreviousSort();
+      }
+      this.syncFormState();
+    }
+  }
+
+  requestSilentLocation() {
+    if (!navigator.geolocation) return;
+
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => {
+        this.setCoordinates(coords.latitude, coords.longitude);
+        this.syncFormState();
+      },
+      () => {},
+      {
+        enableHighAccuracy: true,
+        maximumAge: 300000,
+        timeout: 10000,
+      }
+    );
   }
 
   requestLocation() {
     if (!navigator.geolocation) {
       this.pendingDistanceValue = null;
+      this.pendingNearestSort = false;
       this.showMessage(this.unavailableMessageValue);
       return;
     }
@@ -28,6 +91,24 @@ export default class extends Controller {
       timeout: 10000,
     });
   }
+
+  selectNearestSort = () => {
+    if (this.hasCoordinates) {
+      this.syncFormState();
+      this.sortFormTarget?.requestSubmit();
+      return;
+    }
+
+    if (!navigator.geolocation) {
+      this.restorePreviousSort();
+      this.showMessage(this.unavailableMessageValue);
+      return;
+    }
+
+    this.pendingNearestSort = true;
+    this.hideMessage();
+    this.requestLocation();
+  };
 
   handleSubmit = (event) => {
     if (this.selectedDistanceValue === "" || this.hasCoordinates) return;
@@ -67,16 +148,22 @@ export default class extends Controller {
 
   clearLocation = () => {
     this.pendingDistanceValue = null;
-    this.latitudeTarget.value = "";
-    this.longitudeTarget.value = "";
     this.selectDistanceValue("");
     this.hideMessage();
     this.syncFormState();
   };
 
   handleLocationSuccess = ({ coords }) => {
-    this.latitudeTarget.value = coords.latitude;
-    this.longitudeTarget.value = coords.longitude;
+    this.setCoordinates(coords.latitude, coords.longitude);
+
+    if (this.pendingNearestSort) {
+      this.pendingNearestSort = false;
+      this.hideMessage();
+      this.syncFormState();
+      this.sortFormTarget?.requestSubmit();
+      return;
+    }
+
     this.applyDistance(
       this.pendingDistanceValue || this.selectedDistanceValue || String(this.defaultDistanceValue || "")
     );
@@ -85,10 +172,15 @@ export default class extends Controller {
   };
 
   handleLocationError = (error) => {
-    this.pendingDistanceValue = null;
-    this.selectDistanceValue("");
-    this.latitudeTarget.value = "";
-    this.longitudeTarget.value = "";
+    if (this.pendingNearestSort) {
+      this.pendingNearestSort = false;
+      this.restorePreviousSort();
+    } else {
+      this.pendingDistanceValue = null;
+      this.selectDistanceValue("");
+    }
+
+    this.setCoordinates("", "");
     this.syncFormState();
 
     if (error.code === error.PERMISSION_DENIED) {
@@ -99,16 +191,48 @@ export default class extends Controller {
     this.showMessage(this.unavailableMessageValue);
   };
 
+  restorePreviousSort() {
+    const fallbackValue = this.previousSortValue === "nearest" ? "" : this.previousSortValue;
+
+    if (this.hasNearestSortRadioTarget) {
+      this.nearestSortRadioTarget.checked = false;
+    }
+
+    this.sortRadioTargets.forEach((radio) => {
+      radio.checked = radio.value === fallbackValue;
+    });
+  }
+
+  get currentSortValue() {
+    if (this.hasNearestSortRadioTarget && this.nearestSortRadioTarget.checked) {
+      return "nearest";
+    }
+
+    const checkedRadio = this.sortRadioTargets.find((radio) => radio.checked);
+    return checkedRadio ? checkedRadio.value : "";
+  }
+
+  setCoordinates(lat, lng) {
+    this.latitudeTarget.value = lat;
+    this.longitudeTarget.value = lng;
+    if (this.hasSortLatitudeTarget) this.sortLatitudeTarget.value = lat;
+    if (this.hasSortLongitudeTarget) this.sortLongitudeTarget.value = lng;
+  }
+
   applyDistance(value) {
     this.selectDistanceValue(value);
     this.syncFormState();
   }
 
   syncFormState() {
-    const hasActiveDistance = this.hasCoordinates && this.selectedDistanceValue !== "";
+    const isNearestSort = this.hasNearestSortRadioTarget && this.nearestSortRadioTarget.checked;
+    const needsCoordinates = this.hasCoordinates && (this.selectedDistanceValue !== "" || isNearestSort);
 
-    this.latitudeTarget.disabled = !hasActiveDistance;
-    this.longitudeTarget.disabled = !hasActiveDistance;
+    this.latitudeTarget.disabled = !needsCoordinates;
+    this.longitudeTarget.disabled = !needsCoordinates;
+
+    if (this.hasSortLatitudeTarget) this.sortLatitudeTarget.disabled = !this.hasCoordinates;
+    if (this.hasSortLongitudeTarget) this.sortLongitudeTarget.disabled = !this.hasCoordinates;
   }
 
   get hasCoordinates() {
