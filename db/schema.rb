@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_20_110009) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_22_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -167,8 +167,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_20_110009) do
     t.string "state"
     t.integer "status", null: false
     t.datetime "updated_at", null: false
+    t.integer "visits_count", default: 0, null: false
     t.index ["country_code"], name: "index_skateparks_on_country_code"
     t.index ["state"], name: "index_skateparks_on_state"
+    t.index ["visits_count", "id"], name: "index_skateparks_on_visits_count_and_id"
   end
 
   create_table "users", force: :cascade do |t|

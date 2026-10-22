@@ -1,5 +1,5 @@
 module SeoHelper
-  LOCALE_ALTERNATE_PARAMS = %i[country_code state page].freeze
+  LOCALE_ALTERNATE_PARAMS = %i[country_code state sort page].freeze
   OG_LOCALE_MAP = { en: 'en_US', el: 'el_GR' }.freeze
 
   # Static pages with per-locale titles/descriptions. Social share tags always

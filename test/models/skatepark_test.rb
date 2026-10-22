@@ -185,6 +185,21 @@ class SkateparkTest < ActiveSupport::TestCase
     end
   end
 
+  def test_orders_most_popular_by_visits_count_desc_then_name_asc
+    alpha = create(:skatepark, name_en: 'Alpha Park', name_el: 'Alpha Park', visits_count: 10)
+    zeta = create(:skatepark, name_en: 'Zeta Park', name_el: 'Zeta Park', visits_count: 10)
+    beta = create(:skatepark, name_en: 'Beta Park', name_el: 'Beta Park', visits_count: 25)
+
+    assert_equal [beta.id, alpha.id, zeta.id], Skatepark.most_popular.pluck(:id)
+  end
+
+  def test_orders_newest_by_created_at_desc_then_id_desc
+    older = create(:skatepark, created_at: 2.days.ago)
+    newer = create(:skatepark, created_at: 1.day.ago)
+
+    assert_equal [newer.id, older.id], Skatepark.newest.pluck(:id)
+  end
+
   def test_seo_description_truncates_long_body_copy
     long_description = ('Word ' * 80).to_s
     skatepark = create(:skatepark, description_en: long_description)

@@ -1,5 +1,6 @@
 class SkateparksController < ApplicationController
   include SkateparkDistanceFiltering
+  include SkateparkVisitTracking
 
   before_action :set_skatepark, only: %i[show]
 
@@ -10,6 +11,7 @@ class SkateparksController < ApplicationController
   end
 
   def show
+    track_skatepark_visit
     @title = @skatepark.seo_title
     @meta_description = @skatepark.seo_description
     @meta_image = url_for(@skatepark.cover_image)
@@ -95,7 +97,7 @@ class SkateparksController < ApplicationController
   end
 
   def skateparks_for_filters
-    skateparks = Skatepark.published.includes(:string_translations, :skatepark_images, cover_image_attachment: :blob)
+    skateparks = Skatepark.published.preload(:string_translations, :skatepark_images, cover_image_attachment: :blob)
     skateparks = skateparks.where(country_code: params[:country_code]) if params[:country_code].present?
     skateparks = skateparks.where(state: params[:state]) if params[:state].present? && params[:country_code].present?
     skateparks

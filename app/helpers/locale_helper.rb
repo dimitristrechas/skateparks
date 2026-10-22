@@ -17,6 +17,10 @@ module LocaleHelper
     options = {
       country_code: params[:country_code],
       state: params[:state],
+      distance: params[:distance],
+      lat: params[:lat],
+      lng: params[:lng],
+      sort: params[:sort],
       page: params[:page],
     }
     options[:locale] = locale unless locale == I18n.default_locale

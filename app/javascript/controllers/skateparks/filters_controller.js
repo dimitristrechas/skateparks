@@ -15,6 +15,13 @@ export default class extends Controller {
     this.fetchAvailableStates(countryCode);
   };
 
+  submitForm = (event) => {
+    const form = event.target.form;
+    if (!form) return;
+
+    form.requestSubmit();
+  };
+
   fetchAvailableStates(countryCode) {
     fetch(`/available_states/${countryCode}`, {
       method: "GET",

@@ -1,0 +1,59 @@
+<% current_sort = selected_sort_option %>
+<% selected_distance = location_params_present? ? params[:distance].to_s : "" %>
+<% has_coords = coordinates_valid? %>
+<% sort_option_classes = "relative z-10 flex w-full min-w-0 cursor-pointer items-center justify-center whitespace-nowrap rounded-lg px-2.5 py-2 text-center text-sm font-medium text-neutral-500 transition-colors duration-200 hover:bg-white/70 hover:text-neutral-800 peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-neutral-700 peer-checked:text-neutral-800 peer-checked:hover:bg-transparent peer-checked:hover:text-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-600/35 dark:hover:text-neutral-100 dark:peer-focus-visible:outline-neutral-200 dark:peer-checked:text-neutral-900 dark:peer-checked:hover:bg-transparent dark:peer-checked:hover:text-neutral-900 sm:px-3.5" %>
+
+<div class="float-right">
+  <%= form_with url: skateparks_path,
+                method: :get,
+                data: { "skateparks--geolocation-target": "sortForm" } do |form| %>
+    <%= form.hidden_field :locale, value: I18n.locale %>
+    <%= form.hidden_field :country_code, value: params[:country_code], disabled: params[:country_code].blank? %>
+    <%= form.hidden_field :state, value: params[:state], disabled: params[:state].blank? || params[:country_code].blank? %>
+    <%= form.hidden_field :distance, value: selected_distance, disabled: selected_distance.blank? %>
+
+    <%= form.hidden_field :lat,
+                          value: params[:lat],
+                          disabled: !has_coords,
+                          data: { "skateparks--geolocation-target": "sortLatitude" } %>
+
+    <%= form.hidden_field :lng,
+                          value: params[:lng],
+                          disabled: !has_coords,
+                          data: { "skateparks--geolocation-target": "sortLongitude" } %>
+
+    <fieldset class="flex min-h-11 min-w-0 items-center gap-2 border-0 p-0">
+      <legend class="sr-only"><%= t("sort_by") %></legend>
+      <span aria-hidden="true" class="hidden text-sm font-medium sm:inline"><%= t("sort_by") %></span>
+
+      <div
+        class="
+          distance-filter relative grid grid-cols-4 items-stretch gap-1 overflow-hidden rounded-lg border
+          border-neutral-300/90 p-1 dark:border-neutral-600
+        "
+      >
+        <div aria-hidden="true" class="distance-filter__indicator"></div>
+
+        <% sort_options.each do |sort_option| %>
+          <% sort_id = "sort_#{sort_option}" %>
+          <% sort_value = sort_option == "alphabetical" && selected_distance.blank? ? "" : sort_option %>
+          <% is_nearest = sort_option == "nearest" %>
+
+          <div class="distance-filter__option">
+            <%= radio_button_tag :sort,
+                                 sort_value,
+                                 current_sort == sort_option,
+                                 id: sort_id,
+                                 class: "peer sr-only",
+                                 data: {
+                                   action: is_nearest ? "change->skateparks--geolocation#selectNearestSort" : "change->skateparks--filters#submitForm",
+                                   "skateparks--geolocation-target": is_nearest ? "nearestSortRadio" : "sortRadio"
+                                 } %>
+
+            <%= label_tag sort_id, t("sort_options.#{sort_option}"), class: sort_option_classes %>
+          </div>
+        <% end %>
+      </div>
+    </fieldset>
+  <% end %>
+</div>
