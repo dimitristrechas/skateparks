@@ -26,6 +26,12 @@
   ],
   "packageRules": [
     {
+      "description": "Mirror pnpm minimumReleaseAge (24h): hold npm updates until CI's install gate passes",
+      "matchDatasources": ["npm"],
+      "minimumReleaseAge": "1 day",
+      "internalChecksFilter": "strict"
+    },
+    {
       "description": "One weekly PR for all minor/patch/pin/digest updates across gems, npm, Actions, and Docker (auto-merge when checks pass)",
       "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
       "groupName": "all non-major dependencies",
