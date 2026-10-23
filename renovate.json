@@ -4,6 +4,10 @@
   "labels": ["dependencies"],
   "prHourlyLimit": 0,
   "prConcurrentLimit": 0,
+  "osvVulnerabilityAlerts": true,
+  "lockFileMaintenance": {
+    "enabled": true
+  },
   "customManagers": [
     {
       "description": "Update `# renovate:` annotated *_VERSION env vars in GitHub Actions workflows (e.g. RUBY_VERSION, NODE_VERSION)",
