@@ -1,0 +1,67 @@
+<div
+  class="relative flex flex-col gap-1"
+  data-controller="admin--skatepark-picker"
+  data-admin--skatepark-picker-search-url-value="<%= @search_url %>"
+  data-admin--skatepark-picker-required-value="<%= @required %>"
+  data-admin--skatepark-picker-no-results-text-value="<%= t('admin.skatepark_picker.no_results') %>"
+  data-admin--skatepark-picker-results-count-one-value="<%= t('admin.skatepark_picker.results_count_one') %>"
+  data-admin--skatepark-picker-results-count-other-value="<%= t('admin.skatepark_picker.results_count_other', count: '{count}') %>"
+  data-admin--skatepark-picker-selection-required-value="<%= t('admin.skatepark_picker.selection_required') %>"
+>
+  <label for="<%= combobox_input_id %>" class="block text-sm font-medium text-neutral-700 dark:text-neutral-200">
+    <%= @label %>
+  </label>
+
+  <input
+    type="hidden"
+    name="<%= @input_name %>"
+    id="<%= @input_id %>"
+    value="<%= @selected_id %>"
+    data-admin--skatepark-picker-target="hiddenInput"
+  >
+
+  <input
+    type="text"
+    id="<%= combobox_input_id %>"
+    role="combobox"
+    aria-autocomplete="list"
+    aria-expanded="false"
+    aria-controls="<%= listbox_id %>"
+    autocomplete="off"
+    value="<%= @selected_name %>"
+    placeholder="<%= @placeholder %>"
+    <%= "required" if @required %>
+    class="
+      w-full rounded-lg border border-neutral-300 bg-white p-2 text-sm text-neutral-700 focus-visible:outline
+      focus-visible:outline-offset-1 focus-visible:outline-neutral-700 dark:border-neutral-600 dark:bg-neutral-700
+      dark:text-neutral-100 dark:focus-visible:outline-neutral-200
+    "
+    data-admin--skatepark-picker-target="input"
+    data-action="
+      focus->admin--skatepark-picker#onFocus
+      input->admin--skatepark-picker#onInput
+      keydown->admin--skatepark-picker#onKeydown
+      blur->admin--skatepark-picker#onBlur
+    "
+  >
+
+  <ul
+    id="<%= listbox_id %>"
+    role="listbox"
+    aria-label="<%= @label %>"
+    class="
+      absolute top-full z-20 mt-1 hidden max-h-60 w-full overflow-y-auto rounded-lg border border-neutral-300
+      bg-white py-1 shadow-lg dark:border-neutral-600 dark:bg-neutral-800
+    "
+    data-admin--skatepark-picker-target="listbox"
+  ></ul>
+
+  <p
+    id="<%= error_id %>"
+    class="mt-1 hidden text-sm text-red-600 dark:text-red-400"
+    data-admin--skatepark-picker-target="error"
+    role="alert"
+  ></p>
+
+  <div class="sr-only" aria-live="polite" aria-atomic="true" data-admin--skatepark-picker-target="status"></div>
+</div>

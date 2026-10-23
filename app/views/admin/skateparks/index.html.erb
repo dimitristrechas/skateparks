@@ -1,10 +1,46 @@
 <p style="color: green"><%= notice %></p>
 
-<h1 class="mb-8 text-3xl font-bold"><%= t("admin.skateparks.index_title") %></h1>
+<div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+  <h1 class="text-3xl font-bold"><%= t("admin.skateparks.index_title") %></h1>
 
-<div class="my-4 flex flex-row-reverse">
   <%= render(LinkButtonComponent.new(title: t("admin.skateparks.new_skatepark"), url: new_admin_skatepark_path, contained: true)) %>
 </div>
+
+<%= form_with url: admin_skateparks_path, method: :get, class: "mb-6 flex flex-col gap-4 rounded-lg bg-gray-50 p-4 sm:flex-row sm:items-end dark:bg-gray-800" do |form| %>
+  <div class="flex flex-1 flex-col gap-1">
+    <%= form.label :q, t("admin.skateparks.search_label"), class: "block text-sm font-medium text-neutral-700 dark:text-neutral-200" %>
+
+    <%= form.search_field :q,
+                          value: params[:q],
+                          placeholder: t("admin.skateparks.search_placeholder"),
+                          class: "w-full rounded-lg border border-neutral-300 bg-white p-2 text-sm text-neutral-700 focus-visible:outline focus-visible:outline-offset-1 focus-visible:outline-neutral-700 dark:border-neutral-600 dark:bg-neutral-700 dark:text-neutral-100 dark:focus-visible:outline-neutral-200" %>
+  </div>
+
+  <div class="flex flex-col gap-1">
+    <%= form.label :status, t("skatepark.status"), class: "block text-sm font-medium text-neutral-700 dark:text-neutral-200" %>
+
+    <%= render(
+      SelectComponent.new(
+        name: :status,
+        id: "status",
+        options: [[t("admin.skateparks.all_statuses"), ""]] + Skatepark.statuses.keys.map { |status| [t("admin.skateparks.statuses.#{status}"), status] },
+        selected: params[:status].to_s,
+      ),
+    ) %>
+  </div>
+
+  <div class="flex items-center gap-3">
+    <%= render(ButtonComponent.new(title: t("search"), form: form, type: "submit")) %>
+
+    <% if params[:q].present? || params[:status].present? %>
+      <%= render(LinkButtonComponent.new(title: t("reset_filters"), url: admin_skateparks_path, ghost: true)) %>
+    <% end %>
+  </div>
+<% end %>
+
+<% if @skateparks.total_pages > 1 %>
+  <%= link_to t("skip_to_pagination"), "#skatepark-pagination", class: "skip-link" %>
+<% end %>
 
 <%= render(TableComponent.new) do |table| %>
   <% table.with_header do %>
@@ -16,29 +52,37 @@
     <th scope="col" class="px-6 py-3"></th>
   <% end %>
 
-  <% @skateparks.each do |skatepark| %>
+  <% if @skateparks.empty? %>
     <% table.with_row do %>
-      <th scope="row" class="px-6 py-4 font-medium whitespace-nowrap text-gray-900 dark:text-white">
-        <%= skatepark.name %>
-      </th>
+      <td colspan="6" class="px-6 py-4 text-center"><%= t("admin.skateparks.empty_state") %></td>
+    <% end %>
+  <% else %>
+    <% @skateparks.each do |skatepark| %>
+      <% table.with_row do %>
+        <th scope="row" class="px-6 py-4 font-medium whitespace-nowrap text-gray-900 dark:text-white">
+          <%= skatepark.name %>
+        </th>
 
-      <td class="px-6 py-4"><%= skatepark.location_name %></td>
-      <td class="px-6 py-4"><%= skatepark.skatepark_images.size %></td>
-      <td class="px-6 py-4"><%= skatepark.skatepark_videos.size %></td>
-      <td class="px-6 py-4"><%= render StatusBadgeComponent.new(status: skatepark.status) %></td>
+        <td class="px-6 py-4"><%= skatepark.location_name %></td>
+        <td class="px-6 py-4"><%= skatepark.skatepark_images.size %></td>
+        <td class="px-6 py-4"><%= skatepark.skatepark_videos.size %></td>
+        <td class="px-6 py-4"><%= render StatusBadgeComponent.new(status: skatepark.status) %></td>
 
-      <td class="flex gap-4 px-6 py-4">
-        <%= render(LinkButtonComponent.new(title: t("edit"), url: edit_admin_skatepark_path(skatepark), ghost: true)) %>
+        <td class="flex gap-4 px-6 py-4">
+          <%= render(LinkButtonComponent.new(title: t("edit"), url: edit_admin_skatepark_path(skatepark), ghost: true)) %>
 
-        <% if Rails.env.development? %>
-          <%= form_with url: admin_skatepark_path(skatepark), method: :delete, data: { turbo_confirm: t("delete_confirm") } do |form| %>
-            <%= render(ButtonComponent.new(title: t("admin.skateparks.destroy"), type: :submit, form: form, ghost: true)) %>
+          <% if Rails.env.development? %>
+            <%= form_with url: admin_skatepark_path(skatepark), method: :delete, data: { turbo_confirm: t("delete_confirm") } do |form| %>
+              <%= render(ButtonComponent.new(title: t("admin.skateparks.destroy"), type: :submit, form: form, ghost: true)) %>
+            <% end %>
           <% end %>
-        <% end %>
-      </td>
+        </td>
+      <% end %>
     <% end %>
   <% end %>
 <% end %>
+
+<%= paginate @skateparks, window: 1, outer_window: 1 %>
 
 <%= render(
   LinkComponent.new(

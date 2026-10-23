@@ -3,8 +3,8 @@ module Admin
     before_action :set_popular_skatepark, only: %i[update destroy]
 
     def index
-      @popular_skateparks = PopularSkatepark.includes(:skatepark)
-      @available_skateparks = available_skateparks
+      @popular_skatepark = PopularSkatepark.new
+      load_popular_skateparks
     end
 
     def create
@@ -14,8 +14,7 @@ module Admin
         redirect_to admin_popular_skateparks_url,
                     notice: t('admin.popular_skateparks.added_notice')
       else
-        @popular_skateparks = PopularSkatepark.includes(:skatepark)
-        @available_skateparks = available_skateparks
+        load_popular_skateparks
 
         render :index, status: :unprocessable_content
       end
@@ -26,8 +25,7 @@ module Admin
         redirect_to admin_popular_skateparks_url,
                     notice: t('admin.popular_skateparks.updated_notice')
       else
-        @popular_skateparks = PopularSkatepark.includes(:skatepark)
-        @available_skateparks = available_skateparks
+        load_popular_skateparks
 
         render :index, status: :unprocessable_content
       end
@@ -49,10 +47,8 @@ module Admin
       params.expect(popular_skatepark: %i[skatepark_id position])
     end
 
-    def available_skateparks
-      Skatepark.published
-               .where.not(id: PopularSkatepark.select(:skatepark_id))
-               .order(:name)
+    def load_popular_skateparks
+      @popular_skateparks = PopularSkatepark.includes(skatepark: :string_translations)
     end
   end
 end

@@ -1,33 +1,64 @@
 <%= render "shared/flash" %>
 
-<h1 class="mb-8 text-3xl font-bold"><%= t('admin.users.title') %></h1>
+<h1 class="mb-8 text-3xl font-bold"><%= t("admin.users.title") %></h1>
+
+<%= form_with url: admin_users_path, method: :get, class: "mb-6 flex flex-col gap-4 rounded-lg bg-gray-50 p-4 sm:flex-row sm:items-end dark:bg-gray-800" do |form| %>
+  <div class="flex flex-1 flex-col gap-1">
+    <%= form.label :q, t("admin.users.search_label"), class: "block text-sm font-medium text-neutral-700 dark:text-neutral-200" %>
+
+    <%= form.search_field :q,
+                          value: params[:q],
+                          placeholder: t("admin.users.search_placeholder"),
+                          class: "w-full rounded-lg border border-neutral-300 bg-white p-2 text-sm text-neutral-700 focus-visible:outline focus-visible:outline-offset-1 focus-visible:outline-neutral-700 dark:border-neutral-600 dark:bg-neutral-700 dark:text-neutral-100 dark:focus-visible:outline-neutral-200" %>
+  </div>
+
+  <div class="flex items-center gap-3">
+    <%= render(ButtonComponent.new(title: t("search"), form: form, type: "submit")) %>
+
+    <% if params[:q].present? %>
+      <%= render(LinkButtonComponent.new(title: t("reset_filters"), url: admin_users_path, ghost: true)) %>
+    <% end %>
+  </div>
+<% end %>
+
+<% if @users.total_pages > 1 %>
+  <%= link_to t("skip_to_pagination"), "#skatepark-pagination", class: "skip-link" %>
+<% end %>
 
 <%= render(TableComponent.new) do |table| %>
   <% table.with_header do %>
-    <th scope="col" class="px-6 py-3"><%= t('admin.users.email') %></th>
-    <th scope="col" class="px-6 py-3"><%= t('admin.users.role') %></th>
-    <th scope="col" class="px-6 py-3"><%= t('admin.users.status') %></th>
-    <th scope="col" class="px-6 py-3"><%= t('admin.users.created_at') %></th>
-    <th scope="col" class="px-6 py-3"><%= t('admin.users.actions') %></th>
+    <th scope="col" class="px-6 py-3"><%= t("admin.users.email") %></th>
+    <th scope="col" class="px-6 py-3"><%= t("admin.users.role") %></th>
+    <th scope="col" class="px-6 py-3"><%= t("admin.users.status") %></th>
+    <th scope="col" class="px-6 py-3"><%= t("admin.users.created_at") %></th>
+    <th scope="col" class="px-6 py-3"><%= t("admin.users.actions") %></th>
   <% end %>
 
-  <% @users.each do |user| %>
+  <% if @users.empty? %>
     <% table.with_row do %>
-      <td class="px-6 py-4 font-medium text-gray-900 dark:text-white"><%= user.email_address %></td>
-      <td class="px-6 py-4"><%= user.role.titleize %></td>
+      <td colspan="5" class="px-6 py-4 text-center"><%= t("admin.users.empty_state") %></td>
+    <% end %>
+  <% else %>
+    <% @users.each do |user| %>
+      <% table.with_row do %>
+        <td class="px-6 py-4 font-medium text-gray-900 dark:text-white"><%= user.email_address %></td>
+        <td class="px-6 py-4"><%= user.role.titleize %></td>
 
-      <td class="px-6 py-4">
-        <%= render StatusBadgeComponent.new(status: user.banned? ? :banned : :active) %>
-      </td>
+        <td class="px-6 py-4">
+          <%= render StatusBadgeComponent.new(status: user.banned? ? :banned : :active) %>
+        </td>
 
-      <td class="px-6 py-4"><%= format_datetime(user.created_at) %></td>
+        <td class="px-6 py-4"><%= format_datetime(user.created_at) %></td>
 
-      <td class="px-6 py-4">
-        <%= link_to t('admin.users.view'), admin_user_path(user), class: "text-blue-500 hover:underline" %>
-      </td>
+        <td class="px-6 py-4">
+          <%= link_to t("admin.users.view"), admin_user_path(user), class: "text-blue-500 hover:underline" %>
+        </td>
+      <% end %>
     <% end %>
   <% end %>
 <% end %>
+
+<%= paginate @users, window: 1, outer_window: 1 %>
 
 <%= render(
   LinkComponent.new(

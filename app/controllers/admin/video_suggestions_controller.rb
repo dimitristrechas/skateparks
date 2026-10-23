@@ -6,8 +6,8 @@ module Admin
       @video_suggestions = SkateparkVideo.pending_review
                                          .includes(skatepark: :string_translations,
                                                    proposed_skatepark: :string_translations)
-                                         .order(created_at: :desc)
-      @skateparks = Skatepark.published.i18n.includes(:string_translations).order(:name)
+                                         .order(created_at: :desc, id: :desc)
+                                         .page(params[:page])
     end
 
     def activate
@@ -42,7 +42,7 @@ module Admin
     end
 
     def activate_params
-      params.expect(:skatepark_id)
+      params[:skatepark_id].presence || @video_suggestion.skatepark_id
     end
 
     def activate_video_on!(target_skatepark)

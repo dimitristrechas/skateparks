@@ -1,5 +1,7 @@
 module Admin
   class SkateparksController < BaseController
+    SEARCH_LIMIT = 20
+
     include SkateparkImageAttachment
     include SkateparkVideoManagement
 
@@ -7,7 +9,18 @@ module Admin
 
     # GET /skateparks or /skateparks.json
     def index
-      @skateparks = Skatepark.i18n.order(:name).includes(:skatepark_images, :skatepark_videos)
+      @skateparks = Skatepark.search_by_name(params[:q]).filter_by_status(params[:status])
+                             .i18n.order(:name, :id)
+                             .includes(:string_translations, :skatepark_images, :skatepark_videos)
+                             .page(params[:page])
+    end
+
+    def search
+      skateparks = Skatepark.published.search_by_name(params[:q]).i18n.order(:name, :id)
+                            .includes(:string_translations).limit(SEARCH_LIMIT)
+      skateparks = skateparks.available_for_popular if ActiveModel::Type::Boolean.new.cast(params[:exclude_popular])
+
+      render json: skateparks.map { |s| { id: s.id, name: s.name, location_name: s.location_name } }
     end
 
     # GET /skateparks/1 or /skateparks/1.json
@@ -87,18 +100,15 @@ module Admin
 
     # Only allow a list of trusted parameters through.
     def skatepark_params
-      @skatepark_params ||= params.expect(skatepark: [:name_el, :name_en, :lat, :lng, :cover_image, :description_el,
-                                                      :description_en, :meta_title_el, :meta_title_en,
-                                                      :meta_description_el, :meta_description_en,
-                                                      :google_id, :status, :country_code, :state,
-                                                      { new_images: [] },
-                                                      { new_image_positions: [] },
-                                                      { new_video_urls: [] },
-                                                      { new_video_positions: [] },
-                                                      { skatepark_images_attributes: [%i[id position _destroy]] },
-                                                      {
-                                                        skatepark_videos_attributes: [%i[id position status _destroy]],
-                                                      },])
+      @skatepark_params ||= params.expect(
+        skatepark: [:name_el, :name_en, :lat, :lng, :cover_image, :description_el, :description_en,
+                    :meta_title_el, :meta_title_en, :meta_description_el, :meta_description_en,
+                    :google_id, :status, :country_code, :state,
+                    { new_images: [] }, { new_image_positions: [] },
+                    { new_video_urls: [] }, { new_video_positions: [] },
+                    { skatepark_images_attributes: [%i[id position _destroy]] },
+                    { skatepark_videos_attributes: [%i[id position status _destroy]] },]
+      )
     end
 
     def skatepark_attributes

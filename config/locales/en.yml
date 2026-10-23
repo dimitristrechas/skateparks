@@ -216,6 +216,9 @@ en:
         other: "%{count} visible site announcements"
     users:
       title: "Manage Users"
+      search_label: "Search by email"
+      search_placeholder: "Filter by email address…"
+      empty_state: "No users found."
       email: "Email"
       role: "Role"
       status: "Status"
@@ -252,6 +255,10 @@ en:
       new_skatepark: "New skatepark"
       destroy: "destroy"
       location: "Country / State"
+      search_label: "Search by name"
+      search_placeholder: "Search in English or Greek…"
+      all_statuses: "All statuses"
+      empty_state: "No skateparks found."
       statuses:
         draft: "Draft"
         published: "Published"
@@ -359,6 +366,12 @@ en:
       errors_title:
         one: "1 error prohibited this announcement from being saved:"
         other: "%{count} errors prohibited this announcement from being saved:"
+    skatepark_picker:
+      placeholder: "Search skateparks by name…"
+      no_results: "No matching skateparks found."
+      results_count_one: "1 skatepark available"
+      results_count_other: "%{count} skateparks available"
+      selection_required: "Please select a skatepark from the list."
     video_suggestions:
       title: "Video suggestions"
       pending_count:
@@ -368,6 +381,11 @@ en:
       thumbnail_alt: "Suggested video thumbnail"
       proposed_for: "Proposed for"
       assign_to: "Assign to"
+      change_skatepark: "Change skatepark…"
+      reassign_dialog_title: "Change assigned skatepark"
+      reassign_dialog_description: "Search and select the skatepark where this video should be published."
+      reassign_confirm: "Update skatepark"
+      close_dialog: "Close dialog"
       url: "YouTube URL"
       submitted_at: "Submitted"
       actions: "Actions"

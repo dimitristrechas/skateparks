@@ -7,6 +7,13 @@ class User < ApplicationRecord
 
   enum :role, { user: 0, admin: 1 }, default: :user
 
+  scope :search_by_email, lambda { |query|
+    sanitized = query.to_s.strip
+    next all if sanitized.blank?
+
+    where('email_address ILIKE ?', "%#{sanitize_sql_like(sanitized)}%")
+  }
+
   validates :role, presence: true
   validates :email_address, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
   validates :password, length: { minimum: 12 }, if: :password_digest_changed?

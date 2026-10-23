@@ -10,7 +10,11 @@ Rails.application.routes.draw do
 
   namespace :admin do
     root to: 'dashboard#index'
-    resources :skateparks
+    resources :skateparks do
+      collection do
+        get :search
+      end
+    end
     resources :popular_skateparks, only: %i[index create update destroy], path: 'skateparks_popular'
     resources :video_suggestions, only: :index do
       member do

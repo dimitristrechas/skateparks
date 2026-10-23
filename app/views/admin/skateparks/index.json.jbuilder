@@ -1,1 +1,1 @@
-json.array! @skateparks, partial: 'skateparks/skatepark', as: :skatepark
+json.array! @skateparks, partial: 'admin/skateparks/skatepark', as: :skatepark

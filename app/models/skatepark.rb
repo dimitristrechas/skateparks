@@ -31,8 +31,22 @@ class Skatepark < ApplicationRecord
 
   scope :latest, -> { published.order(created_at: :desc).limit(3) }
   scope :popular, -> { joins(:popular_skatepark).merge(PopularSkatepark.all) }
+  scope :available_for_popular, -> { where.not(id: PopularSkatepark.select(:skatepark_id)) }
   scope :most_popular, -> { order(visits_count: :desc).i18n.order(:name).order(id: :asc) }
   scope :newest, -> { order(created_at: :desc, id: :desc) }
+  scope :filter_by_status, ->(status) { statuses.key?(status.to_s) ? where(status: status.to_s) : all }
+  scope :search_by_name, lambda { |query|
+    sanitized = query.to_s.strip
+    next all if sanitized.blank?
+
+    pattern = "%#{sanitize_sql_like(sanitized)}%"
+    matching_ids = Mobility::Backends::ActiveRecord::KeyValue::StringTranslation
+                   .where(translatable_type: 'Skatepark', key: 'name', locale: %w[en el])
+                   .where('value ILIKE ?', pattern)
+                   .select(:translatable_id)
+
+    where(id: matching_ids)
+  }
 
   def self.homepage_cache_version
     connection_pool.migration_context.current_version
