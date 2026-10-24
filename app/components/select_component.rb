@@ -28,11 +28,11 @@ class SelectComponent < ViewComponent::Base
   end
 
   def size_classes
-    @large ? 'px-6 py-2.5' : 'p-2.5'
+    @large ? 'px-6 py-2.5' : 'h-10 px-3 text-sm'
   end
 
   def select_classes
-    class_names(base_classes, size_classes)
+    class_names(base_classes, size_classes, @html_options[:class])
   end
 
   def select_tag_options
@@ -40,7 +40,7 @@ class SelectComponent < ViewComponent::Base
       disabled: @disabled,
       required: @required,
       class: select_classes,
-    }.merge(aria_attributes).merge(@html_options)
+    }.merge(aria_attributes).merge(@html_options.except(:class))
 
     options[:id] = @id if @id.present?
     options

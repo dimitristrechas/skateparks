@@ -244,6 +244,7 @@ export default class extends Controller {
       this.inputTarget.value = item.name;
     }
     this.clearError();
+    this.cancelPendingWork();
     this.closeListbox();
     this.dispatch("selected", { detail: { id: item.id, name: item.name } });
   }

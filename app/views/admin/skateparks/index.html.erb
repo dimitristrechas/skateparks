@@ -13,7 +13,7 @@
     <%= form.search_field :q,
                           value: params[:q],
                           placeholder: t("admin.skateparks.search_placeholder"),
-                          class: "w-full rounded-lg border border-neutral-300 bg-white p-2 text-sm text-neutral-700 focus-visible:outline focus-visible:outline-offset-1 focus-visible:outline-neutral-700 dark:border-neutral-600 dark:bg-neutral-700 dark:text-neutral-100 dark:focus-visible:outline-neutral-200" %>
+                          class: "h-10 w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-700 focus-visible:outline focus-visible:outline-offset-1 focus-visible:outline-neutral-700 dark:border-neutral-600 dark:bg-neutral-700 dark:text-neutral-100 dark:focus-visible:outline-neutral-200" %>
   </div>
 
   <div class="flex flex-col gap-1">
@@ -30,10 +30,10 @@
   </div>
 
   <div class="flex items-center gap-3">
-    <%= render(ButtonComponent.new(title: t("search"), form: form, type: "submit")) %>
+    <%= render(ButtonComponent.new(title: t("search"), form: form, type: "submit", class: "h-10 justify-center text-sm")) %>
 
     <% if params[:q].present? || params[:status].present? %>
-      <%= render(LinkButtonComponent.new(title: t("reset_filters"), url: admin_skateparks_path, ghost: true)) %>
+      <%= render(LinkButtonComponent.new(title: t("reset_filters"), url: admin_skateparks_path, ghost: true, classnames: "h-10 justify-center text-sm")) %>
     <% end %>
   </div>
 <% end %>

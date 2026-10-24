@@ -5,7 +5,10 @@
 <div class="my-8 rounded-lg bg-gray-50 p-6 dark:bg-gray-800">
   <h2 class="mb-4 text-xl font-semibold"><%= t("admin.popular_skateparks.add_section_title") %></h2>
 
-  <%= form_with model: @popular_skatepark || PopularSkatepark.new,
+  <% add_form_record = @popular_skatepark if @popular_skatepark&.new_record? %>
+  <% add_form_record ||= PopularSkatepark.new %>
+
+  <%= form_with model: add_form_record,
                 url: admin_popular_skateparks_path,
                 class: "flex flex-col gap-4 sm:flex-row sm:items-end" do |form| %>
     <div class="flex flex-1 flex-col gap-2">
@@ -16,8 +19,8 @@
           label: t("skatepark.name"),
           search_url: search_admin_skateparks_path(exclude_popular: true),
           placeholder: t("admin.popular_skateparks.select_prompt"),
-          selected_id: @popular_skatepark&.skatepark_id,
-          selected_name: @popular_skatepark&.skatepark&.name,
+          selected_id: add_form_record.skatepark_id,
+          selected_name: add_form_record.skatepark&.name,
           required: true,
         ),
       ) %>
