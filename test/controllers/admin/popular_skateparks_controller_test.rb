@@ -26,15 +26,24 @@ module Admin
       assert_equal [@first_popular_skatepark, @second_popular_skatepark].sort, assigns(:popular_skateparks).sort
     end
 
-    def test_get_index_assigns_available_published_skateparks_not_in_popular_list
-      unpopular_skatepark = create(:skatepark)
+    def test_get_index_renders_searchable_skatepark_combobox_instead_of_full_select
+      unpopular_skatepark = create(:skatepark, name_en: 'Unpopular Skatepark', name_el: 'Unpopular Skatepark')
       get admin_popular_skateparks_path
-      available = assigns(:available_skateparks)
 
-      assert_includes available, unpopular_skatepark
-      assert_not_includes available, @first_published_skatepark
-      assert_not_includes available, @second_published_skatepark
-      assert_not_includes available, @draft_skatepark
+      assert_response :success
+      assert_select 'select[name="popular_skatepark[skatepark_id]"]', count: 0
+      assert_select 'input[role="combobox"][id="popular_skatepark_skatepark_id_combobox"]'
+      assert_select '[data-admin--skatepark-picker-search-url-value*="exclude_popular=true"]'
+      assert_not_includes response.body, unpopular_skatepark.name
+    end
+
+    def test_get_index_avoids_n_plus_one_queries_for_popular_skatepark_translations
+      queries = capture_sql_queries do
+        get admin_popular_skateparks_path
+      end
+
+      assert_response :success
+      assert_operator count_matching_queries(queries, /FROM "mobility_string_translations"/), :<=, 1
     end
 
     def test_post_create_with_valid_params_creates_popular_skatepark
@@ -147,7 +156,7 @@ module Admin
       assert_equal [@first_popular_skatepark, @second_popular_skatepark].sort, assigns(:popular_skateparks).sort
     end
 
-    def test_post_create_with_invalid_params_assigns_available_skateparks
+    def test_post_create_with_invalid_params_retains_selected_skatepark_in_picker
       invalid_params = {
         popular_skatepark: {
           skatepark_id: @first_published_skatepark.id,
@@ -157,7 +166,8 @@ module Admin
 
       post admin_popular_skateparks_path, params: invalid_params
 
-      assert_not_nil assigns(:available_skateparks)
+      assert_select 'input[type="hidden"][name="popular_skatepark[skatepark_id]"][value=?]',
+                    @first_published_skatepark.id.to_s
     end
 
     def test_post_create_without_position_does_not_create
@@ -259,15 +269,10 @@ module Admin
       assert_equal [@first_popular_skatepark, @second_popular_skatepark].sort, assigns(:popular_skateparks).sort
     end
 
-    def test_patch_update_with_invalid_params_assigns_available_skateparks
-      {
-        id: @first_popular_skatepark.id,
-        popular_skatepark: { position: nil },
-      }
-
+    def test_patch_update_with_invalid_params_renders_skatepark_picker
       patch admin_popular_skatepark_path(@first_popular_skatepark), params: { popular_skatepark: { position: nil } }
 
-      assert_not_nil assigns(:available_skateparks)
+      assert_select 'input[role="combobox"][id="popular_skatepark_skatepark_id_combobox"]'
     end
 
     def test_patch_update_raises_error_when_not_found
@@ -322,6 +327,27 @@ module Admin
 
       assert_redirected_to root_path
       assert_match(/not authorized/, flash[:alert])
+    end
+
+    private
+
+    def capture_sql_queries(&)
+      queries = []
+      callback = lambda do |_name, _started, _finished, _unique_id, payload|
+        sql = payload[:sql]
+        next if payload[:name] == 'SCHEMA' || payload[:cached]
+        next if sql.match?(/\A(?:BEGIN|COMMIT|ROLLBACK|SAVEPOINT|RELEASE SAVEPOINT)/)
+
+        queries << sql.squish
+      end
+
+      ActiveSupport::Notifications.subscribed(callback, 'sql.active_record', &)
+
+      queries
+    end
+
+    def count_matching_queries(queries, pattern)
+      queries.count { |query| query.match?(pattern) }
     end
   end
 end

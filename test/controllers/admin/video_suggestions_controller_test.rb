@@ -8,8 +8,8 @@ module Admin
       Rails.cache.clear
       @admin = create(:user, :admin)
       login_as(@admin)
-      @proposed_skatepark = create(:skatepark, name_en: 'Proposed Park', name_el: 'Proposed Park')
-      @target_skatepark = create(:skatepark, name_en: 'Target Park', name_el: 'Target Park')
+      @proposed_skatepark = create(:skatepark, name_en: 'Proposed Park', name_el: 'Πάρκο Πρότασης')
+      @target_skatepark = create(:skatepark, name_en: 'Target Park', name_el: 'Πάρκο Στόχος')
       @video_suggestion = create(
         :skatepark_video,
         :pending,
@@ -24,6 +24,55 @@ module Admin
 
       assert_response :success
       assert_includes assigns(:video_suggestions), @video_suggestion
+      assert_nil assigns(:skateparks)
+    end
+
+    def test_get_index_renders_single_shared_reassign_modal_instead_of_per_row_selects
+      get admin_video_suggestions_path
+
+      assert_response :success
+      assert_select 'table select[name="skatepark_id"]', count: 0
+      assert_select 'dialog#reassign-skatepark-dialog', count: 1
+      assert_select 'dialog#reassign-skatepark-dialog input[role="combobox"]', count: 1
+      assert_select 'tr input[type="hidden"][name="skatepark_id"][value=?]', @proposed_skatepark.id.to_s
+    end
+
+    def test_get_index_avoids_n_plus_one_queries_across_pending_rows
+      create_list(:skatepark, 3).each_with_index do |park, index|
+        create(
+          :skatepark_video,
+          :pending,
+          skatepark: park,
+          proposed_skatepark: park,
+          youtube_url: "https://youtu.be/0000000000#{index + 1}"
+        )
+      end
+
+      queries = capture_sql_queries do
+        get admin_video_suggestions_path
+      end
+
+      assert_response :success
+      assert_operator count_matching_queries(queries, /FROM "mobility_string_translations"/), :<=, 1
+      assert_equal 0, count_matching_queries(queries, /FROM "skateparks" INNER JOIN "mobility_string_translations"/)
+    end
+
+    def test_get_index_paginates_pending_suggestions_and_shows_total_pending_count
+      Kaminari.config.stubs(:default_per_page).returns(1)
+      create(
+        :skatepark_video,
+        :pending,
+        skatepark: @target_skatepark,
+        proposed_skatepark: @target_skatepark,
+        youtube_url: 'https://youtu.be/9bZkp7q19f0'
+      )
+
+      get admin_video_suggestions_path
+
+      assert_response :success
+      assert_equal 1, assigns(:video_suggestions).size
+      assert_includes response.body, I18n.t('admin.video_suggestions.pending_count', count: 2)
+      assert_select "nav[aria-label='#{I18n.t('views.pagination.aria_label')}']"
     end
 
     def test_get_index_requires_admin
@@ -44,6 +93,16 @@ module Admin
       assert_predicate @video_suggestion, :active?
       assert_equal 1, @video_suggestion.position
       assert_equal 1, @proposed_skatepark.reload.skatepark_videos_count
+    end
+
+    def test_post_activate_defaults_to_assigned_skatepark_when_param_omitted
+      post activate_admin_video_suggestion_path(@video_suggestion)
+
+      @video_suggestion.reload
+
+      assert_redirected_to admin_video_suggestions_path
+      assert_predicate @video_suggestion, :active?
+      assert_equal @proposed_skatepark.id, @video_suggestion.skatepark_id
     end
 
     def test_post_activate_can_reassign_video_to_another_skatepark
@@ -101,6 +160,27 @@ module Admin
       assert_redirected_to admin_video_suggestions_path
       assert_predicate @video_suggestion, :rejected?
       assert_equal @proposed_skatepark.id, @video_suggestion.skatepark_id
+    end
+
+    private
+
+    def capture_sql_queries(&)
+      queries = []
+      callback = lambda do |_name, _started, _finished, _unique_id, payload|
+        sql = payload[:sql]
+        next if payload[:name] == 'SCHEMA' || payload[:cached]
+        next if sql.match?(/\A(?:BEGIN|COMMIT|ROLLBACK|SAVEPOINT|RELEASE SAVEPOINT)/)
+
+        queries << sql.squish
+      end
+
+      ActiveSupport::Notifications.subscribed(callback, 'sql.active_record', &)
+
+      queries
+    end
+
+    def count_matching_queries(queries, pattern)
+      queries.count { |query| query.match?(pattern) }
     end
   end
 end

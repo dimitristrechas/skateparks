@@ -20,6 +20,29 @@ module Admin
       assert_response :success
     end
 
+    test 'filters users index by email search query' do
+      matching_user = create(:user, email_address: 'skater.kavala@example.com')
+      other_user = create(:user, email_address: 'other.person@example.com')
+      login_as @admin
+
+      get admin_users_url, params: { q: 'KAVALA' }
+
+      assert_response :success
+      assert_includes assigns(:users), matching_user
+      assert_not_includes assigns(:users), other_user
+    end
+
+    test 'paginates users index' do
+      Kaminari.config.stubs(:default_per_page).returns(1)
+      login_as @admin
+
+      get admin_users_url
+
+      assert_response :success
+      assert_equal 1, assigns(:users).size
+      assert_select "nav[aria-label='#{I18n.t('views.pagination.aria_label')}']"
+    end
+
     test 'allows admin to view user details' do
       login_as @admin
       get admin_user_url(@regular_user)

@@ -3,7 +3,7 @@ module Admin
     before_action :set_user, only: %i[show ban unban]
 
     def index
-      @users = User.order(created_at: :desc)
+      @users = User.search_by_email(params[:q]).order(created_at: :desc, id: :desc).page(params[:page])
     end
 
     def show

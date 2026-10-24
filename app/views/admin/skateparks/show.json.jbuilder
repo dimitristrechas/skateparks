@@ -1,1 +1,1 @@
-json.partial! 'skateparks/skatepark', skatepark: @skatepark
+json.partial! 'admin/skateparks/skatepark', skatepark: @skatepark

@@ -216,6 +216,9 @@ el:
         other: "%{count} ορατές ανακοινώσεις ιστοτόπου"
     users:
       title: "Διαχείριση Χρηστών"
+      search_label: "Αναζήτηση με email"
+      search_placeholder: "Φιλτράρισμα με διεύθυνση email…"
+      empty_state: "Δεν βρέθηκαν χρήστες."
       email: "Email"
       role: "Ρόλος"
       status: "Κατάσταση"
@@ -252,6 +255,10 @@ el:
       new_skatepark: "Νέο skatepark"
       destroy: "διαγραφή"
       location: "Χώρα / Νομός"
+      search_label: "Αναζήτηση με όνομα"
+      search_placeholder: "Αναζήτηση στα Ελληνικά ή Αγγλικά…"
+      all_statuses: "Όλες οι καταστάσεις"
+      empty_state: "Δεν βρέθηκαν skateparks."
       statuses:
         draft: "Πρόχειρο"
         published: "Δημοσιευμένο"
@@ -359,6 +366,12 @@ el:
       errors_title:
         one: "1 σφάλμα εμπόδισε την αποθήκευση της ανακοίνωσης:"
         other: "%{count} σφάλματα εμπόδισαν την αποθήκευση της ανακοίνωσης:"
+    skatepark_picker:
+      placeholder: "Αναζήτηση skateparks με όνομα…"
+      no_results: "Δεν βρέθηκαν skateparks."
+      results_count_one: "1 διαθέσιμο skatepark"
+      results_count_other: "%{count} διαθέσιμα skateparks"
+      selection_required: "Επιλέξτε ένα skatepark από τη λίστα."
     video_suggestions:
       title: "Προτάσεις βίντεο"
       pending_count:
@@ -368,6 +381,11 @@ el:
       thumbnail_alt: "Thumbnail προτεινόμενου βίντεο"
       proposed_for: "Προτάθηκε για"
       assign_to: "Ανάθεση σε"
+      change_skatepark: "Αλλαγή skatepark…"
+      reassign_dialog_title: "Αλλαγή ανατεθειμένου skatepark"
+      reassign_dialog_description: "Αναζητήστε και επιλέξτε το skatepark όπου θα δημοσιευτεί αυτό το βίντεο."
+      reassign_confirm: "Ενημέρωση skatepark"
+      close_dialog: "Κλείσιμο παραθύρου"
       url: "YouTube URL"
       submitted_at: "Υποβλήθηκε"
       actions: "Ενέργειες"

@@ -22,6 +22,15 @@
   a:focus-visible {
     @apply rounded-lg outline outline-offset-2 outline-neutral-700 dark:outline-neutral-200;
   }
+
+  dialog:modal {
+    overscroll-behavior: contain;
+  }
+
+  dialog::backdrop {
+    overflow: hidden;
+    overscroll-behavior: contain;
+  }
 }
 
 @layer components {

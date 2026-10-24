@@ -29,6 +29,83 @@ module Admin
       assert_equal names.sort, names
     end
 
+    def test_get_index_filters_by_name_across_english_and_greek_translations
+      greek_matched_park = create(:skatepark, name_en: 'Athens Bowl', name_el: 'Μαρούσι Πάρκο')
+      other_park = create(:skatepark, name_en: 'Thessaloniki Street', name_el: 'Θεσσαλονίκη')
+
+      get admin_skateparks_path, params: { q: 'μαρούσι' }
+
+      assert_response :success
+      assert_includes assigns(:skateparks), greek_matched_park
+      assert_not_includes assigns(:skateparks), other_park
+    end
+
+    def test_get_index_filters_by_status
+      draft_park = create(:skatepark, :draft, name_en: 'Draft Park', name_el: 'Draft Park')
+
+      get admin_skateparks_path, params: { status: 'draft' }
+
+      assert_response :success
+      assert_includes assigns(:skateparks), draft_park
+      assert_not_includes assigns(:skateparks), @skatepark
+    end
+
+    def test_get_index_paginates_html_and_json_results
+      Kaminari.config.stubs(:default_per_page).returns(1)
+      create(:skatepark, name_en: 'Second Park', name_el: 'Second Park')
+
+      get admin_skateparks_path
+
+      assert_response :success
+      assert_equal 1, assigns(:skateparks).size
+      assert_select "nav[aria-label='#{I18n.t('views.pagination.aria_label')}']"
+
+      get admin_skateparks_path(format: :json)
+
+      assert_response :success
+      assert_equal 1, response.parsed_body.size
+    end
+
+    def test_get_index_avoids_n_plus_one_queries_for_translations_and_media
+      create_list(:skatepark, 3)
+
+      queries = capture_sql_queries do
+        get admin_skateparks_path
+      end
+
+      assert_response :success
+      assert_operator count_matching_queries(queries, /FROM "mobility_string_translations"/), :<=, 1
+      assert_operator count_matching_queries(queries, /FROM "skatepark_images"/), :<=, 1
+      assert_operator count_matching_queries(queries, /FROM "skatepark_videos"/), :<=, 1
+    end
+
+    def test_get_search_returns_published_skateparks_matching_english_or_greek_name
+      greek_park = create(:skatepark, name_en: 'Kavala Skatepark', name_el: 'Καβάλα Skatepark')
+      create(:skatepark, :draft, name_en: 'Kavala Draft', name_el: 'Καβάλα Πρόχειρο')
+
+      get search_admin_skateparks_path, params: { q: 'καβάλα' }, as: :json
+
+      assert_response :success
+      ids = response.parsed_body.pluck('id')
+
+      assert_equal [greek_park.id], ids
+      assert_equal 'Kavala Skatepark', response.parsed_body.first['name']
+    end
+
+    def test_get_search_excludes_popular_skateparks_when_requested
+      popular_park = create(:skatepark, name_en: 'Popular Park', name_el: 'Popular Park')
+      available_park = create(:skatepark, name_en: 'Popular Candidate', name_el: 'Popular Candidate')
+      create(:popular_skatepark, skatepark: popular_park, position: 1)
+
+      get search_admin_skateparks_path, params: { q: 'Popular', exclude_popular: true }, as: :json
+
+      assert_response :success
+      ids = response.parsed_body.pluck('id')
+
+      assert_includes ids, available_park.id
+      assert_not_includes ids, popular_park.id
+    end
+
     def test_get_show_returns_success_and_assigns_skatepark
       get admin_skatepark_path(@skatepark)
 
@@ -569,6 +646,25 @@ module Admin
 
     def replacement_video_url
       'https://www.youtube-nocookie.com/embed/e-ORhEE9VVg'
+    end
+
+    def capture_sql_queries(&)
+      queries = []
+      callback = lambda do |_name, _started, _finished, _unique_id, payload|
+        sql = payload[:sql]
+        next if payload[:name] == 'SCHEMA' || payload[:cached]
+        next if sql.match?(/\A(?:BEGIN|COMMIT|ROLLBACK|SAVEPOINT|RELEASE SAVEPOINT)/)
+
+        queries << sql.squish
+      end
+
+      ActiveSupport::Notifications.subscribed(callback, 'sql.active_record', &)
+
+      queries
+    end
+
+    def count_matching_queries(queries, pattern)
+      queries.count { |query| query.match?(pattern) }
     end
   end
 end
