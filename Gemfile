@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-ruby '4.0.8'
+ruby '4.0.9'
 
 # Pin Rails to the current 8.1 bugfix release, which includes the latest security fixes.
 gem 'rails', '8.1.4'
