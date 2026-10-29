@@ -51,7 +51,7 @@ cd skateparks
 # Get key files from team: config/credentials/development.key, test.key, production.key
 cp .env.example .env && cp .env.example .env.test
 # Fill in .env and .env.test (RAILS_MASTER_KEY = contents of dev.key / test.key)
-bundle install && corepack enable && pnpm install
+bundle install && npm install -g corepack && corepack enable && pnpm install
 lefthook install
 sh scripts.sh dev up
 ```

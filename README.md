@@ -7,7 +7,7 @@
 3. Get the key files from a team member (`config/credentials/development.key`, `config/credentials/production.key`, `config/credentials/test.key`)
 4. Copy .env.example to .env and .env.test and fill variables, for RAILS_MASTER_KEY use `config/credentials/development.key` and `config/credentials/test.key` respectively
 5. `bundle install`
-6. `corepack enable && pnpm install`
+6. `npm install -g corepack && corepack enable && pnpm install`
 7. `lefthook install` (sets up pre-commit hooks)
 8. `sh scripts.sh`, select option **(1) Start / rebuild development server** and choose rebuild to build containers from scratch (or `sh scripts.sh dev rebuild --force`). For day-to-day restarts after the first build, use `sh scripts.sh dev up`.
 9. Open browser on `localhost:3002`
