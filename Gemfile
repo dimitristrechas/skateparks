@@ -12,6 +12,7 @@ gem 'propshaft'
 gem 'net-imap', '>= 0.6.4.1'
 
 # Pin transitive gems for bundle-audit / pre-push security checks.
+gem 'addressable', '>= 2.9.1' # GHSA-4w5q-wg7v-w6gp, GHSA-539f-xcgw-2gjg, GHSA-8gmh-2hhj-2hv9, GHSA-9crm-g4mf-wc5j, GHSA-9f42-57jx-vpp3, GHSA-j82w-28jv-3pmj, GHSA-qq38-m9mg-xjj5
 gem 'concurrent-ruby', '>= 1.3.7' # CVE-2026-54904, CVE-2026-54905, CVE-2026-54906
 gem 'faraday', '>= 2.14.3' # CVE-2026-54297
 gem 'json', '>= 2.21.2' # CVE-2026-71847
