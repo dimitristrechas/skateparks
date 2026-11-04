@@ -3,7 +3,7 @@ source 'https://rubygems.org'
 ruby '4.0.9'
 
 # Pin Rails to the current 8.1 bugfix release, which includes the latest security fixes.
-gem 'rails', '8.1.4'
+gem 'rails', '8.1.4.1'
 
 # Use Propshaft, the new asset pipeline for Rails 8 [https://github.com/rails/propshaft]
 gem 'propshaft'
