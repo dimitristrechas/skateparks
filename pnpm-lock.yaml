@@ -176,8 +176,8 @@ importers:
   .:
     dependencies:
       '@rails/actiontext':
-        specifier: 8.1.400
-        version: 8.1.400(trix@2.1.19)
+        specifier: 8.1.401
+        version: 8.1.401(trix@2.1.19)
       '@tailwindcss/forms':
         specifier: ^0.5.10
         version: 0.5.11(tailwindcss@4.3.4)
@@ -274,8 +274,8 @@ packages:
   '@popperjs/core@2.11.8':
     resolution: {integrity: sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A==}
 
-  '@rails/actiontext@8.1.400':
-    resolution: {integrity: sha512-WufXWPjzpRyj5/o/J7RW7TSgC3bWUPwmz1uib9asdqXPdC7pARbDHRCJJBfmzE6bqlHeJDA5qqu/AXrbfUlmpQ==}
+  '@rails/actiontext@8.1.401':
+    resolution: {integrity: sha512-VOmnwhRVPiNAWoanXOJvHFrJ/W/cg2DcinBVz5bfMs2DiJ3sKQpdD7LmwLR6waDXCGAww6p9G7xyP0+z6/Xsdw==}
     peerDependencies:
       trix: ^2.0.0
 
@@ -776,7 +776,7 @@ snapshots:
 
   '@popperjs/core@2.11.8': {}
 
-  '@rails/actiontext@8.1.400(trix@2.1.19)':
+  '@rails/actiontext@8.1.401(trix@2.1.19)':
     dependencies:
       '@rails/activestorage': 8.1.400
       trix: 2.1.19
