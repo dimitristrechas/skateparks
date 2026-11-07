@@ -262,7 +262,7 @@ run_single_test() {
     fi
 
     echo -e "${GREEN}Running test: ${target}${NC}"
-    test_run bin/rails test "$target"
+    test_run bash -c 'bin/rails db:prepare && bin/rails test "$@"' bash "$target"
 }
 
 run_tests_cli() {
@@ -329,7 +329,7 @@ needs_full_suite() {
     local file="$1"
 
     case "$file" in
-        Gemfile|Gemfile.lock|db/schema.rb|db/migrate/*|config/application.rb|config/environments/test.rb|Dockerfile.development|docker-compose.yml|.env.test|test/test_helper.rb|test/support/*|test/factories/*)
+        Gemfile|Gemfile.lock|db/schema.rb|db/migrate/*|config/application.rb|config/database.yml|config/environments/test.rb|Dockerfile.development|docker-compose.yml|.env.test|test/test_helper.rb|test/support/*|test/factories/*)
             return 0
             ;;
     esac
@@ -382,7 +382,7 @@ run_tests_changed() {
     echo -e "${GREEN}Running targeted tests:${NC}"
     echo "$tests"
     # shellcheck disable=SC2086
-    test_run bash -c "DISABLE_SIMPLECOV=1 bin/rails test $tests"
+    test_run bash -c "bin/rails db:prepare && DISABLE_SIMPLECOV=1 bin/rails test $tests"
 }
 
 run_lint_changed() {

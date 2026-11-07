@@ -41,7 +41,7 @@ bundle exec bundle-audit check --update  # Gem vulnerability scan
 
 ## Tests (verify i18n, components, query load)
 
-All tests run via Docker (see [docs/minitest-implementation.md](../docs/minitest-implementation.md)).
+All tests run via Docker (see [docs/minitest-implementation.md](../docs/minitest-implementation.md)). On a cold start, run `sh scripts.sh test-server up` first so the test database exists.
 
 ```bash
 sh scripts.sh test --fast

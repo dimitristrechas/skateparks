@@ -5,7 +5,7 @@
 1. `git clone https://github.com/dimitristrechas/skateparks.git`
 2. `cd skateparks`
 3. Get the key files from a team member (`config/credentials/development.key`, `config/credentials/production.key`, `config/credentials/test.key`)
-4. Copy .env.example to .env and .env.test and fill variables, for RAILS_MASTER_KEY use `config/credentials/development.key` and `config/credentials/test.key` respectively
+4. Copy `.env.example` to `.env` and `.env.test.example` to `.env.test`, then fill variables; for `RAILS_MASTER_KEY` use `config/credentials/development.key` and `config/credentials/test.key` respectively
 5. `bundle install`
 6. Use the pinned Node version (`.nvmrc` / `.node-version` = 26.13.0): `nvm install && nvm use`, then `npm install -g corepack && corepack enable && pnpm install`
 7. `lefthook install` (sets up pre-commit hooks)

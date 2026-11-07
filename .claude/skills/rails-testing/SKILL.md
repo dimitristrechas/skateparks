@@ -32,7 +32,7 @@ sh scripts.sh test --fast                    # All tests without coverage
 sh scripts.sh test test/models/foo_test.rb   # Single file or line
 ```
 
-Each run creates a disposable container with `RAILS_ENV=test` and the values from `.env.test`; there is no long-running test container. `sh scripts.sh test` prepares the test database automatically.
+Each run creates a disposable container with `RAILS_ENV=test` and the values from `.env.test`; there is no long-running test container. `sh scripts.sh test` prepares the test database automatically. On a cold start, run `sh scripts.sh test-server up` first so the test database exists.
 
 Direct Docker fallback:
 

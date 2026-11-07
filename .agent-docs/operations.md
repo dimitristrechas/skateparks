@@ -70,7 +70,7 @@ docker compose build skateparks-web
 git clone https://github.com/dimitristrechas/skateparks.git
 cd skateparks
 # Get key files from team: config/credentials/development.key, test.key, production.key
-cp .env.example .env && cp .env.example .env.test
+cp .env.example .env && cp .env.test.example .env.test
 # Fill in .env and .env.test (RAILS_MASTER_KEY = contents of dev.key / test.key)
 bundle install && npm install -g corepack && corepack enable && pnpm install
 lefthook install

@@ -415,7 +415,7 @@ end
 
 ## Running Tests
 
-**Always run via Docker.** Each command runs in a disposable container with `RAILS_ENV=test` and the values from `.env.test`:
+**Always run via Docker.** Each command runs in a disposable container with `RAILS_ENV=test` and the values from `.env.test`. On a cold start, run `sh scripts.sh test-server up` first so the test database exists.
 
 ```bash
 # All tests
