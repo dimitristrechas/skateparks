@@ -1,0 +1,33 @@
+name: Markdown
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "**.md"
+  pull_request:
+    branches: [main]
+    paths:
+      - "**.md"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'push' && github.ref_name || github.head_ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  prettier:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm prettier:check

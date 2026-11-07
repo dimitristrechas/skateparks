@@ -21,6 +21,20 @@ Rails 8.1 skatepark directory app (Ruby 4.0.6, PostgreSQL 17, Hotwire, Tailwind 
 - **N+1 / queries:** For index, show, and admin lists, eager-load associations the view touches (`includes`, `preload`, `eager_load` as appropriate). After changing controllers or associations, verify query counts in tests or development (see [.agent-docs/commands.md](.agent-docs/commands.md)).
 - **Visual consistency:** Prefer existing ViewComponents and patterns in `app/assets/tailwind/application.css` before ad hoc Tailwind. Match focus rings, spacing, and button styles used by `ButtonComponent`, `IconButtonComponent`, etc.
 
+## Agent skills
+
+### Issue tracker
+
+Issues live in Linear (team `SK8`, via the `linear` MCP server). See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Five default triage labels (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`). See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: `GLOSSARY.md` and `docs/adr/` at the repo root. See `docs/agents/domain.md`.
+
 ## Reference
 
 - Operations & troubleshooting: [.agent-docs/operations.md](.agent-docs/operations.md)

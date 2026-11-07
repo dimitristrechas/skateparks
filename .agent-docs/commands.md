@@ -1,6 +1,6 @@
 # Commands Reference
 
-`sh scripts.sh` is the preferred entry point for starting development and test servers and for common lint/format/test workflows. For automation, use non-interactive subcommands (see below). Use the direct commands when `scripts.sh` does not cover the task.
+`sh scripts.sh` is the preferred entry point for the development server, the test environment, and common lint/format/test workflows. For automation, use non-interactive subcommands (see below). Use the direct commands when `scripts.sh` does not cover the task.
 
 ## scripts.sh (non-interactive)
 
@@ -18,8 +18,8 @@ sh scripts.sh gate-quick [--base main]       # lint-changed + test-changed (WIP 
 sh scripts.sh security                       # Brakeman, bundle-audit, pnpm audit (parallel)
 sh scripts.sh ci                             # Full CI parity (all checks in parallel) — run before push/PR
 sh scripts.sh dev up                         # Start development server
-sh scripts.sh dev rebuild --force            # Rebuild development containers
-sh scripts.sh test-server up                 # Start test server
+sh scripts.sh dev rebuild --force            # Rebuild the development image
+sh scripts.sh test-server up                 # Prepare the test database
 sh scripts.sh test-server schema-load        # Reload test DB schema
 ```
 
@@ -31,8 +31,8 @@ bundle exec rubocop -A --force-exclusion    # Auto-fix Ruby
 pnpm herb:lint                      # Lint ERB
 pnpm herb:lint --fix                # Fix ERB lint
 pnpm herb:format                    # Format ERB
-pnpm prettier:check                 # Check JS/CSS/JSON
-pnpm prettier:fix                   # Fix JS/CSS/JSON
+pnpm prettier:check                 # Check JS/CSS/JSON/Markdown
+pnpm prettier:fix                   # Fix JS/CSS/JSON/Markdown
 bundle exec brakeman -q --no-pager  # Security scan
 bundle exec bundle-audit check --update  # Gem vulnerability scan
 ```
@@ -41,10 +41,12 @@ bundle exec bundle-audit check --update  # Gem vulnerability scan
 
 ## Tests (verify i18n, components, query load)
 
-All tests run via Docker (see [docs/minitest-implementation.md](../docs/minitest-implementation.md)).
+All tests run via Docker (see [docs/minitest-implementation.md](../docs/minitest-implementation.md)). On a cold start, run `sh scripts.sh test-server up` first so the test database exists.
 
 ```bash
-docker compose -f docker-compose.test.yml exec skateparks-web-test bin/rails test
+sh scripts.sh test --fast
+# Direct fallback: disposable container with the test env from .env.test
+docker compose run --rm -T --env-from-file .env.test skateparks-web bin/rails test
 ```
 
 - After changing **controllers** that load lists or show pages, run the relevant **controller tests** and watch for N+1 regressions; use `assert_queries` in a focused test when guarding a known-hot path (see minitest guide).
@@ -67,10 +69,19 @@ the diff touches migrations, `db/schema.rb`, `Gemfile*`, `test/test_helper.rb`, 
 
 `sh scripts.sh lint` and lefthook pre-commit hooks do **not** include `pnpm audit`. The `herb-prettier` CI job runs `pnpm audit --audit-level moderate`; use `sh scripts.sh ci` or `sh scripts.sh security` locally. Pre-push hook runs Brakeman, bundle-audit, and pnpm audit.
 
+## Searching
+
+`git grep` and ripgrep (`rg`) both respect `.gitignore`. Plain `grep -rn .` walks `.pnpm-store/` and `node_modules/` and can hang for minutes.
+
+```bash
+git grep -n "pattern"    # tracked files only
+rg -n "pattern"          # also finds untracked files; still skips gitignored paths
+```
+
 ## Development
 
 ```bash
 sh scripts.sh  # Interactive menu (recommended)
-docker compose -f docker-compose.development.yml up -d
-docker compose -f docker-compose.development.yml exec skateparks-web bundle exec rails console
+docker compose up -d
+docker compose exec skateparks-web bundle exec rails console
 ```

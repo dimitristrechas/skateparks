@@ -6,15 +6,15 @@ How skateparks.gr implements search-engine metadata, structured data, internatio
 
 ## Overview
 
-| Layer | Responsibility |
-| ----- | -------------- |
-| **Controllers** | Set per-page `@title`, `@meta_description`, and `@meta_image` instance variables |
-| **Model (`Skatepark`)** | Store optional per-locale SEO overrides; compute fallbacks (`seo_title`, `seo_description`) |
-| **Layout + partials** | Render `<title>`, meta description, robots, Open Graph, Twitter Cards, canonical, hreflang |
-| **`SeoHelper`** | Canonical/hreflang URL generation and social-meta fallbacks |
-| **`SchemaHelper`** | JSON-LD structured data (Organization, WebSite, page-specific schemas) |
-| **Sitemap + robots** | Crawl discovery and admin exclusion |
-| **i18n (`config/locales`)** | Site-wide default copy and static-page metadata |
+| Layer                       | Responsibility                                                                              |
+| --------------------------- | ------------------------------------------------------------------------------------------- |
+| **Controllers**             | Set per-page `@title`, `@meta_description`, and `@meta_image` instance variables            |
+| **Model (`Skatepark`)**     | Store optional per-locale SEO overrides; compute fallbacks (`seo_title`, `seo_description`) |
+| **Layout + partials**       | Render `<title>`, meta description, robots, Open Graph, Twitter Cards, canonical, hreflang  |
+| **`SeoHelper`**             | Canonical/hreflang URL generation and social-meta fallbacks                                 |
+| **`SchemaHelper`**          | JSON-LD structured data (Organization, WebSite, page-specific schemas)                      |
+| **Sitemap + robots**        | Crawl discovery and admin exclusion                                                         |
+| **i18n (`config/locales`)** | Site-wide default copy and static-page metadata                                             |
 
 All public HTML pages share `app/views/layouts/application.html.erb`. SEO output is driven by controller assigns with locale-aware fallbacks.
 
@@ -45,15 +45,15 @@ Every public page resolves metadata in this order:
 
 ## Page-by-page metadata
 
-| Page | Controller action | `@title` | `@meta_description` | `@meta_image` | JSON-LD schema |
-| ---- | ----------------- | -------- | ------------------- | ------------- | -------------- |
-| Homepage | `home#index` | *(default)* | *(default)* | `logo-og.png` | `WebPage` |
-| Skateparks index | `skateparks#index` | *(default)* | *(default)* | `logo-og.png` | `CollectionPage` + `ItemList` |
-| Skatepark show | `skateparks#show` | `skatepark.seo_title` | `skatepark.seo_description` | Cover image URL | `SportsActivityLocation` |
-| About | `home#about` | `t('about.title')` | `t('about_details')` | `logo-og.png` | `WebPage` |
-| Contact | `home#contact` | `t('contact')` | `t('contact_details')` | `logo-og.png` | `WebPage` |
-| Privacy | `home#privacy` | `t('privacy.title')` | `t('privacy.meta_description')` | `logo-og.png` | `WebPage` |
-| Admin (`/admin/*`) | various | *(default)* | *(default)* | `logo-og.png` | `WebPage` |
+| Page               | Controller action  | `@title`              | `@meta_description`             | `@meta_image`   | JSON-LD schema                |
+| ------------------ | ------------------ | --------------------- | ------------------------------- | --------------- | ----------------------------- |
+| Homepage           | `home#index`       | _(default)_           | _(default)_                     | `logo-og.png`   | `WebPage`                     |
+| Skateparks index   | `skateparks#index` | _(default)_           | _(default)_                     | `logo-og.png`   | `CollectionPage` + `ItemList` |
+| Skatepark show     | `skateparks#show`  | `skatepark.seo_title` | `skatepark.seo_description`     | Cover image URL | `SportsActivityLocation`      |
+| About              | `home#about`       | `t('about.title')`    | `t('about_details')`            | `logo-og.png`   | `WebPage`                     |
+| Contact            | `home#contact`     | `t('contact')`        | `t('contact_details')`          | `logo-og.png`   | `WebPage`                     |
+| Privacy            | `home#privacy`     | `t('privacy.title')`  | `t('privacy.meta_description')` | `logo-og.png`   | `WebPage`                     |
+| Admin (`/admin/*`) | various            | _(default)_           | _(default)_                     | `logo-og.png`   | `WebPage`                     |
 
 Site-wide defaults live in `config/locales/en.yml` and `config/locales/el.yml` under `application.title` and `application.meta_description`.
 
@@ -91,9 +91,9 @@ def truncated_plain_description(max_length: 160)
 end
 ```
 
-| Method | When override is blank | When override is set |
-| ------ | ---------------------- | -------------------- |
-| `seo_title` | `"#{name} \| Skateparks.gr"` | Uses `meta_title` verbatim |
+| Method            | When override is blank                                   | When override is set                             |
+| ----------------- | -------------------------------------------------------- | ------------------------------------------------ |
+| `seo_title`       | `"#{name} \| Skateparks.gr"`                             | Uses `meta_title` verbatim                       |
 | `seo_description` | Truncated plain-text body (max 160 chars, word boundary) | Uses `meta_description` verbatim (no truncation) |
 
 Both methods resolve in the **current `I18n.locale`** via Mobility.
@@ -149,9 +149,9 @@ Contact and privacy follow the same pattern with their respective locale keys.
 
 ### Title and description partials
 
-| Partial | Output | Fallback |
-| ------- | ------ | -------- |
-| `app/views/application/_title.html.erb` | `<title>` | `t('application.title')` |
+| Partial                                       | Output                      | Fallback                            |
+| --------------------------------------------- | --------------------------- | ----------------------------------- |
+| `app/views/application/_title.html.erb`       | `<title>`                   | `t('application.title')`            |
 | `app/views/application/_description.html.erb` | `<meta name="description">` | `t('application.meta_description')` |
 
 The title tag uses `data-turbo-permanent` so Turbo Drive navigations keep a stable head title element.
@@ -161,7 +161,7 @@ The title tag uses `data-turbo-permanent` so Turbo Drive navigations keep a stab
 Default for all dynamic pages:
 
 ```html
-<meta name="robots" content="index, follow">
+<meta name="robots" content="index, follow" />
 ```
 
 Override per view with a content block:
@@ -180,15 +180,15 @@ Static error pages in `public/` (`400.html`, `404.html`, `422.html`, `500.html`,
 
 Rendered on every page (including admin):
 
-| Tag | Source |
-| --- | ------ |
-| `og:title` / `twitter:title` | `social_title` |
-| `og:description` / `twitter:description` | `social_description` |
-| `og:image` / `twitter:image` | `social_image` |
-| `og:site_name` | Hard-coded `Skateparks.gr` |
-| `og:type` | Hard-coded `website` |
-| `twitter:card` | `summary_large_image` |
-| `og:url` | `canonical_url` on public pages; `url_for(protocol: 'https')` on admin |
+| Tag                                      | Source                                                                 |
+| ---------------------------------------- | ---------------------------------------------------------------------- |
+| `og:title` / `twitter:title`             | `social_title`                                                         |
+| `og:description` / `twitter:description` | `social_description`                                                   |
+| `og:image` / `twitter:image`             | `social_image`                                                         |
+| `og:site_name`                           | Hard-coded `Skateparks.gr`                                             |
+| `og:type`                                | Hard-coded `website`                                                   |
+| `twitter:card`                           | `summary_large_image`                                                  |
+| `og:url`                                 | `canonical_url` on public pages; `url_for(protocol: 'https')` on admin |
 
 Default social image: `app/assets/images/logo-og.png`.
 
@@ -221,16 +221,16 @@ Rendered only on **public** pages (`public_seo_page?` returns false for `/admin/
 
 **File:** `app/helpers/seo_helper.rb`
 
-| Method / constant | Purpose |
-| ----------------- | ------- |
+| Method / constant         | Purpose                                                                              |
+| ------------------------- | ------------------------------------------------------------------------------------ |
 | `LOCALE_ALTERNATE_PARAMS` | `%i[country_code state page]` — filter/pagination params preserved in alternate URLs |
-| `public_seo_page?` | `true` unless `request.path` starts with `/admin` |
-| `seo_page_url(locale:)` | Full HTTPS URL for current path + locale + filtered query params |
-| `canonical_url` | `seo_page_url(locale: I18n.locale)` |
-| `hreflang_link_tags` | Alternate links for `en`, `el`, and `x-default` |
-| `social_title` | `view_assigns['title']` → `t('application.title')` |
-| `social_description` | `view_assigns['meta_description']` → `t('application.meta_description')` |
-| `social_image` | `view_assigns['meta_image']` → `image_url('logo-og.png')` |
+| `public_seo_page?`        | `true` unless `request.path` starts with `/admin`                                    |
+| `seo_page_url(locale:)`   | Full HTTPS URL for current path + locale + filtered query params                     |
+| `canonical_url`           | `seo_page_url(locale: I18n.locale)`                                                  |
+| `hreflang_link_tags`      | Alternate links for `en`, `el`, and `x-default`                                      |
+| `social_title`            | `view_assigns['title']` → `t('application.title')`                                   |
+| `social_description`      | `view_assigns['meta_description']` → `t('application.meta_description')`             |
+| `social_image`            | `view_assigns['meta_image']` → `image_url('logo-og.png')`                            |
 
 ### HTTPS in URLs
 
@@ -254,18 +254,18 @@ Rendered only on **public** pages (`public_seo_page?` returns false for `/admin/
 
 ### Always included
 
-| Schema | `@type` | Key fields |
-| ------ | ------- | ---------- |
-| Organization | `Organization` | `name: skateparks.gr`, `url`, `description`, `sameAs: []` |
-| WebSite | `WebSite` | `inLanguage: [el, en]`, `SearchAction` targeting the skateparks index |
+| Schema       | `@type`        | Key fields                                                            |
+| ------------ | -------------- | --------------------------------------------------------------------- |
+| Organization | `Organization` | `name: skateparks.gr`, `url`, `description`, `sameAs: []`             |
+| WebSite      | `WebSite`      | `inLanguage: [el, en]`, `SearchAction` targeting the skateparks index |
 
 ### Page-specific (by `controller_name#action_name`)
 
-| Route | Additional schema | `@type` | Notes |
-| ----- | ----------------- | ------- | ----- |
-| `skateparks#show` | `skatepark_schema` | `SportsActivityLocation` | Uses `seo_title`, `seo_description`, geo, address, up to 5 images |
-| `skateparks#index` | `collection_page_schema` | `CollectionPage` + `ItemList` | `numberOfItems` from paginated `total_count` or array size |
-| Everything else | `webpage_schema` | `WebPage` | Uses passed title/description/image or I18n/asset fallbacks |
+| Route              | Additional schema        | `@type`                       | Notes                                                             |
+| ------------------ | ------------------------ | ----------------------------- | ----------------------------------------------------------------- |
+| `skateparks#show`  | `skatepark_schema`       | `SportsActivityLocation`      | Uses `seo_title`, `seo_description`, geo, address, up to 5 images |
+| `skateparks#index` | `collection_page_schema` | `CollectionPage` + `ItemList` | `numberOfItems` from paginated `total_count` or array size        |
+| Everything else    | `webpage_schema`         | `WebPage`                     | Uses passed title/description/image or I18n/asset fallbacks       |
 
 ### SearchAction URL template
 
@@ -279,14 +279,14 @@ When the skateparks URL already contains a query string (e.g. `?locale=en`), the
 
 ### Skatepark structured data fields
 
-| Field | Source |
-| ----- | ------ |
-| `name` | `skatepark.seo_title` (aligned with `<title>` and OG) |
-| `description` | `skatepark.seo_description` |
-| `url` / `@id` | `skatepark_url(protocol: 'https')` |
-| `image` | Cover image + gallery images (max 5) |
-| `geo` | `GeoCoordinates` when lat/lng present |
-| `address` | `PostalAddress` with `addressCountry` and optional `addressRegion` |
+| Field         | Source                                                             |
+| ------------- | ------------------------------------------------------------------ |
+| `name`        | `skatepark.seo_title` (aligned with `<title>` and OG)              |
+| `description` | `skatepark.seo_description`                                        |
+| `url` / `@id` | `skatepark_url(protocol: 'https')`                                 |
+| `image`       | Cover image + gallery images (max 5)                               |
+| `geo`         | `GeoCoordinates` when lat/lng present                              |
+| `address`     | `PostalAddress` with `addressCountry` and optional `addressRegion` |
 
 ---
 
@@ -296,11 +296,11 @@ Admins can override per-skatepark SEO metadata in the skatepark edit form.
 
 **Form:** `app/views/admin/skateparks/_form.html.erb` (SEO section)
 
-| Field | Locale | Label key |
-| ----- | ------ | --------- |
-| `meta_title_el` | Greek | `skatepark.meta_title_el` |
-| `meta_description_el` | Greek | `skatepark.meta_description_el` |
-| `meta_title_en` | English | `skatepark.meta_title_en` |
+| Field                 | Locale  | Label key                       |
+| --------------------- | ------- | ------------------------------- |
+| `meta_title_el`       | Greek   | `skatepark.meta_title_el`       |
+| `meta_description_el` | Greek   | `skatepark.meta_description_el` |
+| `meta_title_en`       | English | `skatepark.meta_title_en`       |
 | `meta_description_en` | English | `skatepark.meta_description_en` |
 
 The form displays guidance from `admin.skateparks.form.seo_hint`:
@@ -319,29 +319,29 @@ There is no model validation enforcing the 60/160 character guidance — admins 
 
 ### Site-wide defaults
 
-| Key | Used for |
-| --- | -------- |
-| `application.title` | Default `<title>`, `social_title`, `webpage_schema.name` |
+| Key                            | Used for                                                            |
+| ------------------------------ | ------------------------------------------------------------------- |
+| `application.title`            | Default `<title>`, `social_title`, `webpage_schema.name`            |
 | `application.meta_description` | Default meta description, schema descriptions, `social_description` |
 
 ### Static page metadata
 
-| Key | Page |
-| --- | ---- |
-| `about.title` / `about_details` | About |
-| `contact` / `contact_details` | Contact |
+| Key                                          | Page    |
+| -------------------------------------------- | ------- |
+| `about.title` / `about_details`              | About   |
+| `contact` / `contact_details`                | Contact |
 | `privacy.title` / `privacy.meta_description` | Privacy |
 
 All keys exist in both `config/locales/en.yml` and `config/locales/el.yml`.
 
 ### Admin form labels
 
-| Key | Purpose |
-| --- | ------- |
-| `admin.skateparks.form.seo_heading` | Section heading ("SEO") |
-| `admin.skateparks.form.seo_hint` | Helper text under heading |
-| `skatepark.meta_title_el/en` | Field labels |
-| `skatepark.meta_description_el/en` | Field labels |
+| Key                                 | Purpose                   |
+| ----------------------------------- | ------------------------- |
+| `admin.skateparks.form.seo_heading` | Section heading ("SEO")   |
+| `admin.skateparks.form.seo_hint`    | Helper text under heading |
+| `skatepark.meta_title_el/en`        | Field labels              |
+| `skatepark.meta_description_el/en`  | Field labels              |
 
 ---
 
@@ -383,19 +383,19 @@ end
 
 Each entry includes `xhtml:link` alternates for `en`, `el`, and `x-default`. English URLs omit the `locale` query param; Greek URLs use `?locale=el`.
 
-| Included | Not included |
-| -------- | ------------ |
-| `/`, `/skateparks`, `/about`, `/contact`, `/privacy` | Filtered/paginated index URLs |
-| Published skatepark show pages (with hreflang alternates) | Admin pages |
-| | `?locale=en` variants (canonical English URLs have no locale param) |
+| Included                                                  | Not included                                                        |
+| --------------------------------------------------------- | ------------------------------------------------------------------- |
+| `/`, `/skateparks`, `/about`, `/contact`, `/privacy`      | Filtered/paginated index URLs                                       |
+| Published skatepark show pages (with hreflang alternates) | Admin pages                                                         |
+|                                                           | `?locale=en` variants (canonical English URLs have no locale param) |
 
 ### Sitemap generation schedule
 
-| Trigger | Mechanism |
-| ------- | --------- |
-| Deploy | `bin/release` runs `bundle exec rake sitemap:refresh` |
-| Weekly | `SitemapWorker` via Sidekiq (`config/schedule.yml` — Sundays 03:00) |
-| Output | `public/sitemap.xml.gz` |
+| Trigger | Mechanism                                                           |
+| ------- | ------------------------------------------------------------------- |
+| Deploy  | `bin/release` runs `bundle exec rake sitemap:refresh`               |
+| Weekly  | `SitemapWorker` via Sidekiq (`config/schedule.yml` — Sundays 03:00) |
+| Output  | `public/sitemap.xml.gz`                                             |
 
 **Worker:** `app/workers/sitemap_worker.rb` invokes `sitemap:refresh:no_ping`.
 
@@ -433,16 +433,16 @@ Add new 301 redirects here when consolidating or renaming skatepark URLs.
 
 ## Admin vs public behavior
 
-| Feature | Public pages | Admin (`/admin/*`) |
-| ------- | ------------ | ------------------ |
-| `<title>` / meta description | Per-page or site defaults | Site defaults only |
-| Canonical URL | Yes | No |
-| Hreflang alternates | Yes | No |
-| Open Graph / Twitter | Yes | Yes (generic defaults) |
-| JSON-LD | Context-aware | Usually `WebPage` |
-| `robots.txt` | Allowed | `Disallow: /admin/` |
-| Umami analytics | Production only | Excluded |
-| Editable SEO fields | N/A | Admin skatepark form |
+| Feature                      | Public pages              | Admin (`/admin/*`)     |
+| ---------------------------- | ------------------------- | ---------------------- |
+| `<title>` / meta description | Per-page or site defaults | Site defaults only     |
+| Canonical URL                | Yes                       | No                     |
+| Hreflang alternates          | Yes                       | No                     |
+| Open Graph / Twitter         | Yes                       | Yes (generic defaults) |
+| JSON-LD                      | Context-aware             | Usually `WebPage`      |
+| `robots.txt`                 | Allowed                   | `Disallow: /admin/`    |
+| Umami analytics              | Production only           | Excluded               |
+| Editable SEO fields          | N/A                       | Admin skatepark form   |
 
 ---
 
@@ -484,20 +484,20 @@ Edit the relevant keys in both locale files (see [Internationalization keys](#in
 
 SEO behavior is covered by Minitest across models, controllers, and helpers.
 
-| Area | File | What's tested |
-| ---- | ---- | ------------- |
-| `seo_title` / `seo_description` fallbacks | `test/models/skatepark_test.rb` | Name suffix, overrides, truncation |
-| Show page meta assigns | `test/controllers/skateparks_controller_test.rb` | Default and custom EN/EL overrides |
-| Canonical + hreflang in HTML | `test/controllers/skateparks_controller_test.rb` | HTTPS canonical, all hreflang values |
-| Default-locale redirect | `test/controllers/application_controller_test.rb` | 301 from `?locale=en` to clean URL |
-| Canonical/hreflang URL helpers | `test/helpers/seo_helper_test.rb` | Default-locale omission, filter params |
-| Sitemap locale alternates | `test/lib/sitemap_locale_helper_test.rb` | `en`, `el`, `x-default` hreflang entries |
-| Twitter Cards in HTML | `test/controllers/skateparks_controller_test.rb` | Card type and title |
-| Static page assigns | `test/controllers/home_controller_test.rb` | About, contact, privacy |
-| Admin SEO form + persist | `test/controllers/admin/skateparks_controller_test.rb` | Field rendering, PATCH persistence |
-| Social meta fallbacks | `test/helpers/seo_helper_test.rb` | `social_title`, `social_description`, `social_image` |
-| Organization / WebSite schema | `test/helpers/schema_helper_test.rb` | Structure, SearchAction URL, locale-aware description |
-| Sitemap worker | `test/jobs/sitemap_worker_test.rb` | Rake task invocation |
+| Area                                      | File                                                   | What's tested                                         |
+| ----------------------------------------- | ------------------------------------------------------ | ----------------------------------------------------- |
+| `seo_title` / `seo_description` fallbacks | `test/models/skatepark_test.rb`                        | Name suffix, overrides, truncation                    |
+| Show page meta assigns                    | `test/controllers/skateparks_controller_test.rb`       | Default and custom EN/EL overrides                    |
+| Canonical + hreflang in HTML              | `test/controllers/skateparks_controller_test.rb`       | HTTPS canonical, all hreflang values                  |
+| Default-locale redirect                   | `test/controllers/application_controller_test.rb`      | 301 from `?locale=en` to clean URL                    |
+| Canonical/hreflang URL helpers            | `test/helpers/seo_helper_test.rb`                      | Default-locale omission, filter params                |
+| Sitemap locale alternates                 | `test/lib/sitemap_locale_helper_test.rb`               | `en`, `el`, `x-default` hreflang entries              |
+| Twitter Cards in HTML                     | `test/controllers/skateparks_controller_test.rb`       | Card type and title                                   |
+| Static page assigns                       | `test/controllers/home_controller_test.rb`             | About, contact, privacy                               |
+| Admin SEO form + persist                  | `test/controllers/admin/skateparks_controller_test.rb` | Field rendering, PATCH persistence                    |
+| Social meta fallbacks                     | `test/helpers/seo_helper_test.rb`                      | `social_title`, `social_description`, `social_image`  |
+| Organization / WebSite schema             | `test/helpers/schema_helper_test.rb`                   | Structure, SearchAction URL, locale-aware description |
+| Sitemap worker                            | `test/jobs/sitemap_worker_test.rb`                     | Rake task invocation                                  |
 
 ### Gaps in test coverage
 
@@ -535,25 +535,25 @@ sh scripts.sh test test/helpers/schema_helper_test.rb
 
 ## File reference
 
-| Category | Path |
-| -------- | ---- |
-| SEO helper | `app/helpers/seo_helper.rb` |
-| Schema helper | `app/helpers/schema_helper.rb` |
-| Locale helper | `app/helpers/locale_helper.rb` |
-| Skatepark model | `app/models/skatepark.rb` |
-| Public controllers | `app/controllers/skateparks_controller.rb`, `app/controllers/home_controller.rb` |
-| Admin controller | `app/controllers/admin/skateparks_controller.rb` |
-| Application controller | `app/controllers/application_controller.rb` |
-| Layout | `app/views/layouts/application.html.erb` |
+| Category                     | Path                                                                                   |
+| ---------------------------- | -------------------------------------------------------------------------------------- |
+| SEO helper                   | `app/helpers/seo_helper.rb`                                                            |
+| Schema helper                | `app/helpers/schema_helper.rb`                                                         |
+| Locale helper                | `app/helpers/locale_helper.rb`                                                         |
+| Skatepark model              | `app/models/skatepark.rb`                                                              |
+| Public controllers           | `app/controllers/skateparks_controller.rb`, `app/controllers/home_controller.rb`       |
+| Admin controller             | `app/controllers/admin/skateparks_controller.rb`                                       |
+| Application controller       | `app/controllers/application_controller.rb`                                            |
+| Layout                       | `app/views/layouts/application.html.erb`                                               |
 | Title / description partials | `app/views/application/_title.html.erb`, `app/views/application/_description.html.erb` |
-| Admin SEO form | `app/views/admin/skateparks/_form.html.erb` |
-| Locale switcher | `app/views/home/_locale_selector.html.erb` |
-| Locale files | `config/locales/en.yml`, `config/locales/el.yml` |
-| Sitemap locale helper | `lib/sitemap_locale_helper.rb` |
-| Sitemap config | `config/sitemap.rb` |
-| Sitemap worker | `app/workers/sitemap_worker.rb` |
-| Deploy hook | `bin/release` |
-| robots.txt | `public/robots.txt` |
-| Default OG image | `app/assets/images/logo-og.png` |
-| Production SSL | `config/environments/production.rb` |
-| URL redirects | `config/routes.rb` |
+| Admin SEO form               | `app/views/admin/skateparks/_form.html.erb`                                            |
+| Locale switcher              | `app/views/home/_locale_selector.html.erb`                                             |
+| Locale files                 | `config/locales/en.yml`, `config/locales/el.yml`                                       |
+| Sitemap locale helper        | `lib/sitemap_locale_helper.rb`                                                         |
+| Sitemap config               | `config/sitemap.rb`                                                                    |
+| Sitemap worker               | `app/workers/sitemap_worker.rb`                                                        |
+| Deploy hook                  | `bin/release`                                                                          |
+| robots.txt                   | `public/robots.txt`                                                                    |
+| Default OG image             | `app/assets/images/logo-og.png`                                                        |
+| Production SSL               | `config/environments/production.rb`                                                    |
+| URL redirects                | `config/routes.rb`                                                                     |

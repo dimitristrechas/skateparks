@@ -32,14 +32,14 @@ sh scripts.sh test --fast                    # All tests without coverage
 sh scripts.sh test test/models/foo_test.rb   # Single file or line
 ```
 
-Container: `skateparks-web-test`. Start with `sh scripts.sh test-server up` if not running.
+Each run creates a disposable container with `RAILS_ENV=test` and the values from `.env.test`; there is no long-running test container. `sh scripts.sh test` prepares the test database automatically. On a cold start, run `sh scripts.sh test-server up` first so the test database exists.
 
 Direct Docker fallback:
 
 ```bash
-docker compose -f docker-compose.test.yml exec skateparks-web-test bin/rails test test/models/skatepark_test.rb
-docker compose -f docker-compose.test.yml exec skateparks-web-test bin/rails test test/models/skatepark_test.rb:42
-docker compose -f docker-compose.test.yml exec skateparks-web-test bin/rails test -n test_method_name
+docker compose run --rm -T --env-from-file .env.test skateparks-web bin/rails test test/models/skatepark_test.rb
+docker compose run --rm -T --env-from-file .env.test skateparks-web bin/rails test test/models/skatepark_test.rb:42
+docker compose run --rm -T --env-from-file .env.test skateparks-web bin/rails test -n test_method_name
 ```
 
 ## Minitest syntax (not RSpec)
@@ -119,7 +119,7 @@ Multilingual factories: set `name_en` and `name_el` separately.
 
 ## When debugging failures
 
-1. Check if test container is running: `docker ps | grep skateparks-web-test`
+1. Confirm Docker is running and `sh scripts.sh test-server up` succeeds (test DB reachable)
 2. Run a single test with full output: append `2>&1` to see all logs
 3. Check transactional test isolation — tests use `use_transactional_tests = true`
 4. Verify factory associations are valid before testing model logic

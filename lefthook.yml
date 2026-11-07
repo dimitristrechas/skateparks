@@ -1,7 +1,7 @@
 pre-commit:
   commands:
     prettier-fix:
-      glob: "*.{js,ts,json,css}"
+      glob: "*.{js,ts,json,css,md}"
       run: pnpm prettier --write {staged_files}
       stage_fixed: true
       priority: 1

@@ -100,15 +100,15 @@ Simplify AI subagents to two thin routers and two OpenCode skills.
 
 ### Type guide
 
-| Type | When |
-|------|------|
-| `feat` | New user-facing behavior or capability |
-| `fix` | Bug fix or correction |
-| `chore` | Tooling, deps, config, maintenance (use scope when helpful: `chore(deps)`, `chore(agents)`) |
-| `docs` | Documentation only |
-| `refactor` | Code structure change without behavior change |
-| `test` | Tests only |
-| `ci` | CI/CD workflow changes |
+| Type       | When                                                                                        |
+| ---------- | ------------------------------------------------------------------------------------------- |
+| `feat`     | New user-facing behavior or capability                                                      |
+| `fix`      | Bug fix or correction                                                                       |
+| `chore`    | Tooling, deps, config, maintenance (use scope when helpful: `chore(deps)`, `chore(agents)`) |
+| `docs`     | Documentation only                                                                          |
+| `refactor` | Code structure change without behavior change                                               |
+| `test`     | Tests only                                                                                  |
+| `ci`       | CI/CD workflow changes                                                                      |
 
 For AI agent, skill, or `opencode.json` changes, use `chore(agents):` or `agents:` (both appear in history; prefer `chore(agents):` for consistency with scoped types).
 

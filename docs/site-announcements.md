@@ -6,10 +6,10 @@ Admins can publish short bilingual news banners on the homepage. Announcements a
 
 ## Overview
 
-| Actor | Capability |
-| ----- | ---------- |
-| **Public (no login)** | See published, in-schedule announcements on the homepage |
-| **Admin** | Create, edit, reorder, schedule, publish, and delete announcements |
+| Actor                 | Capability                                                         |
+| --------------------- | ------------------------------------------------------------------ |
+| **Public (no login)** | See published, in-schedule announcements on the homepage           |
+| **Admin**             | Create, edit, reorder, schedule, publish, and delete announcements |
 
 The homepage region renders only when at least one announcement matches `SiteAnnouncement.visible`. The component does not render an empty wrapper.
 
@@ -28,9 +28,9 @@ site_announcements:
 
 **Mobility translations** (via `string_translations`):
 
-| Attribute | Required |
-| --------- | -------- |
-| `message` | Yes (EN + EL) |
+| Attribute    | Required                                                                      |
+| ------------ | ----------------------------------------------------------------------------- |
+| `message`    | Yes (EN + EL)                                                                 |
 | `link_label` | No (falls back to `home.site_announcements.read_more` when `link_url` is set) |
 
 **Concerns:** `ReorderablePosition` — `position` must be a positive integer. A unique DB index enforces one row per position value.
@@ -61,12 +61,12 @@ site_announcements:
 
 **Scopes:**
 
-| Scope | Filter |
-| ----- | ------ |
-| `ordered` | `position ASC, id ASC` |
-| `published` | `published: true` |
+| Scope                 | Filter                                           |
+| --------------------- | ------------------------------------------------ |
+| `ordered`             | `position ASC, id ASC`                           |
+| `published`           | `published: true`                                |
 | `currently_scheduled` | `starts_at` nil or ≤ now; `ends_at` nil or ≥ now |
-| `visible` | `published.currently_scheduled.ordered` |
+| `visible`             | `published.currently_scheduled.ordered`          |
 
 `#visible?(at = Time.zone.now)` mirrors the scope logic for a single record.
 
@@ -131,12 +131,12 @@ Columns: position (inline PATCH form), English message preview, published status
 
 Schedule column labels:
 
-| State | Label key |
-| ----- | --------- |
-| No dates | `schedule_always` |
-| Start + end | `schedule_range` |
-| Start only | `schedule_from` |
-| End only | `schedule_until` |
+| State       | Label key         |
+| ----------- | ----------------- |
+| No dates    | `schedule_always` |
+| Start + end | `schedule_range`  |
+| Start only  | `schedule_from`   |
+| End only    | `schedule_until`  |
 
 ### Create / edit
 
@@ -144,11 +144,11 @@ Form fields: bilingual message and link label, `link_url`, `position`, `starts_a
 
 **Position assignment:**
 
-| Step | Behavior |
-| ---- | -------- |
-| `GET new` | Pre-fills `position` with `next_position` (a suggested value for the form) |
-| `POST create` | `persist_new_site_announcement` allocates the next position inside a DB transaction with `SELECT … FOR UPDATE`, ignoring any stale value submitted from the form |
-| `PATCH` (index or edit) | Admin can set an explicit `position`; the unique index rejects duplicates |
+| Step                    | Behavior                                                                                                                                                         |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `GET new`               | Pre-fills `position` with `next_position` (a suggested value for the form)                                                                                       |
+| `POST create`           | `persist_new_site_announcement` allocates the next position inside a DB transaction with `SELECT … FOR UPDATE`, ignoring any stale value submitted from the form |
+| `PATCH` (index or edit) | Admin can set an explicit `position`; the unique index rejects duplicates                                                                                        |
 
 `locked_next_position` reads the highest existing position under row lock and returns `max + 1` (or `1` when the table is empty).
 
@@ -164,12 +164,12 @@ All admin actions require an admin session (`Admin::BaseController`). Non-admin 
 
 ## Validation
 
-| Rule | Detail |
-| ---- | ------ |
-| `message_en`, `message_el` | Presence |
-| `position` | Positive integer (`ReorderablePosition`) |
-| `link_url` | Optional; must match `/…` (not `//…`) or `http(s)://…` (`LINK_URL_PATTERN`) |
-| `ends_at` | Must be after `starts_at` when both present |
+| Rule                       | Detail                                                                      |
+| -------------------------- | --------------------------------------------------------------------------- |
+| `message_en`, `message_el` | Presence                                                                    |
+| `position`                 | Positive integer (`ReorderablePosition`)                                    |
+| `link_url`                 | Optional; must match `/…` (not `//…`) or `http(s)://…` (`LINK_URL_PATTERN`) |
+| `ends_at`                  | Must be after `starts_at` when both present                                 |
 
 ---
 
@@ -196,21 +196,21 @@ Keys exist in both `config/locales/en.yml` and `config/locales/el.yml`.
 
 ## Key files
 
-| Area | Path |
-| ---- | ---- |
-| Model | `app/models/site_announcement.rb` |
-| Admin controller | `app/controllers/admin/site_announcements_controller.rb` |
+| Area               | Path                                                                   |
+| ------------------ | ---------------------------------------------------------------------- |
+| Model              | `app/models/site_announcement.rb`                                      |
+| Admin controller   | `app/controllers/admin/site_announcements_controller.rb`               |
 | Homepage component | `app/components/homepage_site_announcements_component.rb`, `.html.erb` |
-| Admin views | `app/views/admin/site_announcements/` |
-| Homepage wiring | `app/views/home/index.html.erb` |
-| Factory | `test/factories/site_announcements.rb` |
+| Admin views        | `app/views/admin/site_announcements/`                                  |
+| Homepage wiring    | `app/views/home/index.html.erb`                                        |
+| Factory            | `test/factories/site_announcements.rb`                                 |
 
 ---
 
 ## Testing
 
 ```bash
-docker compose -f docker-compose.test.yml --env-file ./.env.test run --rm skateparks-web-test bash -c \
+docker compose run --rm -T --env-from-file ./.env.test skateparks-web bash -c \
   'bin/rails db:drop db:create db:migrate && DISABLE_SIMPLECOV=1 bin/rails test \
   test/models/site_announcement_test.rb \
   test/controllers/admin/site_announcements_controller_test.rb \

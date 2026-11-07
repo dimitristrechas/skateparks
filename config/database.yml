@@ -34,6 +34,8 @@ test:
   password: <%= ENV['POSTGRES_PASSWORD'] %>
   allow_concurrency: true
   min_messages: error
+  # db:prepare must not seed the test database: tests assume it starts empty.
+  seeds: false
 
 production:
   <<: *default

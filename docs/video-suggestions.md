@@ -6,10 +6,10 @@ Anonymous visitors can propose YouTube videos for a skatepark. Suggestions are s
 
 ## Overview
 
-| Actor | Capability |
-| ----- | ---------- |
-| **Public (no login)** | Submit a YouTube URL from the skatepark show page |
-| **Admin** | Review pending suggestions, activate on a skatepark, or reject |
+| Actor                 | Capability                                                     |
+| --------------------- | -------------------------------------------------------------- |
+| **Public (no login)** | Submit a YouTube URL from the skatepark show page              |
+| **Admin**             | Review pending suggestions, activate on a skatepark, or reject |
 
 Published skatepark pages only display **active** videos (`active_skatepark_videos`). Pending and rejected videos are hidden from the public UI.
 
@@ -31,10 +31,10 @@ skatepark_videos:
 
 **Associations on `Skatepark`:**
 
-| Association | Scope |
-| ----------- | ----- |
-| `skatepark_videos` | All videos |
-| `active_skatepark_videos` | `status: active`, ordered by `position` |
+| Association                 | Scope                                         |
+| --------------------------- | --------------------------------------------- |
+| `skatepark_videos`          | All videos                                    |
+| `active_skatepark_videos`   | `status: active`, ordered by `position`       |
 | `proposed_skatepark_videos` | Videos originally proposed for this skatepark |
 
 **Counter cache:** `skateparks.skatepark_videos_count` counts **active** videos only. Updated in `SkateparkVideo#sync_skatepark_active_videos_count` after create/update/destroy.
@@ -112,22 +112,22 @@ On the skatepark **show** page (`app/views/skateparks/show.html.erb`):
 
 ### Frontend
 
-| Piece | Role |
-| ----- | ---- |
+| Piece                                      | Role                                                                            |
+| ------------------------------------------ | ------------------------------------------------------------------------------- |
 | `skatepark_video_suggestion_controller.js` | Opens/closes dialog (`showModal`), client-side URL validation, focus management |
-| `lib/youtube_url.js` | Shared YouTube ID extraction (mirrors server logic) |
-| Turbo Stream | Inline success/error feedback without full page reload |
+| `lib/youtube_url.js`                       | Shared YouTube ID extraction (mirrors server logic)                             |
+| Turbo Stream                               | Inline success/error feedback without full page reload                          |
 
 Client validation runs on submit; server validation is authoritative.
 
 ### Abuse prevention
 
-| Control | Setting |
-| ------- | ------- |
-| Per-IP rate limit | 5 requests / 15 minutes |
-| Per-skatepark rate limit | 60 requests / hour |
-| Honeypot field | Hidden `website` field; bots get a fake success |
-| URL length | Max 255 characters |
+| Control                  | Setting                                         |
+| ------------------------ | ----------------------------------------------- |
+| Per-IP rate limit        | 5 requests / 15 minutes                         |
+| Per-skatepark rate limit | 60 requests / hour                              |
+| Honeypot field           | Hidden `website` field; bots get a fake success |
+| URL length               | Max 255 characters                              |
 
 Rate-limited responses return HTTP 429 (Turbo Stream) or redirect with alert (HTML). If the skatepark cannot be resolved during rate limiting, HTML clients redirect to the homepage.
 
@@ -175,11 +175,11 @@ The extracted ID must match `/\A[A-Za-z0-9_-]{11}\z/`.
 
 Uniqueness is enforced on **`(skatepark_id, youtube_video_id)`** for `pending` and `active` statuses only (partial unique index). Rejected rows are ignored.
 
-| Scenario | Error key |
-| -------- | --------- |
-| Same video already active on skatepark | `already_published` |
-| Same video already pending on skatepark | `already_pending` |
-| Race on unique index | `RecordNotUnique` rescued → appropriate error message |
+| Scenario                                | Error key                                             |
+| --------------------------------------- | ----------------------------------------------------- |
+| Same video already active on skatepark  | `already_published`                                   |
+| Same video already pending on skatepark | `already_pending`                                     |
+| Race on unique index                    | `RecordNotUnique` rescued → appropriate error message |
 
 Resubmitting after rejection is allowed. `before_create :remove_stale_rejected_duplicates` deletes any prior rejected row for the same skatepark + video ID.
 
@@ -219,23 +219,23 @@ Keys exist in both `config/locales/en.yml` and `config/locales/el.yml`.
 
 ## Key files
 
-| Area | Path |
-| ---- | ---- |
-| Public controller | `app/controllers/skateparks/video_suggestions_controller.rb` |
-| Admin controller | `app/controllers/admin/video_suggestions_controller.rb` |
-| Model | `app/models/skatepark_video.rb` |
-| URL uniqueness concern | `app/models/concerns/skatepark_video_url_uniqueness.rb` |
-| Admin video attach | `app/controllers/concerns/admin/skatepark_video_management.rb` |
-| Stimulus | `app/javascript/controllers/skatepark_video_suggestion_controller.js` |
-| YouTube helper | `app/javascript/lib/youtube_url.js` |
-| Views | `app/views/skateparks/_video_suggestion_*.html.erb`, `app/views/admin/video_suggestions/index.html.erb` |
+| Area                   | Path                                                                                                    |
+| ---------------------- | ------------------------------------------------------------------------------------------------------- |
+| Public controller      | `app/controllers/skateparks/video_suggestions_controller.rb`                                            |
+| Admin controller       | `app/controllers/admin/video_suggestions_controller.rb`                                                 |
+| Model                  | `app/models/skatepark_video.rb`                                                                         |
+| URL uniqueness concern | `app/models/concerns/skatepark_video_url_uniqueness.rb`                                                 |
+| Admin video attach     | `app/controllers/concerns/admin/skatepark_video_management.rb`                                          |
+| Stimulus               | `app/javascript/controllers/skatepark_video_suggestion_controller.js`                                   |
+| YouTube helper         | `app/javascript/lib/youtube_url.js`                                                                     |
+| Views                  | `app/views/skateparks/_video_suggestion_*.html.erb`, `app/views/admin/video_suggestions/index.html.erb` |
 
 ---
 
 ## Testing
 
 ```bash
-docker compose -f docker-compose.test.yml --env-file ./.env.test run --rm skateparks-web-test bash -c \
+docker compose run --rm -T --env-from-file ./.env.test skateparks-web bash -c \
   'bin/rails db:drop db:create db:migrate && DISABLE_SIMPLECOV=1 bin/rails test \
   test/controllers/skateparks/video_suggestions_controller_test.rb \
   test/controllers/admin/video_suggestions_controller_test.rb \

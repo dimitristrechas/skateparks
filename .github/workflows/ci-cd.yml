@@ -66,7 +66,6 @@ jobs:
         run: |
           ./hadolint-linux-x86_64 --failure-threshold error Dockerfile
           ./hadolint-linux-x86_64 --failure-threshold error Dockerfile.development
-          ./hadolint-linux-x86_64 --failure-threshold error Dockerfile.test
 
   test:
     runs-on: ubuntu-latest

@@ -1,5 +1,24 @@
 #!/bin/bash
 
+# Docs invoke this as `sh scripts.sh`; leave POSIX mode so `echo -e` colors work.
+set +o posix 2>/dev/null || true
+
+# Use the Node version pinned in .nvmrc/.node-version for project tooling, even
+# when the calling shell has not loaded nvm (non-interactive shells, IDEs, agents).
+use_project_node() {
+    local version node_bin
+    version=$(cat .nvmrc 2>/dev/null || cat .node-version 2>/dev/null)
+    version="${version#v}"
+    [ -n "$version" ] || return 0
+    node_bin="${NVM_DIR:-$HOME/.nvm}/versions/node/v${version}/bin"
+    if [ -x "$node_bin/node" ]; then
+        PATH="$node_bin:$PATH"
+        export PATH
+    fi
+}
+
+use_project_node
+
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -8,13 +27,12 @@ PURPLE='\033[0;35m'
 CYAN='\033[0;36m'
 NC='\033[0m'
 
-DEV_COMPOSE_FILE="./docker-compose.development.yml"
-TEST_COMPOSE_FILE="./docker-compose.test.yml"
+COMPOSE_FILE="./docker-compose.yml"
 TEST_ENV_FILE="./.env.test"
 SERVICE_NAME="skateparks-web"
-TEST_SERVICE_NAME="skateparks-web-test"
-DEV_CONTAINER_NAME="rails-app"
-TEST_CONTAINER_NAME="rails-app-test"
+DB_SERVICE_NAME="skateparks-db"
+REDIS_SERVICE_NAME="skateparks-redis"
+WEB_IMAGE="skateparks-dev"
 
 INTERACTIVE=true
 
@@ -25,16 +43,38 @@ check_docker() {
     fi
 }
 
-dev_compose() {
-    docker compose -f "$DEV_COMPOSE_FILE" "$@"
+app_compose() {
+    docker compose -f "$COMPOSE_FILE" "$@"
 }
 
-test_compose() {
-    docker compose -f "$TEST_COMPOSE_FILE" --env-file "$TEST_ENV_FILE" "$@"
+service_exists() {
+    app_compose ps -a --services 2>/dev/null | grep -qx "$1"
 }
 
-container_exists() {
-    docker ps -a --format '{{.Names}}' | grep -qx "$1"
+ensure_web_image() {
+    if ! docker image inspect "$WEB_IMAGE" > /dev/null 2>&1; then
+        echo -e "${GREEN}Building development image...${NC}"
+        app_compose build "$SERVICE_NAME" || return 1
+    fi
+}
+
+ensure_infra() {
+    app_compose up -d --wait "$DB_SERVICE_NAME" "$REDIS_SERVICE_NAME"
+}
+
+# Run a command in a disposable container built from the development image,
+# with the test environment from .env.test (database and Redis isolation).
+test_run() {
+    ensure_web_image || return 1
+    ensure_infra || return 1
+    app_compose run --rm -T --env-from-file "$TEST_ENV_FILE" "$SERVICE_NAME" "$@"
+}
+
+# Same as test_run but keeps a TTY for interactive console/bash sessions.
+test_run_interactive() {
+    ensure_web_image || return 1
+    ensure_infra || return 1
+    app_compose run --rm --env-from-file "$TEST_ENV_FILE" "$SERVICE_NAME" "$@"
 }
 
 show_docker_status() {
@@ -79,7 +119,7 @@ start_dev_server() {
             return 0
         fi
         echo -e "${GREEN}Building and starting development server with fresh build...${NC}"
-        if dev_compose up --remove-orphans --build --force-recreate -d; then
+        if app_compose up --remove-orphans --build --force-recreate -d; then
             echo -e "${GREEN}✅ Development server built and started successfully${NC}"
         else
             echo -e "${RED}❌ Failed to build and start development server${NC}"
@@ -88,9 +128,9 @@ start_dev_server() {
         return 0
     fi
 
-    if container_exists "$DEV_CONTAINER_NAME"; then
+    if service_exists "$SERVICE_NAME"; then
         echo -e "${GREEN}Starting development server...${NC}"
-        if dev_compose start; then
+        if app_compose start; then
             echo -e "${GREEN}✅ Development server started successfully${NC}"
         else
             echo -e "${RED}❌ Failed to start development server${NC}"
@@ -98,7 +138,7 @@ start_dev_server() {
         fi
     else
         echo -e "${GREEN}No existing development containers. Building and starting...${NC}"
-        if dev_compose up --remove-orphans --build -d; then
+        if app_compose up --remove-orphans --build -d; then
             echo -e "${GREEN}✅ Development server built and started successfully${NC}"
         else
             echo -e "${RED}❌ Failed to build and start development server${NC}"
@@ -120,17 +160,17 @@ interactive_start_dev_server() {
 
 view_dev_logs() {
     echo -e "${GREEN}Viewing development server logs...${NC}"
-    dev_compose logs -f "$SERVICE_NAME"
+    app_compose logs -f "$SERVICE_NAME"
 }
 
 dev_rails_console() {
     echo -e "${GREEN}Opening Rails console...${NC}"
-    dev_compose exec "$SERVICE_NAME" bundle exec rails console
+    app_compose exec "$SERVICE_NAME" bundle exec rails console
 }
 
 dev_bash_shell() {
     echo -e "${GREEN}Connecting to development Docker console...${NC}"
-    dev_compose exec "$SERVICE_NAME" bash
+    app_compose exec "$SERVICE_NAME" bash
 }
 
 stop_dev_server() {
@@ -139,7 +179,7 @@ stop_dev_server() {
         return 0
     fi
     echo -e "${YELLOW}Stopping development server...${NC}"
-    if dev_compose stop; then
+    if app_compose stop; then
         echo -e "${GREEN}✅ Development server stopped${NC}"
     else
         echo -e "${RED}❌ Failed to stop development server${NC}"
@@ -147,97 +187,61 @@ stop_dev_server() {
     fi
 }
 
-# --- Test server ---
+# --- Test environment ---
 
-start_test_server() {
+prepare_test_database() {
+    echo -e "${GREEN}Preparing test database...${NC}"
+    if test_run bin/rails db:prepare; then
+        echo -e "${GREEN}✅ Test database ready${NC}"
+    else
+        echo -e "${RED}❌ Failed to prepare test database${NC}"
+        return 1
+    fi
+}
+
+start_test_environment() {
     local rebuild="${1:-false}"
 
     if [ "$rebuild" = true ]; then
-        if ! confirm_action "This will rebuild and recreate the test container." true; then
+        if ! confirm_action "This will rebuild the development image used by test runs." true; then
             echo -e "${RED}Operation cancelled.${NC}"
             return 0
         fi
-        echo -e "${GREEN}Building and starting test server with fresh build...${NC}"
-        if test_compose up --remove-orphans --build --force-recreate -d; then
-            echo -e "${GREEN}✅ Test server built and started successfully${NC}"
-        else
-            echo -e "${RED}❌ Failed to build and start test server${NC}"
-            return 1
-        fi
-        return 0
-    fi
-
-    if container_exists "$TEST_CONTAINER_NAME"; then
-        echo -e "${GREEN}Starting test server...${NC}"
-        if test_compose start; then
-            echo -e "${GREEN}✅ Test server started successfully${NC}"
-        else
-            echo -e "${RED}❌ Failed to start test server${NC}"
-            return 1
-        fi
-    else
-        echo -e "${GREEN}No existing test containers. Building and starting...${NC}"
-        if test_compose up --remove-orphans --build -d; then
-            echo -e "${GREEN}✅ Test server built and started successfully${NC}"
-        else
-            echo -e "${RED}❌ Failed to build and start test server${NC}"
+        echo -e "${GREEN}Rebuilding development image...${NC}"
+        if ! app_compose build "$SERVICE_NAME"; then
+            echo -e "${RED}❌ Failed to rebuild development image${NC}"
             return 1
         fi
     fi
-}
 
-interactive_start_test_server() {
-    echo -e "${YELLOW}Rebuild from scratch? (y/N):${NC} "
-    read -r -n 1 REBUILD_REPLY
-    echo
-    if [[ $REBUILD_REPLY =~ ^[Yy]$ ]]; then
-        start_test_server true
-    else
-        start_test_server false
-    fi
-}
-
-view_test_logs() {
-    echo -e "${GREEN}Viewing test server logs...${NC}"
-    test_compose logs -f "$TEST_SERVICE_NAME"
+    prepare_test_database
 }
 
 test_rails_console() {
     echo -e "${GREEN}Opening test Rails console...${NC}"
-    test_compose exec "$TEST_SERVICE_NAME" bundle exec rails console
+    test_run_interactive bin/rails console
 }
 
 test_bash_shell() {
     echo -e "${GREEN}Connecting to test Docker console...${NC}"
-    test_compose exec "$TEST_SERVICE_NAME" bash
-}
-
-stop_test_server() {
-    if ! confirm_action "This will stop the test server."; then
-        echo -e "${RED}Operation cancelled.${NC}"
-        return 0
-    fi
-    echo -e "${YELLOW}Stopping test server...${NC}"
-    if test_compose stop; then
-        echo -e "${GREEN}✅ Test server stopped${NC}"
-    else
-        echo -e "${RED}❌ Failed to stop test server${NC}"
-        return 1
-    fi
+    test_run_interactive bash
 }
 
 # --- Tests ---
 
 run_tests_with_coverage() {
     echo -e "${GREEN}Running tests with coverage...${NC}"
-    test_compose exec "$TEST_SERVICE_NAME" bash -c "rm -rf coverage && bin/rails test"
-    echo ""
-    echo -e "${CYAN}Coverage report: ${NC}file://$(pwd)/coverage/index.html"
+    if test_run bash -c "bin/rails db:prepare && rm -rf coverage && bin/rails test"; then
+        echo ""
+        echo -e "${CYAN}Coverage report: ${NC}file://$(pwd)/coverage/index.html"
+    else
+        return 1
+    fi
 }
 
 run_tests_fast() {
     echo -e "${GREEN}Running tests without coverage...${NC}"
-    test_compose exec "$TEST_SERVICE_NAME" bash -c "DISABLE_SIMPLECOV=1 bin/rails test"
+    test_run bash -c "bin/rails db:prepare && DISABLE_SIMPLECOV=1 bin/rails test"
 }
 
 run_single_test() {
@@ -258,7 +262,7 @@ run_single_test() {
     fi
 
     echo -e "${GREEN}Running test: ${target}${NC}"
-    test_compose exec "$TEST_SERVICE_NAME" bin/rails test "$target"
+    test_run bash -c 'bin/rails db:prepare && bin/rails test "$@"' bash "$target"
 }
 
 run_tests_cli() {
@@ -325,7 +329,7 @@ needs_full_suite() {
     local file="$1"
 
     case "$file" in
-        Gemfile|Gemfile.lock|db/schema.rb|db/migrate/*|config/application.rb|config/environments/test.rb|Dockerfile.test|docker-compose.test.yml|test/test_helper.rb|test/support/*|test/factories/*)
+        Gemfile|Gemfile.lock|db/schema.rb|db/migrate/*|config/application.rb|config/database.yml|config/environments/test.rb|Dockerfile.development|docker-compose.yml|.env.test|test/test_helper.rb|test/support/*|test/factories/*)
             return 0
             ;;
     esac
@@ -378,7 +382,7 @@ run_tests_changed() {
     echo -e "${GREEN}Running targeted tests:${NC}"
     echo "$tests"
     # shellcheck disable=SC2086
-    test_compose exec "$TEST_SERVICE_NAME" bash -c "DISABLE_SIMPLECOV=1 bin/rails test $tests"
+    test_run bash -c "bin/rails db:prepare && DISABLE_SIMPLECOV=1 bin/rails test $tests"
 }
 
 run_lint_changed() {
@@ -410,14 +414,14 @@ run_lint_changed() {
             *.erb)
                 erb_files="$erb_files $file"
                 ;;
-            *.js|*.ts|*.json|*.css)
+            *.js|*.ts|*.json|*.css|*.md)
                 prettier_files="$prettier_files $file"
                 ;;
         esac
     done <<< "$files"
 
     if [ -z "$rb_files$erb_files$prettier_files" ]; then
-        echo -e "${YELLOW}No lintable changed files (no rb/erb/js/ts/json/css).${NC}"
+        echo -e "${YELLOW}No lintable changed files (no rb/erb/js/ts/json/css/md).${NC}"
         return 0
     fi
 
@@ -601,7 +605,7 @@ run_linters_cli() {
 
 migrate_database() {
     echo -e "${GREEN}Running database migrations...${NC}"
-    if dev_compose exec "$SERVICE_NAME" bash -c "bundle exec rails db:migrate"; then
+    if app_compose exec "$SERVICE_NAME" bash -c "bundle exec rails db:migrate"; then
         echo -e "${GREEN}✅ Database migrated successfully${NC}"
     else
         echo -e "${RED}❌ Failed to migrate database${NC}"
@@ -611,7 +615,7 @@ migrate_database() {
 
 seed_database() {
     echo -e "${GREEN}Seeding the database...${NC}"
-    if dev_compose exec "$SERVICE_NAME" bash -c "bundle exec rails db:seed"; then
+    if app_compose exec "$SERVICE_NAME" bash -c "bundle exec rails db:seed"; then
         echo -e "${GREEN}✅ Database seeded successfully${NC}"
     else
         echo -e "${RED}❌ Failed to seed database${NC}"
@@ -625,7 +629,7 @@ reset_database() {
         return 0
     fi
     echo -e "${GREEN}Resetting database...${NC}"
-    if dev_compose exec "$SERVICE_NAME" bash -c "bundle exec rails db:reset"; then
+    if app_compose exec "$SERVICE_NAME" bash -c "bundle exec rails db:reset"; then
         echo -e "${GREEN}✅ Database reset successfully${NC}"
     else
         echo -e "${RED}❌ Failed to reset database${NC}"
@@ -635,7 +639,7 @@ reset_database() {
 
 clear_rails_cache() {
     echo -e "${GREEN}Clearing Rails cache...${NC}"
-    if dev_compose exec "$SERVICE_NAME" bash -c "bundle exec rails runner 'Rails.cache.clear'"; then
+    if app_compose exec "$SERVICE_NAME" bash -c "bundle exec rails runner 'Rails.cache.clear'"; then
         echo -e "${GREEN}✅ Cache cleared successfully${NC}"
     else
         echo -e "${RED}❌ Failed to clear cache${NC}"
@@ -645,7 +649,7 @@ clear_rails_cache() {
 
 reload_test_schema() {
     echo -e "${GREEN}Reloading test database schema...${NC}"
-    if test_compose exec "$TEST_SERVICE_NAME" bin/rails db:schema:load; then
+    if test_run bin/rails db:create db:schema:load; then
         echo -e "${GREEN}✅ Test database schema loaded successfully${NC}"
     else
         echo -e "${RED}❌ Failed to load test database schema${NC}"
@@ -659,16 +663,9 @@ stop_all_containers() {
         return 0
     fi
     echo -e "${YELLOW}Stopping skateparks Docker containers...${NC}"
-    local stopped=false
-    if dev_compose stop 2>/dev/null; then
-        echo -e "${GREEN}✅ Development containers stopped${NC}"
-        stopped=true
-    fi
-    if test_compose stop 2>/dev/null; then
-        echo -e "${GREEN}✅ Test containers stopped${NC}"
-        stopped=true
-    fi
-    if [ "$stopped" = false ]; then
+    if app_compose stop; then
+        echo -e "${GREEN}✅ Skateparks containers stopped${NC}"
+    else
         echo -e "${YELLOW}⚠️  No skateparks containers were running${NC}"
     fi
 }
@@ -689,13 +686,13 @@ Usage:
   scripts.sh security                  Run all security audits
   scripts.sh ci                        Run all CI parity checks in parallel
   scripts.sh dev <command>             Development server commands
-  scripts.sh test-server <command>     Test server commands
+  scripts.sh test-server <command>     Test environment commands (ephemeral containers)
 
 Dev commands:
   up, rebuild, down, logs, console, bash, migrate, seed, reset, cache-clear
 
-Test-server commands:
-  up, rebuild, down, logs, console, bash, schema-load
+Test-environment commands:
+  up, rebuild, console, bash, schema-load
 
 Destructive non-interactive commands require --force:
   scripts.sh dev rebuild --force
@@ -742,10 +739,8 @@ run_test_server_cli() {
     fi
 
     case "$command" in
-        up) start_test_server false ;;
-        rebuild) start_test_server true ;;
-        down) stop_test_server ;;
-        logs) view_test_logs ;;
+        up) start_test_environment false ;;
+        rebuild) start_test_environment true ;;
         console) test_rails_console ;;
         bash) test_bash_shell ;;
         schema-load) reload_test_schema ;;
@@ -789,7 +784,8 @@ run_cli() {
         gate-quick)
             shift
             run_gate_quick "$@"
-            ;;        security)
+            ;;
+        security)
             run_security_audits
             ;;
         ci)
@@ -825,31 +821,28 @@ show_menu() {
     echo -e " ${BLUE}(4)${NC}  Connect to development Docker console"
     echo -e " ${BLUE}(5)${NC}  Stop development server"
     echo ""
-    echo -e "${GREEN}--- Test Server ---${NC}"
-    echo -e " ${BLUE}(6)${NC}  Start / rebuild test server"
-    echo -e " ${BLUE}(7)${NC}  Run all tests (with coverage)"
-    echo -e " ${BLUE}(8)${NC}  Run tests (no coverage)"
-    echo -e " ${BLUE}(9)${NC}  Run single test"
-    echo -e " ${BLUE}(10)${NC} View test server logs"
-    echo -e " ${BLUE}(11)${NC} Rails console (test)"
-    echo -e " ${BLUE}(12)${NC} Connect to test Docker console"
-    echo -e " ${BLUE}(13)${NC} Stop test server"
+    echo -e "${GREEN}--- Test Environment (ephemeral) ---${NC}"
+    echo -e " ${BLUE}(6)${NC}  Run all tests (with coverage)"
+    echo -e " ${BLUE}(7)${NC}  Run tests (no coverage)"
+    echo -e " ${BLUE}(8)${NC}  Run single test"
+    echo -e " ${BLUE}(9)${NC}  Rails console (test)"
+    echo -e " ${BLUE}(10)${NC} Connect to test Docker console"
+    echo -e " ${BLUE}(11)${NC} Prepare test database (schema + migrations)"
     echo ""
     echo -e "${GREEN}--- Tests & Linting & Formatting ---${NC}"
-    echo -e " ${BLUE}(14)${NC} Run linters (check, fast)"
-    echo -e " ${BLUE}(15)${NC} Run all linters (fix)"
-    echo -e " ${BLUE}(16)${NC} Run security audits"
-    echo -e " ${BLUE}(17)${NC} Run all CI parity checks (parallel)"
+    echo -e " ${BLUE}(12)${NC} Run linters (check, fast)"
+    echo -e " ${BLUE}(13)${NC} Run all linters (fix)"
+    echo -e " ${BLUE}(14)${NC} Run security audits"
+    echo -e " ${BLUE}(15)${NC} Run all CI parity checks (parallel)"
     echo ""
     echo -e "${GREEN}--- Database & Cache ---${NC}"
-    echo -e " ${BLUE}(18)${NC} Migrate database"
-    echo -e " ${BLUE}(19)${NC} Seed the database"
-    echo -e " ${BLUE}(20)${NC} Reset database"
-    echo -e " ${BLUE}(21)${NC} Clear all Rails cache"
-    echo -e " ${BLUE}(22)${NC} Reload test database schema"
+    echo -e " ${BLUE}(16)${NC} Migrate database"
+    echo -e " ${BLUE}(17)${NC} Seed the database"
+    echo -e " ${BLUE}(18)${NC} Reset database"
+    echo -e " ${BLUE}(19)${NC} Clear all Rails cache"
     echo ""
     echo -e "${GREEN}--- Other ---${NC}"
-    echo -e " ${BLUE}(23)${NC} Stop all skateparks Docker containers"
+    echo -e " ${BLUE}(20)${NC} Stop all skateparks Docker containers"
     echo ""
     echo -e "${YELLOW}Choose an option (or q to quit):${NC} "
 }
@@ -861,31 +854,28 @@ run_menu_option() {
         3) dev_rails_console ;;
         4) dev_bash_shell ;;
         5) stop_dev_server ;;
-        6) interactive_start_test_server ;;
-        7) run_tests_with_coverage ;;
-        8) run_tests_fast ;;
-        9) interactive_run_single_test ;;
-        10) view_test_logs ;;
-        11) test_rails_console ;;
-        12) test_bash_shell ;;
-        13) stop_test_server ;;
-        14) run_linters_check ;;
-        15) run_linters_fix ;;
-        16) run_security_audits ;;
-        17) run_ci_checks ;;
-        18) migrate_database ;;
-        19) seed_database ;;
-        20) reset_database ;;
-        21) clear_rails_cache ;;
-        22) reload_test_schema ;;
-        23) stop_all_containers ;;
+        6) run_tests_with_coverage ;;
+        7) run_tests_fast ;;
+        8) interactive_run_single_test ;;
+        9) test_rails_console ;;
+        10) test_bash_shell ;;
+        11) start_test_environment false ;;
+        12) run_linters_check ;;
+        13) run_linters_fix ;;
+        14) run_security_audits ;;
+        15) run_ci_checks ;;
+        16) migrate_database ;;
+        17) seed_database ;;
+        18) reset_database ;;
+        19) clear_rails_cache ;;
+        20) stop_all_containers ;;
         q|Q)
             echo -e "${GREEN}Goodbye!${NC}"
             exit 0
             ;;
         *)
             echo -e "${RED}❌ Unknown option: $OPTION${NC}"
-            echo -e "${YELLOW}Please choose a valid option (1-23) or q to quit${NC}"
+            echo -e "${YELLOW}Please choose a valid option (1-20) or q to quit${NC}"
             return 1
             ;;
     esac
