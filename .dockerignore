@@ -53,4 +53,3 @@
 # Ignore local container and alternate build definitions.
 /docker-compose*.yml
 /Dockerfile.development
-/Dockerfile.test

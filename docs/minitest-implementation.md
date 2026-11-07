@@ -415,32 +415,32 @@ end
 
 ## Running Tests
 
-**Always run via Docker** (tests require the test container):
+**Always run via Docker.** Each command runs in a disposable container with `RAILS_ENV=test` and the values from `.env.test`:
 
 ```bash
 # All tests
-docker compose -f docker-compose.test.yml exec skateparks-web-test bin/rails test
+docker compose run --rm -T --env-from-file .env.test skateparks-web bin/rails test
 
 # All tests with coverage report (SimpleCov is on by default; stale `coverage/` is cleared for a clean merge)
-docker compose -f docker-compose.test.yml exec skateparks-web-test bash -c "rm -rf coverage && bin/rails test"
+docker compose run --rm -T --env-from-file .env.test skateparks-web bash -c "rm -rf coverage && bin/rails test"
 
 # All tests without coverage (faster)
-docker compose -f docker-compose.test.yml exec skateparks-web-test bash -c "DISABLE_SIMPLECOV=1 bin/rails test"
+docker compose run --rm -T --env-from-file .env.test skateparks-web bash -c "DISABLE_SIMPLECOV=1 bin/rails test"
 
 # Single file
-docker compose -f docker-compose.test.yml exec skateparks-web-test bin/rails test test/models/skatepark_test.rb
+docker compose run --rm -T --env-from-file .env.test skateparks-web bin/rails test test/models/skatepark_test.rb
 
 # Single test by line number
-docker compose -f docker-compose.test.yml exec skateparks-web-test bin/rails test test/models/skatepark_test.rb:42
+docker compose run --rm -T --env-from-file .env.test skateparks-web bin/rails test test/models/skatepark_test.rb:42
 
 # Single test by name
-docker compose -f docker-compose.test.yml exec skateparks-web-test bin/rails test test/models/skatepark_test.rb -n test_requires_name_to_be_present
+docker compose run --rm -T --env-from-file .env.test skateparks-web bin/rails test test/models/skatepark_test.rb -n test_requires_name_to_be_present
 ```
 
 Or use the interactive menu or CLI:
 
 ```bash
-./scripts.sh                    # → (7) Run all tests (with coverage)
+./scripts.sh                    # → (6) Run all tests (with coverage)
 sh scripts.sh test --fast       # Without coverage
 sh scripts.sh test test/models/skatepark_test.rb
 ```
@@ -459,7 +459,7 @@ Rails parallel workers fork via `Kernel.fork`. Coverage is merged in [`test/test
 
 1. Check file exists: `test/factories/skateparks.rb`
 2. Check factory name matches: `factory :skatepark do`
-3. Restart the test container if running in Docker
+3. Re-run the test (each run uses a fresh disposable container)
 
 ### "Cannot generate URL for attachment"
 

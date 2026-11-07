@@ -1,3 +1,6 @@
+# Dependency overrides only. This is a single-package Rails app, not a pnpm workspace:
+# there is no `packages/` tree and no `workspaces` field in package.json.
+engineStrict: true
 overrides:
   dompurify: ">=3.4.17"
   nanoid: ">=3.3.18"

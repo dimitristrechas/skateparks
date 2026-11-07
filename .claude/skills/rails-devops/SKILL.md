@@ -2,7 +2,7 @@
 name: rails-devops
 description: >-
   Docker, scripts.sh, CI/CD, credentials, and environment setup for this Rails app.
-  Use for container issues, dev/test server workflows, and deployment troubleshooting.
+  Use for container issues, dev/test workflows, and deployment troubleshooting.
   Covers Dokploy production inspection via the dokploy MCP server.
 compatibility: opencode
 ---
@@ -26,8 +26,8 @@ Use when managing Docker containers, debugging build issues, running CI-parity c
 ```bash
 sh scripts.sh                              # Interactive menu
 sh scripts.sh dev up                       # Start development server
-sh scripts.sh dev rebuild --force          # Rebuild development containers
-sh scripts.sh test-server up               # Start test server
+sh scripts.sh dev rebuild --force          # Rebuild the development image
+sh scripts.sh test-server up               # Prepare the test database
 sh scripts.sh test-server schema-load      # Reload test DB schema
 sh scripts.sh test                         # All tests with coverage
 sh scripts.sh test --fast                  # All tests without coverage
@@ -41,12 +41,11 @@ sh scripts.sh ci                           # Full CI parity — run before push/
 
 ## Docker architecture
 
-| Environment | Compose file                     | Web service           | DB port | Redis port | App port |
-| ----------- | -------------------------------- | --------------------- | ------- | ---------- | -------- |
-| Development | `docker-compose.development.yml` | `skateparks-web`      | 5434    | 6379       | 3002     |
-| Test        | `docker-compose.test.yml`        | `skateparks-web-test` | 5433    | 6380       | 3003     |
+One compose stack (`docker-compose.yml`): `skateparks-db` (Postgres, host port 5434), `skateparks-redis` (Redis, 6379), and `skateparks-web` (development server, 3002).
 
-Codebase is volume-mounted — code changes apply without rebuilds. Native-extension gems need image rebuild (`sh scripts.sh dev rebuild --force`).
+- One Postgres hosts `skateparks_development` and `skateparks_test`; one Redis uses logical DB `/1` (dev) and `/2` (test).
+- Tests run in a disposable container from the same `skateparks-dev` image with `RAILS_ENV=test` and `.env.test` — no long-running test service.
+- Codebase is volume-mounted — code changes apply without rebuilds. Native-extension gems need an image rebuild (`sh scripts.sh dev rebuild --force`).
 
 ## CI/CD (summary)
 
