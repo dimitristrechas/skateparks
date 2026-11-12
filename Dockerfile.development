@@ -4,7 +4,7 @@
 # renovate: datasource=ruby-version depName=ruby versioning=ruby
 ARG RUBY_VERSION=4.0.9
 # renovate: datasource=node-version depName=node versioning=node
-ARG NODE_VERSION=26.13.0
+ARG NODE_VERSION=26.13.1
 ARG BUNDLER_VERSION=2.7.1
 # renovate: datasource=npm depName=corepack
 ARG COREPACK_VERSION=0.36.0
