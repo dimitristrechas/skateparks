@@ -65,7 +65,10 @@ sh scripts.sh ci             # Zeitwerk, RuboCop, Prettier, Herb, Brakeman, bund
 `test-changed` maps `app/models|controllers|components|helpers|jobs|mailers/*.rb` to the
 conventional `test/**/*_test.rb` and runs only those files. It falls back to `test --fast` when
 the diff touches migrations, `db/schema.rb`, `Gemfile*`, `test/test_helper.rb`, `test/support/*`,
-`test/factories/*`, or more than 10 files. View/locale/CSS-only changes run lint only.
+`test/factories/*`, `config/application.rb`, `config/database.yml`, `config/environments/test.rb`,
+`Dockerfile.development`, `docker-compose.yml`, `.env.test`, or more than 10 files.
+View/locale/CSS-only changes run lint only. Changes to `app/workers/`, `lib/`, or `config/routes.rb`
+have no mapped tests — run `sh scripts.sh test --fast` for those.
 
 `sh scripts.sh lint` and lefthook pre-commit hooks do **not** include `pnpm audit`. The `herb-prettier` CI job runs `pnpm audit --audit-level moderate`; use `sh scripts.sh ci` or `sh scripts.sh security` locally. Pre-push hook runs Brakeman, bundle-audit, and pnpm audit.
 

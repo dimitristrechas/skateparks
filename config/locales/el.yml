@@ -2,10 +2,12 @@ el:
   opens_in_new_tab: "(ανοίγει σε νέα καρτέλα)"
   made_with: "Φτιαγμένο με"
   city_of_origin: "Καβάλα, Ελλάδα"
+  city_data_attribution: "Δεδομένα πόλεων από GeoNames (CC BY 4.0)"
   photos: "φωτογραφίες"
   videos: "βίντεο"
   country: "Χώρα"
-  country_state: "Νομός/Περιφέρεια"
+  city: "Πόλη"
+  select_city: "Αναζήτηση πόλης…"
   back_to_skateparks: "Πίσω σε όλα τα skateparks"
   back_to_admin: "Πίσω στην αρχική σελίδα διαχειριστή"
   open_in_google_maps: "Δες το πάρκο στο google maps"
@@ -92,7 +94,7 @@ el:
   reset_filters: "Επαναφορά"
   filters: "Φίλτρα"
   all_countries: "Όλες"
-  all_states: "Όλες"
+  all_cities: "Όλες"
   all_distances: "Όλα"
   distance: "Απόσταση από εσένα"
   within_distance: "%{distance} χλμ"
@@ -254,7 +256,7 @@ el:
       index_title: "Λίστα skateparks"
       new_skatepark: "Νέο skatepark"
       destroy: "διαγραφή"
-      location: "Χώρα / Νομός"
+      location: "Χώρα / Πόλη"
       search_label: "Αναζήτηση με όνομα"
       search_placeholder: "Αναζήτηση στα Ελληνικά ή Αγγλικά…"
       all_statuses: "Όλες οι καταστάσεις"
@@ -372,6 +374,11 @@ el:
       results_count_one: "1 διαθέσιμο skatepark"
       results_count_other: "%{count} διαθέσιμα skateparks"
       selection_required: "Επιλέξτε ένα skatepark από τη λίστα."
+    city_picker:
+      no_results: "Δεν βρέθηκαν πόλεις."
+      results_count_one: "1 διαθέσιμη πόλη"
+      results_count_other: "%{count} διαθέσιμες πόλεις"
+      selection_required: "Επιλέξτε μια πόλη από τη λίστα."
     video_suggestions:
       title: "Προτάσεις βίντεο"
       pending_count:
@@ -400,6 +407,7 @@ el:
   activerecord:
     attributes:
       skatepark:
+        city_geoname_id: "Πόλη"
         skatepark_images: "Φωτογραφίες"
         skatepark_videos: "Βίντεο"
       skatepark_video:

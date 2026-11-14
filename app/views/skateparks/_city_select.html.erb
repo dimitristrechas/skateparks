@@ -1,0 +1,11 @@
+<div class="flex flex-col items-start gap-1" id="city_select">
+  <%= label_tag :city_id, t("city"), class: "block" %>
+
+  <%= render SelectComponent.new(
+    name: :city_id,
+    options: [[t("all_cities"), ""]] + cities.map { |city| [CityDataset.localized_name(city), city['id']] },
+    selected: params[:city_id],
+    disabled: cities.empty?,
+    large: true
+  ) %>
+</div>

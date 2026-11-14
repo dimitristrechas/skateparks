@@ -1,6 +1,7 @@
 <div
   class="relative mb-8 sm:mb-12"
   data-controller="skateparks--filters skateparks--geolocation"
+  data-skateparks--filters-locale-value="<%= I18n.locale %>"
   data-skateparks--geolocation-default-distance-value="<%= default_distance_filter %>"
   data-skateparks--geolocation-denied-message-value="<%= t("geolocation_denied") %>"
   data-skateparks--geolocation-unavailable-message-value="<%= t("geolocation_unavailable") %>"
@@ -47,7 +48,7 @@
                             data: { "skateparks--geolocation-target": "filterSort" } %>
 
       <%= render "country_select", countries: countries %>
-      <%= render "state_select", states: states %>
+      <%= render "city_select", cities: cities %>
 
       <fieldset class="flex min-w-0 flex-col items-start gap-1 border-0 p-0 md:col-span-2 lg:col-span-1 lg:justify-self-start">
         <legend class="mb-1"><%= t("distance") %></legend>

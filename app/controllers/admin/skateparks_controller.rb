@@ -4,6 +4,7 @@ module Admin
 
     include SkateparkImageAttachment
     include SkateparkVideoManagement
+    include CountryData
 
     before_action :set_skatepark, only: %i[show edit update destroy]
 
@@ -82,11 +83,6 @@ module Admin
       end
     end
 
-    def states
-      country = ISO3166::Country[params[:country_code]]
-      render json: country ? country.subdivisions : {}
-    end
-
     private
 
     # Use callbacks to share common setup or constraints between actions.
@@ -103,7 +99,7 @@ module Admin
       @skatepark_params ||= params.expect(
         skatepark: [:name_el, :name_en, :lat, :lng, :cover_image, :description_el, :description_en,
                     :meta_title_el, :meta_title_en, :meta_description_el, :meta_description_en,
-                    :google_id, :status, :country_code, :state,
+                    :google_id, :status, :country_code, :city_geoname_id,
                     { new_images: [] }, { new_image_positions: [] },
                     { new_video_urls: [] }, { new_video_positions: [] },
                     { skatepark_images_attributes: [%i[id position _destroy]] },

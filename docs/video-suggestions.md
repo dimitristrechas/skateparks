@@ -143,7 +143,7 @@ Linked from **Admin dashboard** → “Review Video Suggestions”.
 
 ### Activate
 
-1. Admin picks a target skatepark from a dropdown (defaults to current `skatepark_id`).
+1. Admin uses the shared **Change assigned skatepark** dialog, which contains a searchable `Admin::SkateparkPickerComponent` combobox backed by `GET /admin/skateparks/search` (published parks, 20 results max). The row's hidden `skatepark_id` defaults to the current assignment; applying the dialog updates that value.
 2. `POST activate` runs `activate_video_on!` inside `target_skatepark.with_lock`.
 3. Sets `status: :active`, assigns `skatepark`, computes `position` via `SkateparkVideo.next_active_position_for`.
 4. Flash notice differs when the video stays on the proposed skatepark vs. is reassigned.
@@ -199,7 +199,7 @@ Notable changes:
 
 - Added `status`, `youtube_video_id`, `proposed_skatepark_id`
 - Backfilled existing rows to `active` with parsed video IDs
-- Replaced global position unique index with a partial index on active videos only
+- Replaced the per-skatepark position unique index with a partial index on active videos only
 - Partial unique index on `(skatepark_id, youtube_video_id)` where `status IN (0, 1)`
 - Recounted `skatepark_videos_count` on all skateparks
 
@@ -252,4 +252,4 @@ See [minitest-implementation.md](minitest-implementation.md) for general test co
 
 - **Homepage caches** — Activating or deactivating videos clears `Skatepark.homepage_latest_cache_key` and `homepage_popular_cache_key` when the active status changes.
 - **Stale skatepark URLs** — `SkateparksController#set_skatepark` redirects to the homepage with `skateparks.not_found` when the slug/id does not match a published park (same behavior applies indirectly when suggestion targets are invalid).
-- **Admin skatepark picker** — The activate dropdown lists all published skateparks. This works for the current dataset but may need a searchable picker if the directory grows significantly.
+- **Admin skatepark picker** — The reassign dialog searches published skateparks by name via `GET /admin/skateparks/search`, capped at 20 results, so it scales past a simple dropdown.

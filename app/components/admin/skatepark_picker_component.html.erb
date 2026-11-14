@@ -3,10 +3,10 @@
   data-controller="admin--skatepark-picker"
   data-admin--skatepark-picker-search-url-value="<%= @search_url %>"
   data-admin--skatepark-picker-required-value="<%= @required %>"
-  data-admin--skatepark-picker-no-results-text-value="<%= t('admin.skatepark_picker.no_results') %>"
-  data-admin--skatepark-picker-results-count-one-value="<%= t('admin.skatepark_picker.results_count_one') %>"
-  data-admin--skatepark-picker-results-count-other-value="<%= t('admin.skatepark_picker.results_count_other', count: '{count}') %>"
-  data-admin--skatepark-picker-selection-required-value="<%= t('admin.skatepark_picker.selection_required') %>"
+  data-admin--skatepark-picker-no-results-text-value="<%= @no_results_text %>"
+  data-admin--skatepark-picker-results-count-one-value="<%= @results_count_one %>"
+  data-admin--skatepark-picker-results-count-other-value="<%= @results_count_other %>"
+  data-admin--skatepark-picker-selection-required-value="<%= @selection_required_text %>"
 >
   <label for="<%= combobox_input_id %>" class="block text-sm font-medium text-neutral-700 dark:text-neutral-200">
     <%= @label %>

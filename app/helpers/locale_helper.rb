@@ -16,7 +16,7 @@ module LocaleHelper
   def locale_switch_url_options(locale)
     options = {
       country_code: params[:country_code],
-      state: params[:state],
+      city_id: params[:city_id],
       distance: params[:distance],
       lat: params[:lat],
       lng: params[:lng],

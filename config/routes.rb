@@ -38,7 +38,7 @@ Rails.application.routes.draw do
       mount Sidekiq::Web => '/sidekiq'
     end
 
-    get 'states/:country_code', to: 'skateparks#states'
+    get 'cities', to: 'skateparks#cities'
   end
 
   if Rails.env.production?
@@ -51,7 +51,7 @@ Rails.application.routes.draw do
     resource :video_suggestion, only: :create, module: :skateparks
   end
 
-  get 'available_states(/:country_code)', to: 'skateparks#available_states'
+  get 'available_cities(/:country_code)', to: 'skateparks#available_cities'
 
   get 'healthcheck' => 'rails/health#show', as: :rails_health_check
 

@@ -55,9 +55,9 @@ Four files define MCP servers for different clients. **Keep the same servers, UR
 
 **Servers:** [GitHub MCP](https://github.com/github/github-mcp-server) remote at `https://api.githubcopilot.com/mcp/`; [Linear MCP](https://linear.app/docs/mcp) at `https://mcp.linear.app/mcp`; [Exa MCP](https://docs.exa.ai/reference/mcp) at `https://mcp.exa.ai/mcp`; [Context7 MCP](https://github.com/upstash/context7) at `https://mcp.context7.com/mcp`; [Cloudflare API MCP](https://github.com/cloudflare/mcp) at `https://mcp.cloudflare.com/mcp` (Bearer `CLOUDFLARE_API_TOKEN`; covers DNS, R2, Email Routing, Registrar via Code Mode) + [Cloudflare Docs MCP](https://github.com/cloudflare/mcp-server-cloudflare) at `https://docs.mcp.cloudflare.com/mcp` (no auth); [Dokploy MCP](https://github.com/Dokploy/mcp) stdio via `npx -y @dokploy/mcp@latest` with `DOKPLOY_TOOL_PRESET=deploy`. The deprecated npm package `@modelcontextprotocol/server-github` is not used.
 
-**Node / `npx`:** [`bin/mcp-npx`](../bin/mcp-npx) remains available for any future stdio MCP servers that need `npx` with a login-shell `PATH` (common with nvm/fnm).
+**Node / `npx`:** use `npx` directly for future stdio MCP servers; no project wrapper is currently committed.
 
-**Optional local storage:** export the tokens above in your shell profile (`~/.zshrc` or `~/.bashrc`). See [README.md](../README.md) setup step 12.
+**Optional shell setup:** export the tokens above from a file sourced by every shell (`~/.zshenv` on zsh; `~/.zshrc` is not read by non-interactive shells). See [README.md](../README.md) setup step 12.
 
 Do not add GitHub Copilot-specific MCP endpoints or agent files to this repository.
 

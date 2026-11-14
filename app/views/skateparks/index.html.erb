@@ -1,5 +1,5 @@
 <div id="skateparks">
-  <%= render "skatepark_filters", countries: @countries, states: @states %>
+  <%= render "skatepark_filters", countries: @countries, cities: @cities %>
 
   <% if @skateparks.total_pages > 1 %>
     <%= link_to t("skip_to_pagination"), "#skatepark-pagination", class: "skip-link" %>

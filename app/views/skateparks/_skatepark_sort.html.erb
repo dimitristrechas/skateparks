@@ -9,7 +9,7 @@
                 data: { "skateparks--geolocation-target": "sortForm" } do |form| %>
     <%= form.hidden_field :locale, value: I18n.locale %>
     <%= form.hidden_field :country_code, value: params[:country_code], disabled: params[:country_code].blank? %>
-    <%= form.hidden_field :state, value: params[:state], disabled: params[:state].blank? || params[:country_code].blank? %>
+    <%= form.hidden_field :city_id, value: params[:city_id], disabled: params[:city_id].blank? || params[:country_code].blank? %>
     <%= form.hidden_field :distance, value: selected_distance, disabled: selected_distance.blank? %>
 
     <%= form.hidden_field :lat,

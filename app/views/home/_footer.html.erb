@@ -8,4 +8,12 @@
   <hr class="my-6 border-neutral-400 sm:mx-auto lg:my-8 dark:border-neutral-700">
 
   <div class="text-center"><%= t("made_with") %> ❤️ <%= "#{t("city_of_origin")} #{Time.zone.now.year}" %> 🛹</div>
+
+  <div class="mt-2 text-center text-xs text-neutral-500 dark:text-neutral-400">
+    <%= link_to t("city_data_attribution"),
+                "https://www.geonames.org/",
+                target: "_blank",
+                rel: "noopener",
+                class: "underline hover:no-underline" %>
+  </div>
 </footer>

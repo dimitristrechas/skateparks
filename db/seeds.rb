@@ -32,6 +32,11 @@ def random_european_location
   }
 end
 
+def city_for(location)
+  cities = CityDataset.for_country(location[:country].alpha2)
+  cities.find { |city| city['subdivision'] == location[:subdivision].code } || cities.first
+end
+
 def build_skatepark(location, suffix)
   Skatepark.new(
     name_en: skatepark_name(location[:subdivision].name, suffix),
@@ -42,7 +47,7 @@ def build_skatepark(location, suffix)
     lng: location[:lng],
     status: :published,
     country_code: location[:country].alpha2,
-    state: location[:subdivision].code
+    city_geoname_id: city_for(location)&.dig('id')
   )
 end
 

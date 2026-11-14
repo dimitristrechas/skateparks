@@ -20,10 +20,11 @@ export default class extends Controller {
     "newVideoUrlInput",
     "sortableList",
     "sortableVideoList",
-    "stateSelect",
+    "cityPicker",
   ];
 
   static values = {
+    locale: String,
     confirmDelete: String,
     confirmDeleteVideo: String,
     imageAltPattern: String,
@@ -53,9 +54,7 @@ export default class extends Controller {
     this.itemElementCache = new WeakMap();
     this.pendingUploads = new Map();
 
-    if (this.countrySelectTarget.value) {
-      this.fetchStates(this.countrySelectTarget.value);
-    }
+    this.updateCityPicker(this.countrySelectTarget.value);
 
     this.sortable = this.hasSortableListTarget ? this.createSortable(this.sortableListTarget) : null;
     this.videoSortable = this.hasSortableVideoListTarget ? this.createSortable(this.sortableVideoListTarget) : null;
@@ -71,31 +70,31 @@ export default class extends Controller {
   }
 
   onCountryChange(event) {
-    if (event.target.value) {
-      this.fetchStates(event.target.value);
-    } else {
-      this.stateSelectTarget.innerHTML = "";
-      this.stateSelectTarget.disabled = true;
-    }
+    this.updateCityPicker(event.target.value, { clear: true });
   }
 
-  fetchStates(countryCode) {
-    fetch(`/admin/states/${countryCode}`)
-      .then((response) => response.json())
-      .then((states) => {
-        this.stateSelectTarget.innerHTML = this.buildStateOptions(states);
-        this.stateSelectTarget.disabled = false;
-      });
-  }
+  updateCityPicker(countryCode, { clear = false } = {}) {
+    if (!this.hasCityPickerTarget) return;
 
-  buildStateOptions(states) {
-    return Object.entries(states)
-      .map(([code, state]) => {
-        const selected = code === this.stateSelectTarget.value ? "selected" : "";
+    const picker = this.cityPickerTarget.querySelector('[data-controller~="admin--skatepark-picker"]');
+    if (!picker) return;
 
-        return `<option ${selected} value="${code}">${state.name}</option>`;
-      })
-      .join("");
+    const params = new URLSearchParams();
+    if (countryCode) params.set("country_code", countryCode);
+    if (this.localeValue && this.localeValue !== "en") params.set("locale", this.localeValue);
+
+    picker.dataset.adminSkateparkPickerSearchUrlValue = params.toString()
+      ? `/admin/cities?${params.toString()}`
+      : "/admin/cities";
+
+    const input = picker.querySelector('[data-admin--skatepark-picker-target="input"]');
+    if (input) input.disabled = !countryCode;
+
+    if (!clear) return;
+
+    const hiddenInput = picker.querySelector('[data-admin--skatepark-picker-target="hiddenInput"]');
+    if (hiddenInput) hiddenInput.value = "";
+    if (input) input.value = "";
   }
 
   moveUp(event) {

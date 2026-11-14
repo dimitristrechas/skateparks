@@ -2,10 +2,12 @@ en:
   opens_in_new_tab: "(opens in new tab)"
   made_with: "Made with"
   city_of_origin: "Kavala, Greece"
+  city_data_attribution: "City data by GeoNames (CC BY 4.0)"
   photos: "photos"
   videos: "videos"
   country: "Country"
-  country_state: "State/Region"
+  city: "City"
+  select_city: "Search for a city…"
   back_to_skateparks: "Back to all skateparks"
   back_to_admin: "Back to admin homepage"
   open_in_google_maps: "Open skatepark in google maps"
@@ -92,7 +94,7 @@ en:
   reset_filters: "Reset"
   filters: "Filters"
   all_countries: "All"
-  all_states: "All"
+  all_cities: "All"
   all_distances: "All"
   distance: "Distance from you"
   within_distance: "%{distance} km"
@@ -254,7 +256,7 @@ en:
       index_title: "List of skateparks"
       new_skatepark: "New skatepark"
       destroy: "destroy"
-      location: "Country / State"
+      location: "Country / City"
       search_label: "Search by name"
       search_placeholder: "Search in English or Greek…"
       all_statuses: "All statuses"
@@ -372,6 +374,11 @@ en:
       results_count_one: "1 skatepark available"
       results_count_other: "%{count} skateparks available"
       selection_required: "Please select a skatepark from the list."
+    city_picker:
+      no_results: "No matching cities found."
+      results_count_one: "1 city available"
+      results_count_other: "%{count} cities available"
+      selection_required: "Please select a city from the list."
     video_suggestions:
       title: "Video suggestions"
       pending_count:
@@ -400,6 +407,7 @@ en:
   activerecord:
     attributes:
       skatepark:
+        city_geoname_id: "City"
         skatepark_images: "Images"
         skatepark_videos: "Videos"
       skatepark_video:
