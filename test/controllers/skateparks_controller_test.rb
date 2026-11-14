@@ -38,28 +38,26 @@ class SkateparksControllerTest < ActionDispatch::IntegrationTest
     assert_not_includes assigns(:skateparks), greece_skatepark
   end
 
-  def test_get_index_filters_by_country_code_and_state
-    california_skatepark = create(:skatepark, country_code: 'US', state: 'CA')
-    texas_skatepark = create(:skatepark, country_code: 'US', state: 'TX')
-    greece_skatepark = create(:skatepark, country_code: 'GR')
+  def test_get_index_filters_by_country_code_and_city
+    athens_skatepark = create(:skatepark, city_geoname_id: 264_371)
+    thessaloniki_skatepark = create(:skatepark, city_geoname_id: 734_077)
+    us_skatepark = create(:skatepark, :us_location)
 
-    get skateparks_path(country_code: 'US', state: 'CA')
+    get skateparks_path(country_code: 'GR', city_id: 264_371)
 
-    assert_includes assigns(:skateparks), california_skatepark
-    assert_not_includes assigns(:skateparks), texas_skatepark
-    assert_not_includes assigns(:skateparks), greece_skatepark
+    assert_includes assigns(:skateparks), athens_skatepark
+    assert_not_includes assigns(:skateparks), thessaloniki_skatepark
+    assert_not_includes assigns(:skateparks), us_skatepark
   end
 
-  def test_get_index_ignores_state_filter_when_country_code_missing
-    california_skatepark = create(:skatepark, country_code: 'US', state: 'CA')
-    texas_skatepark = create(:skatepark, country_code: 'US', state: 'TX')
-    greece_skatepark = create(:skatepark, country_code: 'GR')
+  def test_get_index_ignores_city_filter_when_country_code_missing
+    athens_skatepark = create(:skatepark, city_geoname_id: 264_371)
+    thessaloniki_skatepark = create(:skatepark, city_geoname_id: 734_077)
 
-    get skateparks_path(state: 'CA')
+    get skateparks_path(city_id: 264_371)
 
-    assert_includes assigns(:skateparks), california_skatepark
-    assert_includes assigns(:skateparks), texas_skatepark
-    assert_includes assigns(:skateparks), greece_skatepark
+    assert_includes assigns(:skateparks), athens_skatepark
+    assert_includes assigns(:skateparks), thessaloniki_skatepark
   end
 
   def test_get_index_returns_all_published_skateparks_with_no_filters
@@ -214,16 +212,16 @@ class SkateparksControllerTest < ActionDispatch::IntegrationTest
     assert_equal [nearest_skatepark.id, middle_skatepark.id, farthest_skatepark.id], assigns(:skateparks).map(&:id)
   end
 
-  def test_get_index_combines_distance_country_and_state_filters
-    california_skatepark = create_us_skatepark(name: 'California Park', lat: 0.0, lng: 0.05, state: 'CA')
-    texas_skatepark = create_us_skatepark(name: 'Texas Park', lat: 0.0, lng: 0.05, state: 'TX')
-    greece_skatepark = create(:skatepark, name_en: 'Greece Park', name_el: 'Greece Park', lat: 0.0, lng: 0.05)
+  def test_get_index_combines_distance_country_and_city_filters
+    athens_skatepark = create(:skatepark, name_en: 'Athens Park', name_el: 'Athens Park',
+                                          city_geoname_id: 264_371, lat: 0.0, lng: 0.05)
+    thessaloniki_skatepark = create(:skatepark, name_en: 'Thessaloniki Park', name_el: 'Thessaloniki Park',
+                                                city_geoname_id: 734_077, lat: 0.0, lng: 0.05)
 
-    get skateparks_path(country_code: 'US', state: 'CA', lat: 0, lng: 0, distance: 25)
+    get skateparks_path(country_code: 'GR', city_id: 264_371, lat: 0, lng: 0, distance: 25)
 
-    assert_includes assigns(:skateparks), california_skatepark
-    assert_not_includes assigns(:skateparks), texas_skatepark
-    assert_not_includes assigns(:skateparks), greece_skatepark
+    assert_includes assigns(:skateparks), athens_skatepark
+    assert_not_includes assigns(:skateparks), thessaloniki_skatepark
   end
 
   def test_get_index_falls_back_to_alphabetical_order_when_distance_params_are_invalid
@@ -369,16 +367,21 @@ class SkateparksControllerTest < ActionDispatch::IntegrationTest
     assert_instance_of ISO3166::Country, assigns(:countries).first
   end
 
-  def test_get_index_assigns_empty_states_when_no_country_selected
+  def test_get_index_assigns_empty_cities_when_no_country_selected
     get skateparks_path
 
-    assert_equal [], assigns(:states)
+    assert_equal [], assigns(:cities)
   end
 
-  def test_get_index_assigns_states_when_country_code_provided
+  def test_get_index_assigns_cities_used_by_published_skateparks
+    create(:skatepark, city_geoname_id: 734_077)
+
     get skateparks_path(country_code: 'GR')
 
-    assert_instance_of Array, assigns(:states)
+    city_ids = assigns(:cities).pluck('id')
+
+    assert_includes city_ids, 264_371
+    assert_includes city_ids, 734_077
   end
 
   def test_get_show_returns_success_and_assigns_skatepark
@@ -589,78 +592,82 @@ class SkateparksControllerTest < ActionDispatch::IntegrationTest
     assert_not_includes response.body, 'previewVideo-1'
   end
 
-  def test_get_available_states_returns_json_with_country_code
+  def test_get_available_cities_returns_json_with_country_code
     Rails.cache.clear
-    create(:skatepark, country_code: 'US', state: 'CA')
-    create(:skatepark, country_code: 'US', state: 'TX')
+    create(:skatepark, city_geoname_id: 264_371)
+    create(:skatepark, city_geoname_id: 734_077)
 
-    get '/available_states', params: { country_code: 'US' }, as: :json
+    get '/available_cities', params: { country_code: 'GR' }, as: :json
 
     assert_response :success
     assert_match(/json/, response.content_type)
     json_response = response.parsed_body
 
     assert_instance_of Array, json_response
-    assert_includes json_response.pluck('code'), 'CA'
-    assert_includes json_response.pluck('code'), 'TX'
+    assert_equal [264_371, 734_077], json_response.pluck('id')
+    assert_equal %w[Athens Thessaloniki], json_response.pluck('name')
   end
 
-  def test_get_available_states_returns_turbo_stream_with_country_code
+  def test_get_available_cities_returns_localized_names
     Rails.cache.clear
-    create(:skatepark, country_code: 'US', state: 'CA')
-    create(:skatepark, country_code: 'US', state: 'TX')
+    create(:skatepark, city_geoname_id: 264_371)
 
-    get '/available_states', params: { country_code: 'US' }, as: :turbo_stream
+    get '/available_cities', params: { country_code: 'GR', locale: 'el' }, as: :json
+
+    assert_equal ['Αθήνα'], response.parsed_body.pluck('name')
+  end
+
+  def test_get_available_cities_returns_turbo_stream_with_country_code
+    Rails.cache.clear
+    create(:skatepark, city_geoname_id: 264_371)
+
+    get '/available_cities', params: { country_code: 'GR' }, as: :turbo_stream
 
     assert_response :success
     assert_match(/turbo-stream/, response.content_type)
     assert_includes response.body, 'turbo-stream'
-    assert_includes response.body, 'state_select'
+    assert_includes response.body, 'city_select'
   end
 
-  def test_get_available_states_filters_states_by_selected_country
+  def test_get_available_cities_filters_cities_by_selected_country
     Rails.cache.clear
-    create(:skatepark, country_code: 'US', state: 'CA')
-    create(:skatepark, country_code: 'US', state: 'TX')
-    create(:skatepark, country_code: 'GR', state: 'I')
+    create(:skatepark, city_geoname_id: 264_371)
+    create(:skatepark, :us_location)
 
-    get '/available_states', params: { country_code: 'US' }, as: :json
-    json_response = response.parsed_body
+    get '/available_cities', params: { country_code: 'US' }, as: :json
+    city_ids = response.parsed_body.pluck('id')
 
-    assert_includes json_response.pluck('code'), 'CA'
-    assert_includes json_response.pluck('code'), 'TX'
-    assert_not_includes json_response.pluck('code'), 'I'
+    assert_includes city_ids, 5_368_361
+    assert_not_includes city_ids, 264_371
   end
 
-  def test_get_available_states_returns_empty_array_json_without_country_code
-    get '/available_states', as: :json
-
-    assert_response :success
-    json_response = response.parsed_body
-
-    assert_equal [], json_response
-  end
-
-  def test_get_available_states_returns_empty_array_json_with_invalid_country_code
-    get '/available_states', params: { country_code: 'ZZ' }, as: :json
+  def test_get_available_cities_returns_empty_array_json_without_country_code
+    get '/available_cities', as: :json
 
     assert_response :success
     assert_equal [], response.parsed_body
   end
 
-  def test_get_available_states_returns_empty_states_turbo_stream_without_country_code
-    get '/available_states', as: :turbo_stream
+  def test_get_available_cities_returns_empty_array_json_with_invalid_country_code
+    get '/available_cities', params: { country_code: 'ZZ' }, as: :json
 
     assert_response :success
-    assert_equal [], assigns(:states)
+    assert_equal [], response.parsed_body
   end
 
-  def test_get_available_states_returns_empty_states_turbo_stream_with_invalid_country_code
-    get '/available_states', params: { country_code: 'ZZ' }, as: :turbo_stream
+  def test_get_available_cities_returns_empty_cities_turbo_stream_without_country_code
+    get '/available_cities', as: :turbo_stream
+
+    assert_response :success
+    assert_equal [], assigns(:cities)
+  end
+
+  def test_get_available_cities_returns_empty_cities_turbo_stream_with_invalid_country_code
+    get '/available_cities', params: { country_code: 'ZZ' }, as: :turbo_stream
 
     assert_response :success
     assert_match(/turbo-stream/, response.content_type)
-    assert_equal [], assigns(:states)
+    assert_equal [], assigns(:cities)
     assert_includes response.body, 'disabled'
   end
 
@@ -668,7 +675,7 @@ class SkateparksControllerTest < ActionDispatch::IntegrationTest
     get skateparks_path(country_code: 'ZZ')
 
     assert_response :success
-    assert_equal [], assigns(:states)
+    assert_equal [], assigns(:cities)
   end
 
   def test_index_renders_styled_pagination_on_the_first_page
@@ -786,13 +793,12 @@ class SkateparksControllerTest < ActionDispatch::IntegrationTest
     Kaminari.config.stubs(:default_per_page).returns(1)
   end
 
-  def create_us_skatepark(name:, lat:, lng:, state: 'CA')
+  def create_us_skatepark(name:, lat:, lng:)
     create(
       :skatepark,
+      :us_location,
       name_en: name,
       name_el: name,
-      country_code: 'US',
-      state: state,
       lat: lat,
       lng: lng
     )

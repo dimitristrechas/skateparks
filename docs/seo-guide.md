@@ -38,22 +38,24 @@ Every public page resolves metadata in this order:
 
 1. **Controller assigns** — `@title`, `@meta_description`, `@meta_image` when set.
 2. **Partials** — `_title.html.erb` and `_description.html.erb` fall back to `t('application.title')` and `t('application.meta_description')`.
-3. **Social helpers** — `social_title`, `social_description`, and `social_image` in `SeoHelper` read the same controller assigns and fall back again for OG/Twitter tags.
+3. **Social helpers** — `social_title`, `social_description`, and `social_image` in `SeoHelper` build OG/Twitter tags. Title and description resolve in the **default locale** (English) and ignore localized `@title`/`@meta_description` (SK8-99); `social_image` uses the assigned image or falls back to `logo-og.png`.
 4. **JSON-LD** — `SchemaHelper` uses the same values (or skatepark-specific methods on show pages).
 
 ---
 
 ## Page-by-page metadata
 
-| Page               | Controller action  | `@title`              | `@meta_description`             | `@meta_image`   | JSON-LD schema                |
-| ------------------ | ------------------ | --------------------- | ------------------------------- | --------------- | ----------------------------- |
-| Homepage           | `home#index`       | _(default)_           | _(default)_                     | `logo-og.png`   | `WebPage`                     |
-| Skateparks index   | `skateparks#index` | _(default)_           | _(default)_                     | `logo-og.png`   | `CollectionPage` + `ItemList` |
-| Skatepark show     | `skateparks#show`  | `skatepark.seo_title` | `skatepark.seo_description`     | Cover image URL | `SportsActivityLocation`      |
-| About              | `home#about`       | `t('about.title')`    | `t('about_details')`            | `logo-og.png`   | `WebPage`                     |
-| Contact            | `home#contact`     | `t('contact')`        | `t('contact_details')`          | `logo-og.png`   | `WebPage`                     |
-| Privacy            | `home#privacy`     | `t('privacy.title')`  | `t('privacy.meta_description')` | `logo-og.png`   | `WebPage`                     |
-| Admin (`/admin/*`) | various            | _(default)_           | _(default)_                     | `logo-og.png`   | `WebPage`                     |
+| Page               | Controller action  | `@title`              | `@meta_description`             | `@meta_image` / social image    | JSON-LD schema                |
+| ------------------ | ------------------ | --------------------- | ------------------------------- | ------------------------------- | ----------------------------- |
+| Homepage           | `home#index`       | _(default)_           | _(default)_                     | _(unset; logo-og.png fallback)_ | `WebPage`                     |
+| Skateparks index   | `skateparks#index` | _(default)_           | _(default)_                     | _(unset; logo-og.png fallback)_ | `CollectionPage` + `ItemList` |
+| Skatepark show     | `skateparks#show`  | `skatepark.seo_title` | `skatepark.seo_description`     | Cover image URL                 | `SportsActivityLocation`      |
+| About              | `home#about`       | `t('about.title')`    | `t('about_details')`            | _(unset; logo-og.png fallback)_ | `WebPage`                     |
+| Contact            | `home#contact`     | `t('contact')`        | `t('contact_details')`          | _(unset; logo-og.png fallback)_ | `WebPage`                     |
+| Privacy            | `home#privacy`     | `t('privacy.title')`  | `t('privacy.meta_description')` | _(unset; logo-og.png fallback)_ | `WebPage`                     |
+| Admin (`/admin/*`) | various            | _(default)_           | _(default)_                     | _(unset; logo-og.png fallback)_ | `WebPage`                     |
+
+Only `skateparks#show` assigns `@meta_image`; all other pages use the `social_image` fallback. `<title>` and meta description stay localized, but OG/Twitter title and description always use default-locale English copy.
 
 Site-wide defaults live in `config/locales/en.yml` and `config/locales/el.yml` under `application.title` and `application.meta_description`.
 
@@ -180,15 +182,16 @@ Static error pages in `public/` (`400.html`, `404.html`, `422.html`, `500.html`,
 
 Rendered on every page (including admin):
 
-| Tag                                      | Source                                                                 |
-| ---------------------------------------- | ---------------------------------------------------------------------- |
-| `og:title` / `twitter:title`             | `social_title`                                                         |
-| `og:description` / `twitter:description` | `social_description`                                                   |
-| `og:image` / `twitter:image`             | `social_image`                                                         |
-| `og:site_name`                           | Hard-coded `Skateparks.gr`                                             |
-| `og:type`                                | Hard-coded `website`                                                   |
-| `twitter:card`                           | `summary_large_image`                                                  |
-| `og:url`                                 | `canonical_url` on public pages; `url_for(protocol: 'https')` on admin |
+| Tag                                      | Source                                                                                        |
+| ---------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `og:title` / `twitter:title`             | `social_title` (default-locale English)                                                       |
+| `og:description` / `twitter:description` | `social_description` (default-locale English)                                                 |
+| `og:image` / `twitter:image`             | `social_image`                                                                                |
+| `og:locale` / `og:locale:alternate`      | `og_locale` / `og_locale_alternates`: `en_US`; alternatives list other locales (e.g. `el_GR`) |
+| `og:site_name`                           | Hard-coded `Skateparks.gr`                                                                    |
+| `og:type`                                | Hard-coded `website`                                                                          |
+| `twitter:card`                           | `summary_large_image`                                                                         |
+| `og:url`                                 | `canonical_url` on public pages; `url_for(protocol: 'https')` on admin                        |
 
 Default social image: `app/assets/images/logo-og.png`.
 
@@ -221,16 +224,17 @@ Rendered only on **public** pages (`public_seo_page?` returns false for `/admin/
 
 **File:** `app/helpers/seo_helper.rb`
 
-| Method / constant         | Purpose                                                                              |
-| ------------------------- | ------------------------------------------------------------------------------------ |
-| `LOCALE_ALTERNATE_PARAMS` | `%i[country_code state page]` — filter/pagination params preserved in alternate URLs |
-| `public_seo_page?`        | `true` unless `request.path` starts with `/admin`                                    |
-| `seo_page_url(locale:)`   | Full HTTPS URL for current path + locale + filtered query params                     |
-| `canonical_url`           | `seo_page_url(locale: I18n.locale)`                                                  |
-| `hreflang_link_tags`      | Alternate links for `en`, `el`, and `x-default`                                      |
-| `social_title`            | `view_assigns['title']` → `t('application.title')`                                   |
-| `social_description`      | `view_assigns['meta_description']` → `t('application.meta_description')`             |
-| `social_image`            | `view_assigns['meta_image']` → `image_url('logo-og.png')`                            |
+| Method / constant                    | Purpose                                                                                                                                              |
+| ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `LOCALE_ALTERNATE_PARAMS`            | `%i[country_code city_id sort page]` — filter/sort/pagination params preserved in alternate URLs                                                     |
+| `public_seo_page?`                   | `true` unless `request.path` starts with `/admin`                                                                                                    |
+| `seo_page_url(locale:)`              | Full HTTPS URL for current path + locale + filtered query params                                                                                     |
+| `canonical_url`                      | `seo_page_url(locale: I18n.locale)`                                                                                                                  |
+| `hreflang_link_tags`                 | Alternate links for `en`, `el`, and `x-default`                                                                                                      |
+| `social_title`                       | Optional `social_title` assign → skatepark default-locale `seo_title` → static-page default-locale copy → `application.title`                        |
+| `social_description`                 | Optional `social_description` assign → skatepark default-locale `seo_description` → static-page default-locale copy → `application.meta_description` |
+| `social_image`                       | `view_assigns['meta_image']` → `image_url('logo-og.png')`                                                                                            |
+| `og_locale` / `og_locale_alternates` | `en_US` for the default locale; alternates map other locales (e.g. `el_GR`)                                                                          |
 
 ### HTTPS in URLs
 
@@ -242,7 +246,7 @@ Rendered only on **public** pages (`public_seo_page?` returns false for `/admin/
 - `ApplicationController#default_url_options` adds `locale: I18n.locale` only when the current locale is not the default.
 - Explicit `?locale=en` requests receive a **301 redirect** to the clean URL, consolidating duplicate English URLs for crawlers.
 - `x-default` hreflang points at the default-locale URL (no `locale` param).
-- Language switcher (`app/views/home/_locale_selector.html.erb`) and hreflang links preserve `country_code`, `state`, and `page` when present — keeping filtered index URLs consistent across locales.
+- Language switcher (`app/views/home/_locale_selector.html.erb`) preserves `country_code`, `city_id`, `distance`, `lat`, `lng`, `sort`, and `page`; hreflang links preserve only `LOCALE_ALTERNATE_PARAMS` (`country_code`, `city_id`, `sort`, `page`).
 
 ---
 
@@ -279,14 +283,14 @@ When the skateparks URL already contains a query string (e.g. `?locale=en`), the
 
 ### Skatepark structured data fields
 
-| Field         | Source                                                             |
-| ------------- | ------------------------------------------------------------------ |
-| `name`        | `skatepark.seo_title` (aligned with `<title>` and OG)              |
-| `description` | `skatepark.seo_description`                                        |
-| `url` / `@id` | `skatepark_url(protocol: 'https')`                                 |
-| `image`       | Cover image + gallery images (max 5)                               |
-| `geo`         | `GeoCoordinates` when lat/lng present                              |
-| `address`     | `PostalAddress` with `addressCountry` and optional `addressRegion` |
+| Field         | Source                                                                                                |
+| ------------- | ----------------------------------------------------------------------------------------------------- |
+| `name`        | `skatepark.seo_title` (current locale for JSON-LD/`<title>`; OG/Twitter use the default-locale value) |
+| `description` | `skatepark.seo_description`                                                                           |
+| `url` / `@id` | `skatepark_url(protocol: 'https')`                                                                    |
+| `image`       | Cover image + gallery images (max 5)                                                                  |
+| `geo`         | `GeoCoordinates` when lat/lng present                                                                 |
+| `address`     | `PostalAddress` with `addressCountry`, optional `addressLocality`, and optional `addressRegion`       |
 
 ---
 
@@ -503,12 +507,11 @@ SEO behavior is covered by Minitest across models, controllers, and helpers.
 
 Not currently tested (worth adding if SEO regressions are a concern):
 
-- Open Graph tags in rendered HTML
 - JSON-LD content in rendered HTML
 - `canonical_url` / `hreflang_link_tags` unit tests (partial — see `test/helpers/seo_helper_test.rb`)
-- `skatepark_schema` and `collection_page_schema` builders
+- Full `skatepark_schema` object and `collection_page_schema` builder (address helper is covered)
 - Sitemap XML output contents (helper covered in `test/lib/sitemap_locale_helper_test.rb`)
-- Homepage and skateparks index default metadata
+- Homepage and skateparks index default `<title>` / meta description assignments
 
 Run SEO-related tests:
 
@@ -528,7 +531,7 @@ sh scripts.sh test test/helpers/schema_helper_test.rb
 3. **`contact_details`** is a minimal meta description ("Contact" / "Στοιχεία επικοινωνίας") — weak for SERP snippets.
 4. **Custom `meta_description`** overrides are not truncated or validated — long admin input can produce long SERP snippets.
 5. **`organization_schema` `sameAs`** is an empty array placeholder for future social profile URLs.
-6. **Filter query params** (`country_code`, `state`, `page`) are preserved in canonical/hreflang URLs on any page where they appear in the request — including show pages if bookmarked with index filters.
+6. **Filter query params** (`country_code`, `city_id`, `sort`, `page`) are preserved in canonical/hreflang URLs on any page where they appear in the request — including show pages if bookmarked with index filters.
 7. **Slug is always derived from `name_en`** — URL path is locale-neutral; only `?locale=el` differs for Greek.
 
 ---

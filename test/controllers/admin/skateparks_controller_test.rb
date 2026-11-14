@@ -136,6 +136,15 @@ module Admin
       assert_includes response.body, I18n.t('admin.skateparks.form.seo_heading')
     end
 
+    def test_get_edit_renders_city_picker_with_selected_city
+      get edit_admin_skatepark_path(@skatepark)
+
+      assert_response :success
+      assert_select 'input[type="hidden"][name="skatepark[city_geoname_id]"][value="264371"]', visible: :all
+      assert_select 'input[role="combobox"][value="Athens"]'
+      assert_includes response.body, 'data-admin--skatepark-picker-search-url-value="/admin/cities?country_code=GR"'
+    end
+
     def test_patch_update_persists_seo_fields
       patch admin_skatepark_path(@skatepark), params: {
         skatepark: {
@@ -175,6 +184,7 @@ module Admin
       skatepark = Skatepark.order(:id).last
 
       assert_equal [1, 2], skatepark.skatepark_images.pluck(:position)
+      assert_equal 264_371, skatepark.city_geoname_id
     end
 
     def test_post_create_respects_new_image_positions
@@ -258,6 +268,15 @@ module Admin
       patch admin_skatepark_path(@skatepark), params: { skatepark: new_attributes }
 
       assert_redirected_to admin_skateparks_url
+    end
+
+    def test_patch_update_assigns_city_geoname_id
+      patch admin_skatepark_path(@skatepark), params: {
+        skatepark: { city_geoname_id: 734_077 },
+      }
+
+      assert_redirected_to admin_skateparks_url
+      assert_equal 734_077, @skatepark.reload.city_geoname_id
     end
 
     def test_patch_update_with_invalid_params_renders_edit_template
@@ -441,19 +460,27 @@ module Admin
       assert_match(/not authorized/, flash[:alert])
     end
 
-    def test_get_states_returns_json_for_valid_country_code
-      get '/admin/states/US', as: :json
+    def test_get_cities_returns_matching_cities
+      get '/admin/cities', params: { country_code: 'GR', q: 'Thess' }, as: :json
 
       assert_response :success
       assert_match(/json/, response.content_type)
-      assert_includes response.parsed_body.keys, 'CA'
+      assert_equal 734_077, response.parsed_body.first['id']
+      assert_equal 'Thessaloniki', response.parsed_body.first['name']
     end
 
-    def test_get_states_returns_empty_json_for_invalid_country_code
-      get '/admin/states/ZZ', as: :json
+    def test_get_cities_returns_localized_names
+      get '/admin/cities', params: { country_code: 'GR', q: 'Αθή', locale: 'el' }, as: :json
 
       assert_response :success
-      assert_equal({}, response.parsed_body)
+      assert_equal ['Αθήνα'], response.parsed_body.pluck('name')
+    end
+
+    def test_get_cities_returns_empty_array_for_invalid_country_code
+      get '/admin/cities', params: { country_code: 'ZZ' }, as: :json
+
+      assert_response :success
+      assert_equal [], response.parsed_body
     end
 
     private
@@ -475,7 +502,7 @@ module Admin
         google_id: 'test-google-id',
         status: 'published',
         country_code: 'GR',
-        state: 'I',
+        city_geoname_id: 264_371,
       }
     end
 
@@ -491,7 +518,7 @@ module Admin
         new_images: [],
         status: nil,
         country_code: nil,
-        state: nil,
+        city_geoname_id: nil,
       }
     end
 

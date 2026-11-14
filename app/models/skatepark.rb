@@ -72,7 +72,7 @@ class Skatepark < ApplicationRecord
   validates :description, presence: true
   validates :status, presence: true, inclusion: { in: statuses.keys }
   validates :country_code, presence: true, inclusion: { in: ISO3166::Country.codes }
-  validates :state, presence: true
+  validates :city_geoname_id, presence: true
   validate :minimum_skatepark_images
   validate :unique_uploaded_image_filenames
 
@@ -88,12 +88,22 @@ class Skatepark < ApplicationRecord
     ISO3166::Country[country_code]
   end
 
-  def state_name
-    country.subdivisions[state]&.name if state.present?
+  def city_name
+    return if city_geoname_id.blank?
+
+    city = CityDataset.find(country_code, city_geoname_id)
+    CityDataset.localized_name(city) if city
+  end
+
+  def region_name
+    return if city_geoname_id.blank?
+
+    city = CityDataset.find(country_code, city_geoname_id)
+    CityDataset.region_name(city, country) if city
   end
 
   def location_name
-    "#{translated_state_name}, #{translated_country_name}"
+    [city_name, region_name, translated_country_name].compact_blank.join(', ')
   end
 
   def seo_title
@@ -112,12 +122,6 @@ class Skatepark < ApplicationRecord
   end
 
   private
-
-  def translated_state_name
-    subdivision = country&.subdivisions&.[](state)
-
-    subdivision&.translations&.[](I18n.locale) || state_name
-  end
 
   def translated_country_name
     country&.translation(I18n.locale) || country_code
@@ -165,19 +169,30 @@ class Skatepark < ApplicationRecord
   end
 
   def clear_countries_cache
-    Rails.cache.delete('skateparks_countries') if saved_change_to_country_code? || saved_change_to_status?
+    return unless destroyed? || saved_change_to_country_code? || saved_change_to_status?
+
+    Rails.cache.delete('skateparks_countries')
   end
 
   def clear_location_caches
-    return unless saved_change_to_country_code? || saved_change_to_state? || saved_change_to_status?
+    return unless location_cache_changed?
 
-    Rails.cache.delete('skateparks_countries')
-    Rails.cache.delete("skateparks_states_#{country_code}") if country_code.present?
-    Rails.cache.delete("skateparks_states_#{country_code_before_last_save}") if country_code_before_last_save.present?
+    clear_location_cache(country_code)
+    clear_location_cache(country_code_before_last_save)
+  end
+
+  def location_cache_changed?
+    destroyed? || saved_change_to_country_code? || saved_change_to_city_geoname_id? || saved_change_to_status?
+  end
+
+  def clear_location_cache(code)
+    return if code.blank?
+
+    Rails.cache.delete("skateparks_cities_#{code}")
   end
 
   def clear_skateparks_latest_cache
-    return unless saved_change_to_country_code? || saved_change_to_status?
+    return unless destroyed? || saved_change_to_country_code? || saved_change_to_status?
 
     self.class.clear_homepage_caches
   end

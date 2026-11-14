@@ -54,4 +54,14 @@ class SchemaHelperTest < ActionView::TestCase
       assert_equal I18n.t('application.meta_description', locale: :el), schema[:description]
     end
   end
+
+  def test_skatepark_schema_address_includes_city_and_region
+    skatepark = build(:skatepark)
+
+    schema = skatepark_schema_address(skatepark)
+
+    assert_equal 'GR', schema[:addressCountry]
+    assert_equal 'Athens', schema[:addressLocality]
+    assert_equal 'Attica', schema[:addressRegion]
+  end
 end

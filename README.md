@@ -13,7 +13,7 @@
 9. Open browser on `localhost:3002`
 10. Optionally run migrations with `sh scripts.sh dev migrate` (menu option **(16)**) if needed on first run
 11. Optionally seed the database with option **(17) Seed the database** in `sh scripts.sh` (or `sh scripts.sh dev seed`)
-12. Optionally set MCP token environment variables in shell profile (~/.zshrc or ~/.bashrc):
+12. Optionally set MCP token environment variables from a file sourced by every shell (`~/.zshenv` on zsh; `~/.zshrc` is not read by non-interactive shells):
     - `export GITHUB_MCP_TOKEN=<your-token>`
     - `export LINEAR_MCP_TOKEN=<your-token>`
     - `export CONTEXT7_API_KEY=<your-token>`

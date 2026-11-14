@@ -126,7 +126,7 @@ The verification jobs (`workflow-lint`, `test`, `rubocop-brakeman`, `herb-pretti
 
 ## Rollback (manual)
 
-`.github/workflows/rollback.yml` (manual `workflow_dispatch` only) rolls production back to a target commit: it re-tags the existing `sha-<short>` image as `:latest`, reverses migrations applied after the target via the `ops-rollback-migrations` Dokploy schedule (auto-created on first use), re-triggers the Dokploy webhook, and polls `/healthcheck`. Empty `sha` input defaults to the previous successful Dokploy deployment. Requires the `DOKPLOY_API_KEY` repository secret (Settings → Secrets and variables → Actions); the schedule executes `db:migrate:down` inside the running production container. GHCR keeps ~10 recent publishes (`cleanup-ghcr.yml`), which bounds how far back a rollback can reach.
+`.github/workflows/rollback.yml` (manual `workflow_dispatch` only) rolls production back to a target commit: it re-tags the existing `sha-<short>` image as `:latest`, reverses migrations applied after the target via the `ops-rollback-migrations` Dokploy schedule (auto-created on first use), re-triggers the Dokploy webhook, and polls `/healthcheck`. Empty `sha` input defaults to the previous successful Dokploy deployment. Requires the `DOKPLOY_API_KEY` and `DOKPLOY_WEBHOOK_KEY` repository secrets (Settings → Secrets and variables → Actions); the schedule executes `db:migrate:down` inside the running production container. GHCR keeps ~10 recent publishes (`cleanup-ghcr.yml`), which bounds how far back a rollback can reach.
 
 ## Renovate (dependency updates)
 
@@ -148,18 +148,19 @@ Hooks defined in `lefthook.yml`:
 
 **pre-commit** (auto-fix, priority 1):
 
-- `prettier --write` on changed JS/CSS/JSON
+- `prettier --write` on changed JS/TS/CSS/JSON/Markdown
 - `herb --format` + `herb --lint --fix` on changed ERB
 - `rubocop -A` on changed Ruby
 
 **pre-commit** (check, priority 2 — runs after fixes):
 
-- Validates linting passes after auto-fixes
+- Re-runs Herb lint and RuboCop on changed ERB/Ruby (Prettier is not re-checked)
 
 **pre-push**:
 
 - `brakeman -q --no-pager` security scan
 - `bundle exec bundle-audit check --update` gem vulnerability scan
+- `pnpm audit --audit-level moderate` JS vulnerability scan
 
 If a pre-commit hook fails, the commit is blocked. Run `sh scripts.sh lint --fix` or see [commands.md](commands.md).
 

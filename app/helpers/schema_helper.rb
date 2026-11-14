@@ -111,15 +111,10 @@ module SchemaHelper
       addressCountry: skatepark.country_code,
     }
 
-    address[:addressRegion] = skatepark_schema_region(skatepark) if skatepark.state.present?
+    address[:addressLocality] = skatepark.city_name if skatepark.city_geoname_id.present?
+    address[:addressRegion] = skatepark.region_name if skatepark.region_name.present?
 
     address
-  end
-
-  def skatepark_schema_region(skatepark)
-    country = ISO3166::Country[skatepark.country_code]
-    subdivision = country&.subdivisions&.[](skatepark.state)
-    subdivision&.name || skatepark.state
   end
 
   def collection_page_schema(skateparks)

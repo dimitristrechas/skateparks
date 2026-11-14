@@ -5,3 +5,4 @@ log/
 coverage/
 public/assets/
 app/assets/builds/
+db/data/cities/

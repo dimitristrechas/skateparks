@@ -1,13 +1,14 @@
 class SkateparksController < ApplicationController
   include SkateparkDistanceFiltering
   include SkateparkVisitTracking
+  include SkateparkCityFiltering
 
   before_action :set_skatepark, only: %i[show]
 
   def index
     @skateparks = filtered_skateparks.page(params[:page])
     @countries = cached_countries
-    @states = states_for_country
+    @cities = cities_for_country
   end
 
   def show
@@ -18,13 +19,16 @@ class SkateparksController < ApplicationController
     @location_friendly_name = location_name
   end
 
-  def available_states
-    @states = states_for_country
+  def available_cities
+    @cities = cities_for_country
 
     respond_to do |format|
-      format.json { render json: @states }
+      format.json do
+        render json: @cities.map { |city| { id: city['id'], name: CityDataset.localized_name(city) } }
+      end
+
       format.turbo_stream do
-        render turbo_stream: turbo_stream.replace('state_select', partial: 'state_select', locals: { states: @states })
+        render turbo_stream: turbo_stream.replace('city_select', partial: 'city_select', locals: { cities: @cities })
       end
     end
   end
@@ -47,7 +51,7 @@ class SkateparksController < ApplicationController
   end
 
   def skatepark_params
-    params.expect(skatepark: [:name, :lat, :lng, :country_code, :state, { images: [] }])
+    params.expect(skatepark: [:name, :lat, :lng, :country_code, :city_geoname_id, { images: [] }])
   end
 
   def filtered_skateparks
@@ -62,44 +66,16 @@ class SkateparksController < ApplicationController
     end
   end
 
-  def states_for_country
-    return [] if params[:country_code].blank?
-
-    available_states = cached_available_states
-    filter_subdivisions_by_availability(available_states)
-  end
-
-  def cached_available_states
-    Rails.cache.fetch("skateparks_states_#{params[:country_code]}", expires_in: 1.year) do
-      Skatepark.published
-               .where(country_code: params[:country_code])
-               .distinct
-               .pluck(:state)
-               .compact
-    end
-  end
-
-  def filter_subdivisions_by_availability(available_states)
-    country = ISO3166::Country[params[:country_code]]
-    return [] unless country
-
-    country.subdivisions.values
-           .select { |subdivision| available_states.include?(subdivision.code) }
-           .sort_by(&:name)
-  end
-
   def location_name
-    @country_friendly_name = ISO3166::Country[@skatepark.country_code].translation(I18n.locale)
-    @state_friendly_name = ISO3166::Country[@skatepark.country_code].subdivisions[@skatepark.state].code_with_translations[@skatepark.state][I18n.locale]
-    @country_emoji = ISO3166::Country[@skatepark.country_code]&.emoji_flag || ''
+    country = ISO3166::Country[@skatepark.country_code]
+    country_name = country&.translation(I18n.locale) || @skatepark.country_code
 
-    "#{@state_friendly_name}, #{@country_friendly_name} #{@country_emoji}"
+    [@skatepark.city_name, @skatepark.region_name, "#{country_name} #{country&.emoji_flag}".strip]
+      .compact_blank.join(', ')
   end
 
   def skateparks_for_filters
     skateparks = Skatepark.published.preload(:string_translations, :skatepark_images, cover_image_attachment: :blob)
-    skateparks = skateparks.where(country_code: params[:country_code]) if params[:country_code].present?
-    skateparks = skateparks.where(state: params[:state]) if params[:state].present? && params[:country_code].present?
-    skateparks
+    apply_location_filters(skateparks)
   end
 end

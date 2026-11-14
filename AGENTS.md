@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Rails 8.1 skatepark directory app (Ruby 4.0.6, PostgreSQL 17, Hotwire, Tailwind 4.0).
+Rails 8.1 skatepark directory app (Ruby 4.0.9, PostgreSQL 18 in dev/test/CI, Hotwire, Tailwind 4.3).
 
 **This file is the canonical source for project instructions and quality expectations.** Cursor rules under `.cursor/rules/` extend it for editor-specific behavior. Claude Code agents (`.claude/agents/`), OpenCode (`opencode.json`), and Codex (`.codex/`, `.agents/skills/`) should mirror this contract, not replace it.
 
@@ -9,7 +9,7 @@ Rails 8.1 skatepark directory app (Ruby 4.0.6, PostgreSQL 17, Hotwire, Tailwind 
 - Do not commit unless explicitly instructed
 - All code must pass linting (RuboCop, Herb, Prettier) and CI parity checks (`sh scripts.sh ci`) before PR open/merge to `main`
 - Prefer `sh scripts.sh` for development server, test server, lint, and formatter workflows whenever it supports the task. Fall back to direct `docker compose`, `bundle`, or `pnpm` commands only when `scripts.sh` does not cover the needed operation or automation requires a non-interactive command.
-- **Tiered gates (fast path for simple commits):** for WIP commits on a feature branch, `sh scripts.sh gate-quick` (`lint-changed` + `test-changed` vs `main`) is enough. Run full `sh scripts.sh test --fast` (or `sh scripts.sh test` for coverage) and `sh scripts.sh ci` once before push + PR open/merge, not on every WIP commit. `test-changed` auto-falls-back to `test --fast` for migrations, schema, Gemfile, factories/test helpers, or >10 files. Do not rely on `sh scripts.sh lint` or pre-commit hooks alone for the final gate — CI also runs `pnpm audit --audit-level moderate`, which is only included in `sh scripts.sh ci` and `sh scripts.sh security`.
+- **Tiered gates (fast path for simple commits):** for WIP commits on a feature branch, `sh scripts.sh gate-quick` (`lint-changed` + `test-changed` vs `main`) is enough for the paths it maps. Run full `sh scripts.sh test --fast` (or `sh scripts.sh test` for coverage) and `sh scripts.sh ci` once before push + PR open/merge, not on every WIP commit. `test-changed` auto-falls-back to `test --fast` for migrations, schema, Gemfile, factories/test helpers, or >10 files, but changes to `app/workers/`, `lib/`, or `config/routes.rb` are not mapped to tests — run `sh scripts.sh test --fast` for those. Do not rely on `sh scripts.sh lint` or pre-commit hooks alone for the final gate — CI also runs `pnpm audit --audit-level moderate`, which is not included in `sh scripts.sh lint` or pre-commit hooks; run it via `sh scripts.sh ci` / `sh scripts.sh security` (pre-push also runs it).
 - **Commit messages:** Use [Conventional Commits](https://www.conventionalcommits.org/) — see [.agent-docs/conventions.md](.agent-docs/conventions.md#commit-messages). Always include a `type` prefix and colon (e.g. `feat:`, `fix:`, `chore(agents):`). Do **not** use unprefixed subjects like `Add …` or `Refactor …`.
 
 ## Product quality (i18n, a11y, performance, UI)
@@ -25,15 +25,15 @@ Rails 8.1 skatepark directory app (Ruby 4.0.6, PostgreSQL 17, Hotwire, Tailwind 
 
 ### Issue tracker
 
-Issues live in Linear (team `SK8`, via the `linear` MCP server). See `docs/agents/issue-tracker.md`.
+Issues live in Linear (team `SK8`, via the `linear` MCP server). Always use full identifiers (`SK8-<n>`), and the identifier as commit scope.
 
 ### Triage labels
 
-Five default triage labels (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`). See `docs/agents/triage-labels.md`.
+Five default triage labels (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`).
 
 ### Domain docs
 
-Single-context: `GLOSSARY.md` and `docs/adr/` at the repo root. See `docs/agents/domain.md`.
+Single-context layout: `GLOSSARY.md` and `docs/adr/` at the repo root when terms or decisions get recorded.
 
 ## Reference
 

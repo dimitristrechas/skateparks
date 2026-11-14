@@ -10,7 +10,7 @@ FactoryBot.define do
     lat { Faker::Address.latitude }
     lng { Faker::Address.longitude }
     country_code { 'GR' }
-    state { 'I' }
+    city_geoname_id { 264_371 }
 
     description_en { Faker::Lorem.paragraph(sentence_count: 3) }
     description_el { Faker::Lorem.paragraph(sentence_count: 3) }
@@ -27,7 +27,7 @@ FactoryBot.define do
 
     trait :us_location do
       country_code { 'US' }
-      state { 'CA' }
+      city_geoname_id { 5_368_361 }
     end
 
     after(:build) do |skatepark, evaluator|

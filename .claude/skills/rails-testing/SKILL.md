@@ -63,7 +63,7 @@ end
 | Controllers    | `ActionDispatch::IntegrationTest` |
 | ViewComponents | `ViewComponent::TestCase`         |
 | Workers        | `ActiveSupport::TestCase`         |
-| System         | `ApplicationSystemTestCase`       |
+| System         | None yet (no system tests)        |
 
 ## Key assertions
 
@@ -111,11 +111,11 @@ Multilingual factories: set `name_en` and `name_el` separately.
 - Cloudinary uploads — stub `Cloudinary::Uploader.upload`
 - Kaminari pagination — test page scoping
 - ActionText rich text content
-- Country/state filtering scopes
+- Country/city/distance filtering scopes
 - Authentication and authorization (admin vs regular user)
 - Rate limiting on login/password endpoints
 - Cache invalidation (`after_save`/`after_destroy` callbacks)
-- Slug generation and uniqueness
+- Slug generation
 
 ## When debugging failures
 

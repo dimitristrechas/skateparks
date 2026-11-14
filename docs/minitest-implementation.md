@@ -29,13 +29,17 @@ test/
 ├── components/         # ViewComponent tests
 ├── controllers/        # Controller integration tests
 ├── factories/          # FactoryBot factory definitions
+│   ├── popular_skateparks.rb
+│   ├── site_announcements.rb
+│   ├── skatepark_images.rb
+│   ├── skatepark_videos.rb
 │   ├── skateparks.rb
-│   ├── users.rb
-│   └── popular_skateparks.rb
+│   └── users.rb
 ├── fixtures/           # Fixtures for users + audit_logs only
 │   └── files/         # Sample images for file upload tests
 ├── helpers/            # ActionView helper tests
 ├── jobs/               # ActiveJob tests
+├── lib/                # Library/helper tests
 ├── mailers/            # ActionMailer tests
 ├── models/             # Model unit tests
 ├── support/            # Support helpers autoloaded from test/support/**/*.rb
@@ -102,17 +106,20 @@ popular = create(:popular_skatepark)
 
 ### Available Factories and Traits
 
-| Factory              | Traits                                |
-| -------------------- | ------------------------------------- |
-| `:skatepark`         | `:draft`, `:archived`, `:us_location` |
-| `:user`              | `:admin`, `:banned`                   |
-| `:popular_skatepark` | —                                     |
+| Factory              | Traits                                                  |
+| -------------------- | ------------------------------------------------------- |
+| `:popular_skatepark` | —                                                       |
+| `:site_announcement` | `:draft`, `:scheduled_future`, `:expired`, `:with_link` |
+| `:skatepark`         | `:draft`, `:archived`, `:us_location`                   |
+| `:skatepark_image`   | — (transient `image_fixture` selects the fixture)       |
+| `:skatepark_video`   | `:pending`, `:rejected`                                 |
+| `:user`              | `:admin`, `:banned`                                     |
 
-The `:skatepark` factory attaches real fixture images (`test/fixtures/files/sample_image{1,2,3}.jpg`) for `cover_image` and `images`.
+The `:skatepark` factory attaches real fixture images (`test/fixtures/files/sample_image{1,2,3}.jpg`) for `cover_image` and `skatepark_images`.
 
 ### Fixtures (users + audit_logs only)
 
-Rails fixtures exist for `users` and `audit_logs`. Access via `users(:one)`, `audit_logs(:one)`. All other models use factories.
+Rails fixtures exist for `users` and `audit_logs`. Access via `users(:one)`, `audit_logs(:one)`. Most other models use factories; sessions have no factory — create them through `user.sessions.create!`.
 
 ---
 
@@ -211,8 +218,8 @@ Pass `locale` on the path (this app uses `default_url_options` with `I18n.locale
 require 'test_helper'
 
 class ButtonComponentTest < ViewComponent::TestCase
-  def test_renders_primary_variant
-    render_inline(ButtonComponent.new(variant: :primary)) { 'Click me' }
+  def test_renders_button
+    render_inline(ButtonComponent.new(title: 'Click me', type: :button))
     assert_selector 'button', text: 'Click me'
   end
 end
@@ -223,7 +230,7 @@ Components that call route helpers require a `with_request_url` block:
 ```ruby
 def test_renders_skatepark_link
   with_request_url '/' do
-    render_inline(HomepageSkateparkCardComponent.new(skatepark: create(:skatepark)))
+    render_inline(HomepageSkateparkCardComponent.new(skatepark: create(:skatepark), badge_type: :new))
     assert_selector 'a[href]'
   end
 end
@@ -236,8 +243,17 @@ require 'test_helper'
 
 class SessionCleanupWorkerTest < ActiveSupport::TestCase
   def test_deletes_expired_sessions
-    expired = create(:session, expires_at: 1.day.ago)
-    active  = create(:session, expires_at: 2.weeks.from_now)
+    user = create(:user)
+    expired = user.sessions.create!(
+      user_agent: 'Test',
+      ip_address: '127.0.0.1',
+      expires_at: 1.day.ago
+    )
+    active = user.sessions.create!(
+      user_agent: 'Test',
+      ip_address: '127.0.0.1',
+      expires_at: 2.weeks.from_now
+    )
 
     SessionCleanupWorker.new.perform
 
@@ -344,7 +360,7 @@ SomeClass.any_instance.stubs(:method_name).returns(value)
 Rails.stubs(:env).returns(ActiveSupport::StringInquirer.new('production'))
 
 # Expect (test fails if not called)
-Rails.cache.expects(:delete).with('skateparks_popular').once
+Rails.cache.expects(:delete).with(Skatepark.homepage_popular_cache_key).once
 
 # Stub with dynamic return
 Rake::Task.expects(:[]).with('sitemap:refresh:no_ping').returns(
@@ -364,16 +380,16 @@ end
 
 def test_caches_result_after_first_request
   get root_path
-  assert_not_nil Rails.cache.read('skateparks_latest')
+  assert_not_nil Rails.cache.read(Skatepark.homepage_latest_cache_key)
 end
 
-def test_cache_invalidated_on_publish
+def test_cache_invalidated_on_status_change
   # Populate cache
   get root_path
 
-  @skatepark.update!(status: :published)
+  @skatepark.update!(status: :archived)
 
-  assert_nil Rails.cache.read('skateparks_latest')
+  assert_nil Rails.cache.read(Skatepark.homepage_latest_cache_key)
 end
 ```
 
@@ -390,7 +406,8 @@ def test_requires_cover_image
 end
 
 def test_rejects_single_image
-  skatepark = build(:skatepark, images: [fixture_file_upload('sample_image1.jpg')])
+  skatepark = build(:skatepark, skatepark_images_count: 0)
+  skatepark.skatepark_images.build(position: 1).image.attach(fixture_file_upload('sample_image1.jpg'))
   assert_not skatepark.save   # Requires at least 2 images
 end
 ```
@@ -476,10 +493,15 @@ Using `fixture_file_upload` inside a factory definition. Factories don't run in 
 
 ```ruby
 # In factory — use this
-cover_image { Rack::Test::UploadedFile.new(Rails.root.join('test/fixtures/files/sample.jpg'), 'image/jpeg') }
+after(:build) do |skatepark|
+  skatepark.cover_image.attach(
+    Rack::Test::UploadedFile.new(Rails.root.join('test/fixtures/files/sample_image1.jpg'), 'image/jpeg')
+  )
+end
 
 # In test method — this is fine
-build(:skatepark, images: [fixture_file_upload('sample_image1.jpg')])
+park = build(:skatepark, skatepark_images_count: 0)
+park.skatepark_images.build(position: 1).image.attach(fixture_file_upload('sample_image1.jpg'))
 ```
 
 ### Tests pass alone, fail in full suite
@@ -513,4 +535,5 @@ assert_not_includes Skatepark.published, @draft_skatepark
 | `faker`                    | Random test data                                                        |
 | `mocha`                    | Mocking and stubbing                                                    |
 | `rails-controller-testing` | `assigns(:var)` in controller tests                                     |
+| `simplecov`                | Coverage (enabled unless `DISABLE_SIMPLECOV=1`)                         |
 | `capybara`                 | System test browser automation (installed; no system tests written yet) |

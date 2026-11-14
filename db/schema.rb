@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_22_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_11_140000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -164,12 +164,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_22_120000) do
     t.string "name"
     t.integer "skatepark_videos_count", default: 0, null: false
     t.string "slug"
-    t.string "state"
     t.integer "status", null: false
     t.datetime "updated_at", null: false
     t.integer "visits_count", default: 0, null: false
+    t.bigint "city_geoname_id"
+    t.index ["city_geoname_id"], name: "index_skateparks_on_city_geoname_id"
     t.index ["country_code"], name: "index_skateparks_on_country_code"
-    t.index ["state"], name: "index_skateparks_on_state"
     t.index ["visits_count", "id"], name: "index_skateparks_on_visits_count_and_id"
   end
 

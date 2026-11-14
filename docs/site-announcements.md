@@ -179,7 +179,7 @@ Migration: `db/migrate/20260707190000_create_site_announcements.rb`
 
 Indexes: unique on `position`; composite on `published`, `starts_at`, `ends_at` for the homepage `visible` scope.
 
-Mobility string translations are stored in the shared `string_translations` table (no extra columns on `site_announcements`).
+Mobility string translations are stored in the shared `mobility_string_translations` table (the `string_translations` association; no extra columns on `site_announcements`).
 
 ---
 

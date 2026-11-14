@@ -3,6 +3,7 @@
               class: "my-8",
               data: {
                 controller: 'admin--skateparks--form',
+                admin__skateparks__form_locale_value: I18n.locale,
                 admin__skateparks__form_confirm_delete_value: t('admin.skateparks.form.confirm_delete'),
                 admin__skateparks__form_confirm_delete_video_value: t('admin.skateparks.form.confirm_delete_video'),
                 admin__skateparks__form_image_alt_pattern_value: t('admin.skateparks.form.image_alt', position: '{position}'),
@@ -99,23 +100,23 @@
                   } %>
     </div>
 
-    <div class="flex flex-col gap-2">
-      <%= form.label :state,
-                 t("country_state"),
-                 class: "block text-neutral-600 dark:text-neutral-300 mb-1" %>
-
-      <%= form.select :state,
-                  skatepark.country&.subdivisions&.map { |code, subdivision|
-                    [subdivision.name, code]
-                  } || [["", ""]],
-                  { selected: skatepark.state },
-                  {
-                    disabled: skatepark.country_code.blank?,
-                    class: "p-1 text-neutral-600 dark:text-neutral-700",
-                    data: {
-                      admin__skateparks__form_target: "stateSelect",
-                    },
-                  } %>
+    <div class="flex flex-col gap-2" data-admin--skateparks--form-target="cityPicker">
+      <%= render(
+        Admin::SkateparkPickerComponent.new(
+          input_name: "skatepark[city_geoname_id]",
+          input_id: "skatepark_city_geoname_id",
+          label: t("city"),
+          search_url: admin_cities_path(country_code: skatepark.country_code),
+          placeholder: t("select_city"),
+          selected_id: skatepark.city_geoname_id,
+          selected_name: skatepark.city_name,
+          required: true,
+          no_results_text: t("admin.city_picker.no_results"),
+          results_count_one: t("admin.city_picker.results_count_one"),
+          results_count_other: t("admin.city_picker.results_count_other", count: "{count}"),
+          selection_required_text: t("admin.city_picker.selection_required"),
+        ),
+      ) %>
     </div>
 
     <div class="col-start-1">

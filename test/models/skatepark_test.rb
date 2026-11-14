@@ -36,6 +36,13 @@ class SkateparkTest < ActiveSupport::TestCase
     assert_not skatepark.save
   end
 
+  def test_requires_city_geoname_id_to_be_present
+    skatepark = build(:skatepark, city_geoname_id: nil)
+
+    assert_not skatepark.save
+    assert_includes skatepark.errors[:city_geoname_id], "can't be blank"
+  end
+
   def test_requires_at_least_2_images_to_be_present
     skatepark = build(:skatepark, skatepark_images_count: 1)
 
@@ -98,25 +105,44 @@ class SkateparkTest < ActiveSupport::TestCase
     assert_equal 'updated-name', skatepark.slug
   end
 
-  def test_location_name_combines_state_and_country
+  def test_location_name_combines_city_region_and_country
     skatepark = build(:skatepark)
 
-    assert_equal 'Attica, Greece', skatepark.location_name
+    assert_equal 'Athens, Attica, Greece', skatepark.location_name
   end
 
-  def test_location_name_localizes_state_and_country
+  def test_location_name_localizes_city_region_and_country
     skatepark = build(:skatepark)
 
     I18n.with_locale(:el) do
-      assert_equal 'Αττική, Ελλάδα', skatepark.location_name
+      assert_equal 'Αθήνα, Αττική, Ελλάδα', skatepark.location_name
     end
+  end
+
+  def test_city_name_uses_the_localized_dataset_name
+    skatepark = build(:skatepark)
+
+    assert_equal 'Athens', skatepark.city_name
+
+    I18n.with_locale(:el) do
+      assert_equal 'Αθήνα', skatepark.city_name
+    end
+  end
+
+  def test_clears_city_filter_cache_when_city_changes
+    skatepark = create(:skatepark)
+    Rails.cache.write('skateparks_cities_GR', [skatepark.city_geoname_id])
+
+    skatepark.update!(city_geoname_id: 734_077)
+
+    assert_nil Rails.cache.read('skateparks_cities_GR')
   end
 
   def test_returns_correct_format_in_to_param
     skatepark = create(:skatepark, :us_location,
                        name_en: 'Chicago Skate Park',
                        name_el: 'Chicago Skate Park',
-                       state: 'IL',
+                       city_geoname_id: 4_887_398,
                        lat: 41.8819,
                        lng: -87.6231)
 

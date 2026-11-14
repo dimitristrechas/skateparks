@@ -33,6 +33,7 @@ Metrics/MethodLength:
 Metrics/BlockLength:
   Exclude:
     - "config/**/*"
+    - "lib/tasks/**/*"
     - "test/**/*"
 
 Metrics/ClassLength:

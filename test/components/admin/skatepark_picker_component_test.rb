@@ -56,5 +56,25 @@ module Admin
         assert_selector "[data-admin--skatepark-picker-no-results-text-value='#{no_results_text}']"
       end
     end
+
+    def test_renders_custom_texts_for_city_picker
+      render_inline(
+        Admin::SkateparkPickerComponent.new(
+          input_name: 'skatepark[city_geoname_id]',
+          input_id: 'skatepark_city_geoname_id',
+          label: 'City',
+          search_url: '/admin/cities?country_code=GR',
+          no_results_text: 'No matching cities found.',
+          results_count_one: '1 city available',
+          results_count_other: 'N cities available',
+          selection_required_text: 'Please select a city from the list.'
+        )
+      )
+
+      assert_selector '[data-admin--skatepark-picker-no-results-text-value="No matching cities found."]'
+      assert_selector '[data-admin--skatepark-picker-results-count-one-value="1 city available"]'
+      assert_selector '[data-admin--skatepark-picker-results-count-other-value="N cities available"]'
+      assert_selector '[data-admin--skatepark-picker-selection-required-value="Please select a city from the list."]'
+    end
   end
 end
