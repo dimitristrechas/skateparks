@@ -49,7 +49,7 @@ class SkateparkTest < ActiveSupport::TestCase
     assert_not skatepark.save
   end
 
-  def test_rejects_duplicate_new_image_filenames
+  def test_rejects_duplicate_new_image_contents
     skatepark = create(:skatepark)
     duplicate_image = skatepark.skatepark_images.build(position: 3)
 
@@ -61,7 +61,29 @@ class SkateparkTest < ActiveSupport::TestCase
     )
 
     assert_not skatepark.valid?
-    assert_includes skatepark.errors[:skatepark_images], 'sample_image1.jpg has already been uploaded'
+    assert_includes skatepark.errors[:skatepark_images], 'This image has already been uploaded'
+  end
+
+  def test_allows_new_image_with_existing_filename_but_different_content
+    skatepark = create(:skatepark)
+    new_image = skatepark.skatepark_images.build(position: 3)
+
+    new_image.image.attach(
+      Rack::Test::UploadedFile.new(
+        Rails.root.join('test/fixtures/files/sample_image2.jpg'),
+        'image/jpeg',
+        original_filename: 'sample_image1.jpg'
+      )
+    )
+
+    assert_predicate skatepark, :valid?, skatepark.errors.full_messages.to_sentence
+  end
+
+  def test_allows_same_image_content_on_different_skateparks
+    create(:skatepark)
+    skatepark = build(:skatepark)
+
+    assert_predicate skatepark, :valid?, skatepark.errors.full_messages.to_sentence
   end
 
   def test_rejects_duplicate_video_urls

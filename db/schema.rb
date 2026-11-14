@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_11_140000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_14_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -136,6 +136,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_11_140000) do
     t.integer "position", null: false
     t.bigint "skatepark_id", null: false
     t.datetime "updated_at", null: false
+    t.string "checksum"
+    t.index ["skatepark_id", "checksum"], name: "index_unique_skatepark_images_on_skatepark_id_and_checksum", unique: true
     t.index ["skatepark_id", "position"], name: "index_unique_skatepark_images_on_skatepark_id_and_position", unique: true
     t.index ["skatepark_id"], name: "index_skatepark_images_on_skatepark_id"
   end

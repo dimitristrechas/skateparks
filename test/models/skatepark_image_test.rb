@@ -14,6 +14,14 @@ class SkateparkImageTest < ActiveSupport::TestCase
     assert_not skatepark_image.save
   end
 
+  def test_sets_checksum_from_image_content
+    skatepark_image = build(:skatepark_image)
+
+    skatepark_image.valid?
+
+    assert_equal skatepark_image.image.blob.checksum, skatepark_image.checksum
+  end
+
   def test_requires_position_to_be_a_positive_integer
     skatepark_image = build(:skatepark_image, position: 0)
 

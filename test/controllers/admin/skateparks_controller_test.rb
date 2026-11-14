@@ -305,8 +305,8 @@ module Admin
       patch admin_skatepark_path(@skatepark), params: {
         skatepark: {
           new_images: [
-            uploaded_image('sample_image1.jpg', 'new_sample_image1.jpg'),
-            uploaded_image('sample_image3.jpg', 'new_sample_image3.jpg'),
+            uploaded_image('sample_image2.jpg', 'new_sample_image2.jpg'),
+            uploaded_image('sample_image4.jpg', 'new_sample_image4.jpg'),
           ],
         },
       }
@@ -423,7 +423,7 @@ module Admin
       assert_duplicate_video_error_messages_in_greek(duplicate_video_url)
     end
 
-    def test_patch_update_rejects_duplicate_new_image_filename
+    def test_patch_update_rejects_duplicate_new_image_content
       assert_no_difference('SkateparkImage.count') do
         patch admin_skatepark_path(@skatepark), params: {
           skatepark: {
@@ -436,7 +436,7 @@ module Admin
       end
 
       assert_template 'edit'
-      assert_includes assigns(:skatepark).errors[:skatepark_images], 'sample_image1.jpg has already been uploaded'
+      assert_includes assigns(:skatepark).errors[:skatepark_images], 'This image has already been uploaded'
     end
 
     def test_delete_destroy_destroys_skatepark
@@ -530,7 +530,7 @@ module Admin
             '1' => { id: second_image.id, position: 3 },
           },
           new_images: [
-            uploaded_image('sample_image1.jpg', 'inserted_sample_image1.jpg'),
+            uploaded_image('sample_image2.jpg', 'inserted_sample_image2.jpg'),
           ],
           new_image_positions: ['2'],
         },
@@ -541,7 +541,7 @@ module Admin
       assert_redirected_to admin_skateparks_url
       assert_equal [1, 2, 3], ordered_images.map(&:position)
       assert_equal first_image_id, ordered_images.first.id
-      assert_equal 'inserted_sample_image1.jpg', ordered_images.second.image.filename.to_s
+      assert_equal 'inserted_sample_image2.jpg', ordered_images.second.image.filename.to_s
       assert_equal second_image_id, ordered_images.third.id
     end
 

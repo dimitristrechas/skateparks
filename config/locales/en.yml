@@ -419,7 +419,7 @@ en:
           attributes:
             skatepark_images:
               minimum_images: "2 is the minimum allowed"
-              duplicate_image: "%{filename} has already been uploaded"
+              duplicate_image: "This image has already been uploaded"
             skatepark_videos:
               duplicate_video: "%{youtube_url} has already been added"
         skatepark_video:
