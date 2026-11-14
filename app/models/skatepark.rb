@@ -74,7 +74,7 @@ class Skatepark < ApplicationRecord
   validates :country_code, presence: true, inclusion: { in: ISO3166::Country.codes }
   validates :city_geoname_id, presence: true
   validate :minimum_skatepark_images
-  validate :unique_uploaded_image_filenames
+  validate :unique_uploaded_image_checksums
 
   after_validation :set_slug, only: %i[create update]
   after_destroy :clear_countries_cache, :clear_location_caches, :clear_skateparks_latest_cache
@@ -137,20 +137,20 @@ class Skatepark < ApplicationRecord
     errors.add(:skatepark_images, :minimum_images)
   end
 
-  def unique_uploaded_image_filenames
-    duplicate_uploaded_image_filenames.each do |filename|
-      errors.add(:skatepark_images, :duplicate_image, filename: filename)
-    end
+  def unique_uploaded_image_checksums
+    return if duplicate_uploaded_image_checksums.empty?
+
+    errors.add(:skatepark_images, :duplicate_image)
   end
 
-  def duplicate_uploaded_image_filenames
+  def duplicate_uploaded_image_checksums
     active_skatepark_images
-      .group_by { |skatepark_image| normalized_image_filename(skatepark_image) }
-      .filter_map do |_normalized_filename, image_records|
-        next if image_records.one?
+      .group_by { |skatepark_image| skatepark_image.image.blob.checksum }
+      .filter_map do |checksum, image_records|
+        next if checksum.blank? || image_records.one?
         next unless image_records.any?(&:new_record?)
 
-        image_records.last.image.filename.to_s
+        checksum
       end
   end
 
@@ -158,10 +158,6 @@ class Skatepark < ApplicationRecord
     skatepark_images.reject(&:marked_for_destruction?).select do |skatepark_image|
       skatepark_image.image.attached?
     end
-  end
-
-  def normalized_image_filename(skatepark_image)
-    skatepark_image.image.filename.to_s.strip.downcase
   end
 
   def set_slug

@@ -419,7 +419,7 @@ el:
           attributes:
             skatepark_images:
               minimum_images: "Τουλάχιστον 2 απαιτούνται"
-              duplicate_image: "Το %{filename} έχει ήδη ανεβεί"
+              duplicate_image: "Η εικόνα έχει ήδη ανεβεί"
             skatepark_videos:
               duplicate_video: "Το %{youtube_url} έχει ήδη προστεθεί"
         skatepark_video:
