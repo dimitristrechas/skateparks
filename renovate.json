@@ -59,6 +59,14 @@
       "groupSlug": "major-npm-packages"
     },
     {
+      "description": "Unify the same Docker image across managers (compose, Dockerfile, CI service containers) into one major-update PR",
+      "matchDatasources": ["docker"],
+      "matchUpdateTypes": ["major"],
+      "matchPackageNames": ["!ruby"],
+      "groupName": "Docker images (major)",
+      "groupSlug": "major-docker-images"
+    },
+    {
       "matchUpdateTypes": ["major"],
       "matchManagers": ["github-actions"],
       "groupName": "GitHub Actions (major)",
@@ -70,6 +78,12 @@
       "groupName": "Docker images (major)",
       "groupSlug": "major-docker-images",
       "matchPackageNames": ["!ruby"]
+    },
+    {
+      "description": "Pin postgres to the major running in production (Dokploy postgres:17); bump only as part of a planned prod upgrade",
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["postgres"],
+      "allowedVersions": "/^17/"
     },
     {
       "matchPackageNames": ["renovatebot/github-action"],
