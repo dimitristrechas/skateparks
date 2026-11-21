@@ -10,7 +10,7 @@ VISUAL="code --wait" bin/rails credentials:edit --environment production
 
 ## Database version
 
-Canonical dev/test database is **PostgreSQL 18** (`postgres:18-alpine` in `docker-compose.yml`).
+Canonical dev/test/CI database is **PostgreSQL 17** (`postgres:17-alpine` in `docker-compose.yml` and `.github/workflows/ci-cd.yml`), pinned to match production (Dokploy-managed `postgres:17`). Renovate's `allowedVersions` pin in `renovate.json` keeps it there — bump it only as part of a planned production major upgrade (new Dokploy postgres service + dump/restore, never a tag bump on the live data dir).
 
 Inspect the running instance:
 

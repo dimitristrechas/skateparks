@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Rails 8.1 skatepark directory app (Ruby 4.0.9, PostgreSQL 18 in dev/test/CI, Hotwire, Tailwind 4.3).
+Rails 8.1 skatepark directory app (Ruby 4.0.9, PostgreSQL 17 in dev/test/CI — pinned to the production major, Hotwire, Tailwind 4.3).
 
 **This file is the canonical source for project instructions and quality expectations.** Cursor rules under `.cursor/rules/` extend it for editor-specific behavior. Claude Code agents (`.claude/agents/`), OpenCode (`opencode.json`), and Codex (`.codex/`, `.agents/skills/`) should mirror this contract, not replace it.
 
