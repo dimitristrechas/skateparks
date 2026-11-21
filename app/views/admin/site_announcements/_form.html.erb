@@ -1,17 +1,10 @@
 <%= form_with(model: [:admin, site_announcement], class: "my-8 flex flex-col gap-6") do |form| %>
-  <% if site_announcement.errors.any? %>
-    <div class="mb-4">
-      <h2 class="mb-1 text-xl font-semibold">
-        <%= t("admin.site_announcements.errors_title", count: site_announcement.errors.count) %>
-      </h2>
-
-      <ul class="list-inside list-disc text-red-600">
-        <% site_announcement.errors.each do |error| %>
-          <li><%= error.full_message %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
+  <%= render(
+    FormErrorsComponent.new(
+      model: site_announcement,
+      heading: t('admin.site_announcements.errors_title', count: site_announcement.errors.count),
+    ),
+  ) %>
 
   <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
     <%= render(TextFieldComponent.new(name: "message_en", title: t("admin.site_announcements.message_en"), form: form)) %>

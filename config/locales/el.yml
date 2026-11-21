@@ -12,6 +12,10 @@ el:
   back_to_admin: "Πίσω στην αρχική σελίδα διαχειριστή"
   open_in_google_maps: "Δες το πάρκο στο google maps"
   delete_confirm: "Είσαι σίγουρος;"
+  form_errors:
+    heading:
+      one: "1 σφάλμα εμπόδισε την αποθήκευση:"
+      other: "%{count} σφάλματα εμπόδισαν την αποθήκευση:"
   image_gallery: "Γκαλερί φωτογραφιών"
   gallery_image_announcement: "Φωτογραφία %{current} από %{total}"
   view_image_in_gallery: "Δες την φωτογραφία %{number} στη γκαλερί"

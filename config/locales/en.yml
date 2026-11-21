@@ -12,6 +12,10 @@ en:
   back_to_admin: "Back to admin homepage"
   open_in_google_maps: "Open skatepark in google maps"
   delete_confirm: "Are you sure?"
+  form_errors:
+    heading:
+      one: "1 error prohibited this from being saved:"
+      other: "%{count} errors prohibited this from being saved:"
   image_gallery: "Image gallery"
   gallery_image_announcement: "Image %{current} of %{total}"
   view_image_in_gallery: "View image %{number} in gallery"

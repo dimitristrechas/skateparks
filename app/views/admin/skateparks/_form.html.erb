@@ -34,17 +34,12 @@
                 admin__skateparks__form_invalid_video_url_value: t('admin.skateparks.form.invalid_video_url'),
                 admin__skateparks__form_duplicate_video_url_value: t('admin.skateparks.form.duplicate_video_url'),
               }) do |form| %>
-  <% if skatepark.errors.any? %>
-    <div class="mb-4">
-      <h2 class="mb-1 text-xl font-semibold"><%= t("admin.skateparks.form.errors_title") %></h2>
-
-      <ul class="list-inside list-disc text-red-600">
-        <% skatepark.errors.each do |error| %>
-          <li><%= error.full_message %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
+  <%= render(
+    FormErrorsComponent.new(
+      model: skatepark,
+      heading: t('admin.skateparks.form.errors_title'),
+    ),
+  ) %>
 
   <div class="grid grid-cols-2 gap-8">
     <div class="flex flex-col gap-2">
