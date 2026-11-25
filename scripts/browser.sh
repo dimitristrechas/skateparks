@@ -22,7 +22,7 @@ ensure_agent_browser() {
 }
 
 # Read a value from .env without sourcing it (values may contain shell metacharacters).
-# Follows Compose rules: double quotes support backslash escapes, single quotes are literal,
+# Follows Compose rules: double quotes support backslash escapes, single quotes only \',
 # unquoted values drop " # comments".
 dotenv_value() {
     local line value
@@ -30,35 +30,39 @@ dotenv_value() {
     value="${line#*=}"
     value="${value#"${value%%[![:space:]]*}"}"
     case "$value" in
-        \"*) dotenv_double_quoted "${value#\"}" ;;
-        \'*)
-            value="${value#\'}"
-            printf '%s' "${value%%\'*}"
-            ;;
+        \"*) dotenv_quoted '"' "${value#\"}" ;;
+        \'*) dotenv_quoted "'" "${value#\'}" ;;
         *) printf '%s' "$value" | sed -E 's/[[:space:]]+#.*$//; s/[[:space:]]+$//' ;;
     esac
 }
 
-# Prints a double-quoted .env value up to its unescaped closing quote.
-dotenv_double_quoted() {
-    local rest="$1" out="" char
+# Prints a quoted .env value up to its unescaped closing quote ($1 = quote character).
+dotenv_quoted() {
+    local quote="$1" rest="$2" out="" char next
     while [ -n "$rest" ]; do
         char="${rest:0:1}"
         rest="${rest:1}"
-        case "$char" in
-            \\)
-                char="${rest:0:1}"
+        if [ "$char" = "$quote" ]; then
+            break
+        elif [ "$char" = "\\" ]; then
+            next="${rest:0:1}"
+            if [ "$next" = "$quote" ]; then
+                out+="$quote"
                 rest="${rest:1}"
-                case "$char" in
+            elif [ "$quote" = '"' ]; then
+                rest="${rest:1}"
+                case "$next" in
                     n) out+=$'\n' ;;
                     r) out+=$'\r' ;;
                     t) out+=$'\t' ;;
-                    *) out+="$char" ;;
+                    *) out+="$next" ;;
                 esac
-                ;;
-            \") break ;;
-            *) out+="$char" ;;
-        esac
+            else
+                out+="$char"
+            fi
+        else
+            out+="$char"
+        fi
     done
     printf '%s' "$out"
 }
