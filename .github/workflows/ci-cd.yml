@@ -159,7 +159,7 @@ jobs:
         run: bundle exec rails test test/components test/controllers test/models test/helpers test/jobs test/workers test/mailers test/channels
 
       - name: Run system tests
-        run: bundle exec rails test:system
+        run: bundle exec rails test test/system
         env:
           PARALLEL_WORKERS: "1"
 

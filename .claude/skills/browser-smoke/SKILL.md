@@ -72,7 +72,7 @@ agent-browser --session skateparks-public screenshot tmp/agent-browser/screensho
 - Base class: `test/application_system_test_case.rb` (Selenium + headless Chrome; `sign_in_as(user)`,
   `localized_path(path, locale)`).
 - `sh scripts.sh test --system [path]` starts the `skateparks-chrome` container (compose profile `test`)
-  and runs with `SELENIUM_REMOTE_URL`, one worker, no coverage. CI runs `bin/rails test:system` with the
+  and runs with `SELENIUM_REMOTE_URL`, one worker, no coverage. CI runs `bin/rails test test/system` with the
   runner's local Chrome.
 - `bin/rails test` and `sh scripts.sh test` do **not** include system tests.
 - Failure screenshots: `tmp/screenshots/`.
