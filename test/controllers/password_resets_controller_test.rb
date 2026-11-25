@@ -80,6 +80,22 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
     assert_equal I18n.t('authentication.password_reset_invalid_token'), flash[:alert]
   end
 
+  test 'should reject a concurrent redemption whose token was consumed while waiting for the lock' do
+    user = create(:user)
+    session_record = user.sessions.create!(expires_at: 1.day.from_now)
+    token = user.password_reset_token
+    # The before_action sees a valid token; by the time the row lock is acquired another
+    # request has already reset the password, so the in-lock re-check no longer matches.
+    User.stubs(:find_by_password_reset_token).with(token).returns(user).then.returns(nil)
+
+    patch password_reset_url(token), params: { password: 'newpassword12345', password_confirmation: 'newpassword12345' }
+
+    assert_redirected_to new_password_reset_path
+    assert_equal I18n.t('authentication.password_reset_invalid_token'), flash[:alert]
+    assert user.reload.authenticate('password123456')
+    assert Session.exists?(session_record.id)
+  end
+
   test 'should reject blank password' do
     user = create(:user)
     session_record = user.sessions.create!(expires_at: 1.day.from_now)

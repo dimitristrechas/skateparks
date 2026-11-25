@@ -27,9 +27,12 @@ class PasswordResetsController < ApplicationController
   end
 
   def update
-    if @user.update(password: params[:password], password_confirmation: params[:password_confirmation])
+    case redeem_password_reset
+    when :updated
       @user.sessions.destroy_all
       redirect_to new_session_path, notice: t('authentication.password_reset_success')
+    when :invalid_token
+      redirect_to new_password_reset_path, alert: t('authentication.password_reset_invalid_token')
     else
       alert = @user.errors.full_messages.to_sentence.presence || t('authentication.password_reset_failed')
       redirect_to edit_password_reset_path(params[:token]), alert: alert
@@ -37,6 +40,17 @@ class PasswordResetsController < ApplicationController
   end
 
   private
+
+  # Re-checks the token under a row lock so concurrent redemptions of one token cannot both succeed:
+  # the first commit rotates password_salt, which invalidates the token for the waiting request.
+  def redeem_password_reset
+    @user.with_lock do
+      next :invalid_token unless User.find_by_password_reset_token(params[:token]) == @user
+
+      updated = @user.update(password: params[:password], password_confirmation: params[:password_confirmation])
+      updated ? :updated : :failed
+    end
+  end
 
   def set_user_by_token
     @user = User.find_by_password_reset_token(params[:token])

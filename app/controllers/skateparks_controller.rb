@@ -37,9 +37,17 @@ class SkateparksController < ApplicationController
 
     return if @skatepark.to_param == params[:id].to_s
 
-    redirect_to skatepark_path(@skatepark, request.query_parameters.symbolize_keys), status: :moved_permanently
+    redirect_to canonical_skatepark_path, status: :moved_permanently
   rescue ActiveRecord::RecordNotFound, ArgumentError
     redirect_to root_path, alert: t('skateparks.not_found')
+  end
+
+  def canonical_skatepark_path
+    path = skatepark_path(@skatepark)
+    query = request.query_parameters.except('locale')
+    return path if query.empty?
+
+    "#{path}#{path.include?('?') ? '&' : '?'}#{query.to_query}"
   end
 
   def published_skateparks_with_media

@@ -548,6 +548,19 @@ class SkateparksControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to skatepark_path(@skatepark)
   end
 
+  def test_get_show_stale_slug_redirect_ignores_conflicting_id_query_param
+    get "/skateparks/#{@skatepark.id}-wrong-slug-name?id=999999&utm_source=share"
+
+    assert_response :moved_permanently
+    assert_redirected_to "/skateparks/#{@skatepark.to_param}?id=999999&utm_source=share"
+  end
+
+  def test_get_show_stale_slug_redirect_keeps_locale_and_query_params
+    get "/skateparks/#{@skatepark.id}-wrong-slug-name?locale=el&utm_source=share"
+
+    assert_redirected_to "/skateparks/#{@skatepark.to_param}?locale=el&utm_source=share"
+  end
+
   def test_get_show_redirects_stale_slug_preserving_locale
     get skatepark_path("#{@skatepark.id}-wrong-slug-name", locale: :el)
 
