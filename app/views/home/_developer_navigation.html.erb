@@ -9,17 +9,6 @@
           current: request.path.start_with?("/admin"),
         ) %>
       </li>
-
-      <% if defined?(Lookbook) %>
-        <li>
-          <%= render LinkComponent.new(
-            title: t("home.developer_navigation.lookbook"),
-            url: lookbook_path,
-            classnames: "inline-flex items-center min-h-8 min-w-8",
-            current: request.path.start_with?("/lookbook"),
-          ) %>
-        </li>
-      <% end %>
     </ul>
   </nav>
 <% end %>

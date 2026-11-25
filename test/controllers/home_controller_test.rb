@@ -63,7 +63,6 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, I18n.t('home.developer_navigation.admin')
     assert_includes response.body, admin_root_path
-    assert_not_includes response.body, I18n.t('home.developer_navigation.lookbook')
   end
 
   def test_get_index_hides_developer_navigation_in_production
@@ -73,7 +72,6 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_not_includes response.body, I18n.t('home.developer_navigation.admin')
-    assert_not_includes response.body, I18n.t('home.developer_navigation.lookbook')
   end
 
   def test_get_index_assigns_skateparks_latest_from_cache
