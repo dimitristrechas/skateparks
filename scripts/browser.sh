@@ -22,25 +22,45 @@ ensure_agent_browser() {
 }
 
 # Read a value from .env without sourcing it (values may contain shell metacharacters).
-# Follows Compose rules: quoted values end at the closing quote; unquoted values drop " # comments".
+# Follows Compose rules: double quotes support backslash escapes, single quotes are literal,
+# unquoted values drop " # comments".
 dotenv_value() {
     local line value
-    line=$(grep -E "^[[:space:]]*(export[[:space:]]+)?$1=" .env 2>/dev/null | tail -1)
+    line=$(grep -E "^[[:space:]]*(export[[:space:]]+)?$1[[:space:]]*=" .env 2>/dev/null | tail -1)
     value="${line#*=}"
+    value="${value#"${value%%[![:space:]]*}"}"
     case "$value" in
-        \"*)
-            value="${value#\"}"
-            value="${value%%\"*}"
-            ;;
+        \"*) dotenv_double_quoted "${value#\"}" ;;
         \'*)
             value="${value#\'}"
-            value="${value%%\'*}"
+            printf '%s' "${value%%\'*}"
             ;;
-        *)
-            value=$(printf '%s' "$value" | sed -E 's/^[[:space:]]+//; s/[[:space:]]+#.*$//; s/[[:space:]]+$//')
-            ;;
+        *) printf '%s' "$value" | sed -E 's/[[:space:]]+#.*$//; s/[[:space:]]+$//' ;;
     esac
-    printf '%s' "$value"
+}
+
+# Prints a double-quoted .env value up to its unescaped closing quote.
+dotenv_double_quoted() {
+    local rest="$1" out="" char
+    while [ -n "$rest" ]; do
+        char="${rest:0:1}"
+        rest="${rest:1}"
+        case "$char" in
+            \\)
+                char="${rest:0:1}"
+                rest="${rest:1}"
+                case "$char" in
+                    n) out+=$'\n' ;;
+                    r) out+=$'\r' ;;
+                    t) out+=$'\t' ;;
+                    *) out+="$char" ;;
+                esac
+                ;;
+            \") break ;;
+            *) out+="$char" ;;
+        esac
+    done
+    printf '%s' "$out"
 }
 
 ab() {
