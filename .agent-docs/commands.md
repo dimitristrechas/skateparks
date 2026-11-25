@@ -10,7 +10,7 @@ sh scripts.sh test                           # All tests with coverage
 sh scripts.sh test --fast                    # All tests without coverage
 sh scripts.sh test test/models/foo_test.rb   # Single file or line
 sh scripts.sh test --system [path]           # Capybara system tests (Chromium container)
-sh scripts.sh test-changed [--base main]     # Targeted tests for changed files; falls back to test --fast
+sh scripts.sh test-changed [--base main]     # Targeted tests for changed files; falls back to test --fast + --system
 sh scripts.sh lint                           # Fast linter checks (parallel RuboCop, Herb, Prettier)
 sh scripts.sh lint --full                    # Includes Zeitwerk check
 sh scripts.sh lint --fix                     # Auto-fix then re-check
@@ -67,7 +67,8 @@ sh scripts.sh ci             # Zeitwerk, RuboCop, Prettier, Herb, Brakeman, bund
 ```
 
 `test-changed` maps `app/models|controllers|components|helpers|jobs|mailers/*.rb` to the
-conventional `test/**/*_test.rb` and runs only those files. It falls back to `test --fast` when
+conventional `test/**/*_test.rb` and runs only those files (changed `test/system/*` files run in the
+Chromium container). It falls back to `test --fast` plus `test --system` when
 the diff touches migrations, `db/schema.rb`, `Gemfile*`, `test/test_helper.rb`, `test/support/*`,
 `test/factories/*`, `config/application.rb`, `config/database.yml`, `config/environments/test.rb`,
 `Dockerfile.development`, `docker-compose.yml`, `.env.test`, or more than 10 files.

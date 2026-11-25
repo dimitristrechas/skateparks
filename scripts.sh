@@ -368,6 +368,14 @@ needs_full_suite() {
     return 1
 }
 
+# test --fast excludes test/system, so the full-suite fallback runs both.
+run_tests_full_fallback() {
+    local status=0
+    run_tests_fast || status=1
+    run_system_tests || status=1
+    return $status
+}
+
 run_tests_changed() {
     local base="main"
     if [ "${1:-}" = "--base" ] && [ -n "${2:-}" ]; then
@@ -387,8 +395,8 @@ run_tests_changed() {
     local count
     count=$(printf '%s\n' "$files" | wc -l | tr -d ' ')
     if [ "$count" -gt 10 ]; then
-        echo -e "${YELLOW}${count} changed files — falling back to full fast suite.${NC}"
-        run_tests_fast
+        echo -e "${YELLOW}${count} changed files — falling back to full fast suite + system tests.${NC}"
+        run_tests_full_fallback
         return $?
     fi
 
@@ -396,8 +404,8 @@ run_tests_changed() {
     local file
     while IFS= read -r file; do
         if needs_full_suite "$file"; then
-            echo -e "${YELLOW}${file} requires full suite — falling back to test --fast.${NC}"
-            run_tests_fast
+            echo -e "${YELLOW}${file} requires full suite — falling back to test --fast + system tests.${NC}"
+            run_tests_full_fallback
             return $?
         fi
         mapped=$(map_app_file_to_test "$file")
