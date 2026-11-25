@@ -37,7 +37,6 @@ en:
     developer_navigation:
       aria_label: "Developer navigation"
       admin: "Admin"
-      lookbook: "Lookbook"
     go_skate_day:
       countdown:
         one: "1 day until Go Skate Day!"

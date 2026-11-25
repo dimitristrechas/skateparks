@@ -1,7 +1,6 @@
 Rails.application.routes.draw do
   resource :session
   resources :password_resets, param: :token
-  mount Lookbook::Engine, at: '/lookbook' if Rails.env.development?
 
   namespace :account do
     resource :profile, only: %i[show edit update]

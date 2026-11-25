@@ -37,7 +37,6 @@ el:
     developer_navigation:
       aria_label: "Πλοήγηση προγραμματιστή"
       admin: "Admin"
-      lookbook: "Lookbook"
     go_skate_day:
       countdown:
         one: "1 ημέρα μέχρι την Go Skate Day!"
