@@ -24,3 +24,5 @@ Follow [AGENTS.md](AGENTS.md). Read linked docs before acting; do not duplicate 
 ## Tests
 
 When adding or changing behavior, **load the `rails-testing` skill** (via the `skill` tool in OpenCode) before writing or running tests. Prefer `sh scripts.sh test`.
+
+After UI, view, route, controller, or locale changes, **load the `browser-smoke` skill** and run `sh scripts.sh browser smoke` against the dev server.

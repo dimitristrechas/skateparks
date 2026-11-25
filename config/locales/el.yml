@@ -1,4 +1,7 @@
 el:
+  time:
+    formats:
+      short: "%d/%m %H:%M"
   opens_in_new_tab: "(ανοίγει σε νέα καρτέλα)"
   made_with: "Φτιαγμένο με"
   city_of_origin: "Καβάλα, Ελλάδα"
@@ -48,6 +51,7 @@ el:
   skatepark:
     name: "Όνομα"
     images: "Φωτογραφίες"
+    videos: "Βίντεο"
     media_tabs: "Πολυμέσα skatepark"
     google_id: "Google ID"
     status: "Κατάσταση"

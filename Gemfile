@@ -94,6 +94,7 @@ group :test do
   gem 'faker'
   gem 'mocha'
   gem 'rails-controller-testing'
+  gem 'selenium-webdriver'
   gem 'simplecov', require: false
 end
 

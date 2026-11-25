@@ -48,6 +48,7 @@ en:
   skatepark:
     name: "Name"
     images: "Images"
+    videos: "Videos"
     media_tabs: "Skatepark media"
     google_id: "Google ID"
     status: "status"

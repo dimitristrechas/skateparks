@@ -32,6 +32,8 @@ TEST_ENV_FILE="./.env.test"
 SERVICE_NAME="skateparks-web"
 DB_SERVICE_NAME="skateparks-db"
 REDIS_SERVICE_NAME="skateparks-redis"
+CHROME_SERVICE_NAME="skateparks-chrome"
+SELENIUM_REMOTE_URL="http://${CHROME_SERVICE_NAME}:4444"
 WEB_IMAGE="skateparks-dev"
 
 INTERACTIVE=true
@@ -68,6 +70,19 @@ test_run() {
     ensure_web_image || return 1
     ensure_infra || return 1
     app_compose run --rm -T --env-from-file "$TEST_ENV_FILE" "$SERVICE_NAME" "$@"
+}
+
+# test_run with extra env vars: test_run_with_env KEY=VALUE... -- command...
+test_run_with_env() {
+    local env_args=()
+    while [ $# -gt 0 ] && [ "$1" != "--" ]; do
+        env_args+=(-e "$1")
+        shift
+    done
+    shift
+    ensure_web_image || return 1
+    ensure_infra || return 1
+    app_compose run --rm -T --env-from-file "$TEST_ENV_FILE" "${env_args[@]}" "$SERVICE_NAME" "$@"
 }
 
 # Same as test_run but keeps a TTY for interactive console/bash sessions.
@@ -179,7 +194,7 @@ stop_dev_server() {
         return 0
     fi
     echo -e "${YELLOW}Stopping development server...${NC}"
-    if app_compose stop; then
+    if app_compose --profile test stop; then
         echo -e "${GREEN}✅ Development server stopped${NC}"
     else
         echo -e "${RED}❌ Failed to stop development server${NC}"
@@ -265,10 +280,23 @@ run_single_test() {
     test_run bash -c 'bin/rails db:prepare && bin/rails test "$@"' bash "$target"
 }
 
+# System tests drive Chromium in the skateparks-chrome container (compose profile "test").
+# One worker: the Selenium container serves one session at a time.
+run_system_tests() {
+    echo -e "${GREEN}Running system tests...${NC}"
+    app_compose --profile test up -d --wait "$CHROME_SERVICE_NAME" || return 1
+    test_run_with_env SELENIUM_REMOTE_URL="$SELENIUM_REMOTE_URL" PARALLEL_WORKERS=1 DISABLE_SIMPLECOV=1 -- \
+        bash -c 'bin/rails db:prepare && bin/rails test "${@:-test/system}"' bash "$@"
+}
+
 run_tests_cli() {
     case "${1:-}" in
         --fast)
             run_tests_fast
+            ;;
+        --system)
+            shift
+            run_system_tests "$@"
             ;;
         "")
             run_tests_with_coverage
@@ -309,6 +337,10 @@ map_app_file_to_test() {
     local candidate=""
 
     case "$file" in
+        test/application_system_test_case.rb)
+            echo "test/system"
+            return
+            ;;
         test/*_test.rb)
             candidate="$file"
             ;;
@@ -336,6 +368,14 @@ needs_full_suite() {
     return 1
 }
 
+# test --fast excludes test/system, so the full-suite fallback runs both.
+run_tests_full_fallback() {
+    local status=0
+    run_tests_fast || status=1
+    run_system_tests || status=1
+    return $status
+}
+
 run_tests_changed() {
     local base="main"
     if [ "${1:-}" = "--base" ] && [ -n "${2:-}" ]; then
@@ -355,8 +395,8 @@ run_tests_changed() {
     local count
     count=$(printf '%s\n' "$files" | wc -l | tr -d ' ')
     if [ "$count" -gt 10 ]; then
-        echo -e "${YELLOW}${count} changed files — falling back to full fast suite.${NC}"
-        run_tests_fast
+        echo -e "${YELLOW}${count} changed files — falling back to full fast suite + system tests.${NC}"
+        run_tests_full_fallback
         return $?
     fi
 
@@ -364,8 +404,8 @@ run_tests_changed() {
     local file
     while IFS= read -r file; do
         if needs_full_suite "$file"; then
-            echo -e "${YELLOW}${file} requires full suite — falling back to test --fast.${NC}"
-            run_tests_fast
+            echo -e "${YELLOW}${file} requires full suite — falling back to test --fast + system tests.${NC}"
+            run_tests_full_fallback
             return $?
         fi
         mapped=$(map_app_file_to_test "$file")
@@ -381,8 +421,20 @@ run_tests_changed() {
 
     echo -e "${GREEN}Running targeted tests:${NC}"
     echo "$tests"
-    # shellcheck disable=SC2086
-    test_run bash -c "bin/rails db:prepare && DISABLE_SIMPLECOV=1 bin/rails test $tests"
+
+    local system_tests other_tests status=0
+    system_tests=$(printf '%s\n' "$tests" | grep '^test/system' || true)
+    other_tests=$(printf '%s\n' "$tests" | grep -v '^test/system' || true)
+
+    if [ -n "$other_tests" ]; then
+        # shellcheck disable=SC2086
+        test_run bash -c "bin/rails db:prepare && DISABLE_SIMPLECOV=1 bin/rails test $other_tests" || status=1
+    fi
+    if [ -n "$system_tests" ]; then
+        # shellcheck disable=SC2086
+        run_system_tests $system_tests || status=1
+    fi
+    return $status
 }
 
 run_lint_changed() {
@@ -663,12 +715,17 @@ stop_all_containers() {
         return 0
     fi
     echo -e "${YELLOW}Stopping skateparks Docker containers...${NC}"
-    if app_compose stop; then
+    if app_compose --profile test stop; then
         echo -e "${GREEN}✅ Skateparks containers stopped${NC}"
     else
         echo -e "${YELLOW}⚠️  No skateparks containers were running${NC}"
     fi
 }
+
+# --- Browser sanity checks: scripts/browser.sh ---
+
+# shellcheck source=scripts/browser.sh
+. ./scripts/browser.sh
 
 # --- CLI ---
 
@@ -679,6 +736,7 @@ Skateparks.gr Development Toolkit
 Usage:
   scripts.sh                         Interactive menu
   scripts.sh test [--fast] [path]    Run tests (coverage, fast, or single file/line)
+  scripts.sh test --system [path]    Run Capybara system tests (Chromium container)
   scripts.sh test-changed [--base main]  Targeted tests for changed files (fast path)
   scripts.sh lint [--fix] [--full]       Run linters (fast by default; --full adds Zeitwerk)
   scripts.sh lint-changed [--base main]  Linters on changed files only (fast path)
@@ -687,12 +745,18 @@ Usage:
   scripts.sh ci                        Run all CI parity checks in parallel
   scripts.sh dev <command>             Development server commands
   scripts.sh test-server <command>     Test environment commands (ephemeral containers)
+  scripts.sh browser <command>         agent-browser sanity checks against the dev server
 
 Dev commands:
   up, rebuild, down, logs, console, bash, migrate, seed, reset, cache-clear
 
 Test-environment commands:
   up, rebuild, console, bash, schema-load
+
+Browser commands (needs agent-browser on the host and 'dev up'):
+  login                                Sign in with ADMIN_EMAIL/ADMIN_PASSWORD from .env
+  smoke [--public|--admin] [--mobile] [--screenshots]
+  close                                Close the browser sessions
 
 Destructive non-interactive commands require --force:
   scripts.sh dev rebuild --force
@@ -798,6 +862,10 @@ run_cli() {
         test-server)
             shift
             run_test_server_cli "$@"
+            ;;
+        browser)
+            shift
+            run_browser_cli "$@"
             ;;
         *)
             echo -e "${RED}Unknown command: ${1:-}${NC}"

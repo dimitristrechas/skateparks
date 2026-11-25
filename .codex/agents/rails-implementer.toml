@@ -16,4 +16,7 @@ Tests:
 When adding or changing behavior, use the `rails-testing` skill
 (`.agents/skills/rails-testing/SKILL.md`) before writing or running tests.
 Prefer `sh scripts.sh test`.
+
+After UI, view, route, controller, or locale changes, use the `browser-smoke`
+skill (`.agents/skills/browser-smoke/SKILL.md`) and run `sh scripts.sh browser smoke`.
 """

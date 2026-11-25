@@ -44,7 +44,7 @@ test/
 ├── models/             # Model unit tests
 ├── support/            # Support helpers autoloaded from test/support/**/*.rb
 │   └── form_builder_double.rb
-├── system/             # Capybara system tests (no tests written yet)
+├── system/             # Capybara system tests (`sh scripts.sh test --system`)
 ├── workers/            # Sidekiq worker tests
 └── test_helper.rb
 ```
@@ -529,11 +529,12 @@ assert_not_includes Skatepark.published, @draft_skatepark
 
 ## Test Gems
 
-| Gem                        | Purpose                                                                 |
-| -------------------------- | ----------------------------------------------------------------------- |
-| `factory_bot_rails`        | Test data factories                                                     |
-| `faker`                    | Random test data                                                        |
-| `mocha`                    | Mocking and stubbing                                                    |
-| `rails-controller-testing` | `assigns(:var)` in controller tests                                     |
-| `simplecov`                | Coverage (enabled unless `DISABLE_SIMPLECOV=1`)                         |
-| `capybara`                 | System test browser automation (installed; no system tests written yet) |
+| Gem                        | Purpose                                                                |
+| -------------------------- | ---------------------------------------------------------------------- |
+| `factory_bot_rails`        | Test data factories                                                    |
+| `faker`                    | Random test data                                                       |
+| `mocha`                    | Mocking and stubbing                                                   |
+| `rails-controller-testing` | `assigns(:var)` in controller tests                                    |
+| `simplecov`                | Coverage (enabled unless `DISABLE_SIMPLECOV=1`)                        |
+| `capybara`                 | System test browser automation (`test/system/`)                        |
+| `selenium-webdriver`       | Capybara driver; remote Chromium container locally, local Chrome in CI |
