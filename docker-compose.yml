@@ -34,6 +34,17 @@ services:
       timeout: 5s
       retries: 30
 
+  skateparks-chrome:
+    image: selenium/standalone-chromium:4.54.0
+    container_name: skateparks-chrome
+    profiles: ["test"]
+    shm_size: 2gb
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:4444/readyz"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
   skateparks-web:
     container_name: skateparks-web
     image: skateparks-dev

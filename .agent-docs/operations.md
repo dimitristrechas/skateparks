@@ -26,11 +26,12 @@ Node **26.13.0** is pinned in `.nvmrc` and `.node-version`. `package.json` decla
 
 One compose stack (`docker-compose.yml`, project `skateparks`):
 
-| Service            | Container          | Purpose                                                           | Host port |
-| ------------------ | ------------------ | ----------------------------------------------------------------- | --------- |
-| `skateparks-db`    | `skateparks-db`    | PostgreSQL — hosts `skateparks_development` and `skateparks_test` | 5434      |
-| `skateparks-redis` | `skateparks-redis` | Redis — logical DB `/1` (dev) and `/2` (test)                     | 6379      |
-| `skateparks-web`   | `skateparks-web`   | Development server (`foreman`: web + Tailwind watch + Sidekiq)    | 3002      |
+| Service             | Container           | Purpose                                                                         | Host port |
+| ------------------- | ------------------- | ------------------------------------------------------------------------------- | --------- |
+| `skateparks-db`     | `skateparks-db`     | PostgreSQL — hosts `skateparks_development` and `skateparks_test`               | 5434      |
+| `skateparks-redis`  | `skateparks-redis`  | Redis — logical DB `/1` (dev) and `/2` (test)                                   | 6379      |
+| `skateparks-web`    | `skateparks-web`    | Development server (`foreman`: web + Tailwind watch + Sidekiq)                  | 3002      |
+| `skateparks-chrome` | `skateparks-chrome` | Selenium Chromium for system tests (profile `test`, started by `test --system`) | —         |
 
 Tests do **not** use a long-running web service. `sh scripts.sh test` starts a disposable container from the same `skateparks-dev` image with `RAILS_ENV=test` and the values from `.env.test`, then removes it. This keeps test runs isolated without a second always-on stack.
 

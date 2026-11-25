@@ -61,6 +61,10 @@ Four files define MCP servers for different clients. **Keep the same servers, UR
 
 Do not add GitHub Copilot-specific MCP endpoints or agent files to this repository.
 
+## Browser automation
+
+All agents use the **agent-browser** CLI (host install) through `sh scripts.sh browser …` and the `browser-smoke` skill. It is shell-only, so no MCP entry is needed and the four MCP files stay unchanged. Editor-specific browsers (Cursor Browser, Claude in Chrome, Codex/T3 in-app previews) are optional for ad-hoc use but are not the shared contract.
+
 ## Change checklist
 
 When adding or changing an agent, skill, or MCP server:

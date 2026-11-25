@@ -9,6 +9,7 @@ sh scripts.sh                              # Interactive menu
 sh scripts.sh test                           # All tests with coverage
 sh scripts.sh test --fast                    # All tests without coverage
 sh scripts.sh test test/models/foo_test.rb   # Single file or line
+sh scripts.sh test --system [path]           # Capybara system tests (Chromium container)
 sh scripts.sh test-changed [--base main]     # Targeted tests for changed files; falls back to test --fast
 sh scripts.sh lint                           # Fast linter checks (parallel RuboCop, Herb, Prettier)
 sh scripts.sh lint --full                    # Includes Zeitwerk check
@@ -21,6 +22,9 @@ sh scripts.sh dev up                         # Start development server
 sh scripts.sh dev rebuild --force            # Rebuild the development image
 sh scripts.sh test-server up                 # Prepare the test database
 sh scripts.sh test-server schema-load        # Reload test DB schema
+sh scripts.sh browser smoke [--public|--admin] [--mobile] [--screenshots]  # agent-browser sanity check (dev server)
+sh scripts.sh browser login                  # Admin sign-in from .env ADMIN_EMAIL/ADMIN_PASSWORD
+sh scripts.sh browser close                  # Close agent-browser sessions
 ```
 
 ## Linting

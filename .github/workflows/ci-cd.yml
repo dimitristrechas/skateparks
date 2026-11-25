@@ -158,6 +158,19 @@ jobs:
       - name: Run tests
         run: bundle exec rails test test/components test/controllers test/models test/helpers test/jobs test/workers test/mailers test/channels
 
+      - name: Run system tests
+        run: bundle exec rails test:system
+        env:
+          PARALLEL_WORKERS: "1"
+
+      - name: Upload system test screenshots
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: system-test-screenshots
+          path: tmp/screenshots
+          if-no-files-found: ignore
+
   rubocop-brakeman:
     runs-on: ubuntu-latest
     timeout-minutes: 5

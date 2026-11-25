@@ -19,6 +19,7 @@ Rails 8.1 skatepark directory app (Ruby 4.0.9, PostgreSQL 17 in dev/test/CI — 
 - **Accessibility:** Semantic HTML first; meaningful labels for interactive controls; keyboard support (Tab, Enter, Escape, arrows where applicable); visible focus; sufficient contrast. Decorative SVGs should use `aria-hidden="true"`.
 - **Mobile / responsive:** Mobile-first layouts; respect touch targets (project components already use `min-h-8` / `min-w-8` patterns—follow them).
 - **N+1 / queries:** For index, show, and admin lists, eager-load associations the view touches (`includes`, `preload`, `eager_load` as appropriate). After changing controllers or associations, verify query counts in tests or development (see [.agent-docs/commands.md](.agent-docs/commands.md)).
+- **Browser sanity check:** After UI, view, route, controller, or locale changes, run `sh scripts.sh browser smoke` (agent-browser against the dev server; public + admin, `en` + `el`) before PR open. All agents use agent-browser for this — see the `browser-smoke` skill. Admin credentials come from `.env` via `sh scripts.sh browser login`; never read or echo them.
 - **Visual consistency:** Prefer existing ViewComponents and patterns in `app/assets/tailwind/application.css` before ad hoc Tailwind. Match focus rings, spacing, and button styles used by `ButtonComponent`, `IconButtonComponent`, etc.
 
 ## Agent skills
