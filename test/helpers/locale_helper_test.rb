@@ -15,7 +15,7 @@ class LocaleHelperTest < ActionView::TestCase
   def test_locale_switch_url_options_omits_default_locale
     stubs(:params).returns(ActionController::Parameters.new(country_code: 'GR', page: '2'))
 
-    assert_equal({ country_code: 'GR', page: '2' }, locale_switch_url_options(:en))
+    assert_equal({ country_code: 'GR', page: '2', locale: nil }, locale_switch_url_options(:en))
   end
 
   def test_locale_switch_url_options_includes_non_default_locale

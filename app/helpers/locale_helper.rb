@@ -17,8 +17,8 @@ module LocaleHelper
       lng: params[:lng],
       sort: params[:sort],
       page: params[:page],
-    }
-    options[:locale] = locale unless locale == I18n.default_locale
-    options.compact
+    }.compact
+    options[:locale] = locale.to_sym == I18n.default_locale ? nil : locale
+    options
   end
 end

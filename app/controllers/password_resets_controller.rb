@@ -31,7 +31,8 @@ class PasswordResetsController < ApplicationController
       @user.sessions.destroy_all
       redirect_to new_session_path, notice: t('authentication.password_reset_success')
     else
-      redirect_to edit_password_reset_path(params[:token]), alert: t('authentication.password_reset_failed')
+      alert = @user.errors.full_messages.to_sentence.presence || t('authentication.password_reset_failed')
+      redirect_to edit_password_reset_path(params[:token]), alert: alert
     end
   end
 

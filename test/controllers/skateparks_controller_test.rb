@@ -784,6 +784,12 @@ class SkateparksControllerTest < ActionDispatch::IntegrationTest
     assert_select "button[disabled][aria-label='#{I18n.t('views.pagination.previous', locale: :el)}']"
   end
 
+  def test_english_language_link_drops_locale_on_greek_page
+    get skateparks_path(locale: :el, country_code: 'GR')
+
+    assert_select 'nav[aria-label="Language selector"] a[href=?]', '/skateparks?country_code=GR', text: 'English'
+  end
+
   def test_index_filter_forms_omit_locale_for_default_locale
     get skateparks_path
 

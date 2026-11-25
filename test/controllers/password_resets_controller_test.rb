@@ -88,7 +88,7 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
     patch password_reset_url(token), params: { password: '', password_confirmation: '' }
 
     assert_redirected_to edit_password_reset_path(token)
-    assert_equal I18n.t('authentication.password_reset_failed'), flash[:alert]
+    assert_equal "Password can't be blank", flash[:alert]
     assert Session.exists?(session_record.id)
   end
 
@@ -99,7 +99,7 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
     patch password_reset_url(token)
 
     assert_redirected_to edit_password_reset_path(token)
-    assert_equal I18n.t('authentication.password_reset_failed'), flash[:alert]
+    assert_equal "Password can't be blank", flash[:alert]
   end
 
   test 'should reject mismatched passwords' do
@@ -112,7 +112,7 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
     }
 
     assert_redirected_to edit_password_reset_path(token)
-    assert_equal I18n.t('authentication.password_reset_failed'), flash[:alert]
+    assert_equal "Password confirmation doesn't match Password", flash[:alert]
   end
 
   test 'should rate limit password reset requests per ip' do

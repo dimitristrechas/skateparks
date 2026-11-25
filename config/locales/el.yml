@@ -419,6 +419,11 @@ el:
       skatepark_video:
         youtube_url: "YouTube URL"
         status: "Κατάσταση"
+      user:
+        email_address: "Email"
+        password: "Κωδικός"
+        password_confirmation: "Επιβεβαίωση κωδικού"
+        current_password: "Τρέχων κωδικός"
     errors:
       models:
         skatepark:
@@ -440,3 +445,11 @@ el:
   errors:
     messages:
       taken: "έχει ήδη χρησιμοποιηθεί"
+      blank: "πρέπει να συμπληρωθεί"
+      invalid: "δεν έχει έγκυρη μορφή"
+      confirmation: "δεν ταιριάζει με το πεδίο %{attribute}"
+      inclusion: "έχει μη αποδεκτή τιμή"
+      greater_than: "πρέπει να έχει τιμή μεγαλύτερη από %{count}"
+      too_short:
+        one: "πρέπει να έχει τουλάχιστον 1 χαρακτήρα"
+        other: "πρέπει να έχει τουλάχιστον %{count} χαρακτήρες"

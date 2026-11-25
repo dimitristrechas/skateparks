@@ -82,7 +82,7 @@ export default class extends Controller {
     const url = new URL(this.citiesUrlValue, window.location.origin);
     if (countryCode) url.searchParams.set("country_code", countryCode);
 
-    picker.dataset.adminSkateparkPickerSearchUrlValue = `${url.pathname}${url.search}`;
+    picker.setAttribute("data-admin--skatepark-picker-search-url-value", `${url.pathname}${url.search}`);
 
     const input = picker.querySelector('[data-admin--skatepark-picker-target="input"]');
     if (input) input.disabled = !countryCode;
