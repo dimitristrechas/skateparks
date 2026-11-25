@@ -42,7 +42,7 @@ sh scripts.sh browser close                 # close both browser sessions when d
 ```
 
 Each page is checked for: HTTP 200, no redirect to sign-in, no JS page errors, no `.translation_missing`
-spans, and (with `--mobile`) no horizontal overflow. The route lists live in `scripts.sh`
+spans, and (with `--mobile`) no horizontal overflow. The route lists live in `scripts/browser.sh`
 (`BROWSER_PUBLIC_PATHS`, `BROWSER_ADMIN_PATHS`); add new top-level routes there.
 
 When smoke fails, find the cause in `sh scripts.sh dev logs` (500s, `Translation missing` errors).
