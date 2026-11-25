@@ -27,7 +27,7 @@ class PasswordResetsController < ApplicationController
   end
 
   def update
-    if @user.update(params.permit(:password, :password_confirmation))
+    if @user.update(password: params[:password], password_confirmation: params[:password_confirmation])
       @user.sessions.destroy_all
       redirect_to new_session_path, notice: t('authentication.password_reset_success')
     else
@@ -38,7 +38,7 @@ class PasswordResetsController < ApplicationController
   private
 
   def set_user_by_token
-    @user = User.find_signed(params[:token], purpose: :password_reset)
+    @user = User.find_by_password_reset_token(params[:token])
     redirect_to new_password_reset_path, alert: t('authentication.password_reset_invalid_token') if @user.nil?
   end
 end

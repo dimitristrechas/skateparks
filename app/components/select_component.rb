@@ -1,6 +1,5 @@
 class SelectComponent < ViewComponent::Base
-  # rubocop:disable-next Metrics/ParameterLists
-  def initialize(name:, options:, selected: nil, disabled: false, large: false,
+  def initialize(name:, options:, selected: nil, disabled: false, large: false, # rubocop:disable Metrics/ParameterLists
                  id: nil, required: false, aria: {}, **html_options)
     super()
     @name = name

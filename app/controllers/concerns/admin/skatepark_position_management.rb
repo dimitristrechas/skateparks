@@ -29,6 +29,20 @@ module Admin
         records.reject(&:marked_for_destruction?).filter_map(&:position)
     end
 
+    def ordered_new_items(items, positions, records:, existing_attributes:)
+      positions = fallback_positions(items, requested_positions(existing_attributes, records)) if positions.empty?
+
+      items.zip(positions).filter_map do |item, position|
+        [item, position.to_i] unless item.blank? || position.blank?
+      end
+    end
+
+    def fallback_positions(items, existing_positions)
+      starting_position = existing_positions.max.to_i + 1
+
+      items.each_index.map { |index| starting_position + index }
+    end
+
     def reserve_existing_positions!(records, existing_attributes)
       return if existing_attributes.empty?
 

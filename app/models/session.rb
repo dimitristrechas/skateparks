@@ -6,7 +6,13 @@ class Session < ApplicationRecord
   validates :session_token, presence: true, uniqueness: true
 
   scope :expired, -> { where(expires_at: ...Time.current) }
-  scope :active, -> { where('expires_at >= ? OR expires_at IS NULL', Time.current) }
+
+  def self.find_active_by_token(token)
+    return if token.blank?
+
+    session = includes(:user).find_by(session_token: token)
+    session if session && !session.expired? && session.user.active?
+  end
 
   def expired?
     expires_at && expires_at < Time.current

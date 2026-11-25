@@ -5,24 +5,13 @@ module Account
                   alert: t('authentication.rate_limit_exceeded')
     }
 
-    def edit
-      @user = Current.session.user
-    end
+    def edit; end
 
     def update
-      @user = Current.session.user
-
-      unless @user.authenticate(password_params[:current_password])
-        @user.errors.add(:current_password, t('authentication.password_change_failed'))
+      unless current_password_valid?(password_params[:current_password])
         return render :edit, status: :unprocessable_content
       end
 
-      update_password
-    end
-
-    private
-
-    def update_password
       if @user.update(password: password_params[:password],
                       password_confirmation: password_params[:password_confirmation])
         @user.sessions.destroy_all
@@ -32,6 +21,8 @@ module Account
         render :edit, status: :unprocessable_content
       end
     end
+
+    private
 
     def password_params
       params.expect(user: %i[current_password password password_confirmation])

@@ -21,28 +21,13 @@ class SchemaHelperTest < ActionView::TestCase
     assert_equal 'https://schema.org', schema[:@context]
     assert_equal 'WebSite', schema[:@type]
     assert_equal 'skateparks.gr', schema[:name]
-    assert_equal %w[el en], schema[:inLanguage]
+    assert_equal %w[en el], schema[:inLanguage]
   end
 
-  def test_website_schema_includes_search_action
+  def test_website_schema_omits_search_action
     stubs(:root_url).returns('https://skateparks.gr/')
-    stubs(:skateparks_url).returns('https://skateparks.gr/skateparks')
 
-    schema = website_schema
-
-    assert_equal 'SearchAction', schema[:potentialAction][:@type]
-    assert_equal 'https://skateparks.gr/skateparks?search={search_term_string}',
-                 schema[:potentialAction][:target][:urlTemplate]
-  end
-
-  def test_website_schema_search_action_uses_ampersand_when_locale_is_present
-    stubs(:root_url).returns('https://skateparks.gr/')
-    stubs(:skateparks_url).returns('https://skateparks.gr/skateparks?locale=en')
-
-    schema = website_schema
-
-    assert_equal 'https://skateparks.gr/skateparks?locale=en&search={search_term_string}',
-                 schema[:potentialAction][:target][:urlTemplate]
+    assert_not website_schema.key?(:potentialAction)
   end
 
   def test_organization_schema_uses_current_locale_description

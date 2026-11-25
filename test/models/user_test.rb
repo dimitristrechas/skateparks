@@ -40,4 +40,17 @@ class UserTest < ActiveSupport::TestCase
 
     assert_predicate user, :active?
   end
+
+  test 'rejects blank password assignment on update' do
+    user = create(:user)
+
+    assert_not user.update(password: '', password_confirmation: '')
+    assert_predicate user.errors[:password], :present?
+  end
+
+  test 'allows updates that do not touch the password' do
+    user = create(:user)
+
+    assert user.update(email_address: 'changed@example.com')
+  end
 end

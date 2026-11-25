@@ -41,7 +41,8 @@ module Account
     test 'update email success' do
       user = create(:user, email_address: 'old@example.com')
       sign_in_as(user)
-      patch account_profile_url, params: { user: { email_address: 'new@example.com' } }
+      patch account_profile_url,
+            params: { user: { email_address: 'new@example.com', current_password: 'password123456' } }
 
       assert_redirected_to account_profile_path
       assert_equal 'new@example.com', user.reload.email_address
@@ -53,16 +54,26 @@ module Account
     test 'update email with invalid email fails' do
       user = create(:user, email_address: 'valid@example.com')
       sign_in_as(user)
-      patch account_profile_url, params: { user: { email_address: '' } }
+      patch account_profile_url, params: { user: { email_address: '', current_password: 'password123456' } }
 
       assert_response :unprocessable_content
       assert_equal 'valid@example.com', user.reload.email_address
     end
 
+    test 'update email requires current password' do
+      user = create(:user, email_address: 'old@example.com')
+      sign_in_as(user)
+      patch account_profile_url, params: { user: { email_address: 'new@example.com', current_password: 'wrong' } }
+
+      assert_response :unprocessable_content
+      assert_equal 'old@example.com', user.reload.email_address
+    end
+
     test 'update normalizes email' do
       user = create(:user, email_address: 'old@example.com')
       sign_in_as(user)
-      patch account_profile_url, params: { user: { email_address: '  NEW@EXAMPLE.COM  ' } }
+      patch account_profile_url,
+            params: { user: { email_address: '  NEW@EXAMPLE.COM  ', current_password: 'password123456' } }
 
       assert_redirected_to account_profile_path
       assert_equal 'new@example.com', user.reload.email_address

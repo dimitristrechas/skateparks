@@ -1,15 +1,13 @@
 module Account
   class ProfilesController < BaseController
-    def show
-      @user = Current.session.user
-    end
+    def show; end
 
-    def edit
-      @user = Current.session.user
-    end
+    def edit; end
 
     def update
-      @user = Current.session.user
+      unless current_password_valid?(params.dig(:user, :current_password))
+        return render :edit, status: :unprocessable_content
+      end
 
       if @user.update(profile_params)
         redirect_to account_profile_path, notice: t('account.profile_updated')

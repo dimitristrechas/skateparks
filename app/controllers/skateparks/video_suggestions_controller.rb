@@ -25,7 +25,8 @@ module Skateparks
         respond_with_errors
       end
     rescue ActiveRecord::RecordNotUnique
-      @video_suggestion.errors.add(:youtube_url, duplicate_youtube_url_error_key)
+      error_key = SkateparkVideo.duplicate_error_key_for(@skatepark, @video_suggestion.youtube_video_id)
+      @video_suggestion.errors.add(:youtube_url, error_key)
       respond_with_errors
     end
 
@@ -98,17 +99,6 @@ module Skateparks
       return 'video_suggestion_feedback' if @skatepark.blank?
 
       helpers.dom_id(@skatepark, :video_suggestion_feedback)
-    end
-
-    def duplicate_youtube_url_error_key
-      existing = @skatepark.skatepark_videos.find_by(
-        youtube_video_id: @video_suggestion.youtube_video_id,
-        status: %i[pending active]
-      )
-
-      return :already_submitted if existing.blank?
-
-      existing.active? ? :already_published : :already_pending
     end
   end
 end

@@ -541,11 +541,18 @@ class SkateparksControllerTest < ActionDispatch::IntegrationTest
     assert_equal I18n.t('skateparks.not_found'), flash[:alert]
   end
 
-  def test_get_show_redirects_to_homepage_for_stale_slug
+  def test_get_show_redirects_stale_slug_to_canonical_url
     get skatepark_path("#{@skatepark.id}-wrong-slug-name")
 
-    assert_redirected_to root_path
-    assert_equal I18n.t('skateparks.not_found'), flash[:alert]
+    assert_response :moved_permanently
+    assert_redirected_to skatepark_path(@skatepark)
+  end
+
+  def test_get_show_redirects_stale_slug_preserving_locale
+    get skatepark_path("#{@skatepark.id}-wrong-slug-name", locale: :el)
+
+    assert_response :moved_permanently
+    assert_redirected_to skatepark_path(@skatepark, locale: :el)
   end
 
   def test_get_show_includes_videos_tab_when_no_active_videos
@@ -592,29 +599,24 @@ class SkateparksControllerTest < ActionDispatch::IntegrationTest
     assert_not_includes response.body, 'previewVideo-1'
   end
 
-  def test_get_available_cities_returns_json_with_country_code
+  def test_get_available_cities_returns_sorted_cities_for_country
     Rails.cache.clear
     create(:skatepark, city_geoname_id: 264_371)
     create(:skatepark, city_geoname_id: 734_077)
 
-    get '/available_cities', params: { country_code: 'GR' }, as: :json
+    get '/available_cities', params: { country_code: 'GR' }, as: :turbo_stream
 
-    assert_response :success
-    assert_match(/json/, response.content_type)
-    json_response = response.parsed_body
-
-    assert_instance_of Array, json_response
-    assert_equal [264_371, 734_077], json_response.pluck('id')
-    assert_equal %w[Athens Thessaloniki], json_response.pluck('name')
+    assert_equal [264_371, 734_077], assigns(:cities).pluck('id')
+    assert_includes response.body, 'Thessaloniki'
   end
 
   def test_get_available_cities_returns_localized_names
     Rails.cache.clear
     create(:skatepark, city_geoname_id: 264_371)
 
-    get '/available_cities', params: { country_code: 'GR', locale: 'el' }, as: :json
+    get '/available_cities', params: { country_code: 'GR', locale: 'el' }, as: :turbo_stream
 
-    assert_equal ['Αθήνα'], response.parsed_body.pluck('name')
+    assert_includes response.body, 'Αθήνα'
   end
 
   def test_get_available_cities_returns_turbo_stream_with_country_code
@@ -629,30 +631,25 @@ class SkateparksControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, 'city_select'
   end
 
+  def test_get_available_cities_accepts_country_code_path_segment
+    Rails.cache.clear
+    create(:skatepark, city_geoname_id: 264_371)
+
+    get '/available_cities/GR', as: :turbo_stream
+
+    assert_equal [264_371], assigns(:cities).pluck('id')
+  end
+
   def test_get_available_cities_filters_cities_by_selected_country
     Rails.cache.clear
     create(:skatepark, city_geoname_id: 264_371)
     create(:skatepark, :us_location)
 
-    get '/available_cities', params: { country_code: 'US' }, as: :json
-    city_ids = response.parsed_body.pluck('id')
+    get '/available_cities', params: { country_code: 'US' }, as: :turbo_stream
+    city_ids = assigns(:cities).pluck('id')
 
     assert_includes city_ids, 5_368_361
     assert_not_includes city_ids, 264_371
-  end
-
-  def test_get_available_cities_returns_empty_array_json_without_country_code
-    get '/available_cities', as: :json
-
-    assert_response :success
-    assert_equal [], response.parsed_body
-  end
-
-  def test_get_available_cities_returns_empty_array_json_with_invalid_country_code
-    get '/available_cities', params: { country_code: 'ZZ' }, as: :json
-
-    assert_response :success
-    assert_equal [], response.parsed_body
   end
 
   def test_get_available_cities_returns_empty_cities_turbo_stream_without_country_code
@@ -785,6 +782,18 @@ class SkateparksControllerTest < ActionDispatch::IntegrationTest
     assert_select "nav[aria-label='#{I18n.t('views.pagination.aria_label', locale: :el)}']"
     assert_select "a[rel=next][href*='locale=el']"
     assert_select "button[disabled][aria-label='#{I18n.t('views.pagination.previous', locale: :el)}']"
+  end
+
+  def test_index_filter_forms_omit_locale_for_default_locale
+    get skateparks_path
+
+    assert_select 'input[type=hidden][name=locale][disabled]', count: 2
+  end
+
+  def test_index_filter_forms_send_locale_for_non_default_locale
+    get skateparks_path(locale: :el)
+
+    assert_select 'input[type=hidden][name=locale][value=el]:not([disabled])', count: 2
   end
 
   private

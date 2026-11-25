@@ -10,7 +10,7 @@ module SkateparkDistanceFiltering
   included do
     helper_method :default_distance_filter,
                   :distance_filter_options,
-                  :location_params_present?,
+                  :selected_distance,
                   :coordinates_valid?,
                   :sort_options,
                   :selected_sort_option
@@ -87,8 +87,8 @@ module SkateparkDistanceFiltering
     DISTANCE_FILTER_OPTIONS
   end
 
-  def location_params_present?
-    params[:lat].present? && params[:lng].present?
+  def selected_distance
+    params[:lat].present? && params[:lng].present? ? params[:distance].to_s : ''
   end
 
   def coordinates_valid?

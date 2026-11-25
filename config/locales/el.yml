@@ -412,6 +412,8 @@ el:
     attributes:
       skatepark:
         city_geoname_id: "Πόλη"
+        name_en: "Όνομα στα Αγγλικά"
+        description_en: "Περιγραφή στα Αγγλικά"
         skatepark_images: "Φωτογραφίες"
         skatepark_videos: "Βίντεο"
       skatepark_video:

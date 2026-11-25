@@ -63,3 +63,7 @@ Style/TrailingCommaInHashLiteral:
 
 Minitest/MultipleAssertions:
   Max: 5
+
+Rails/DynamicFindBy:
+  AllowedMethods:
+    - find_by_password_reset_token

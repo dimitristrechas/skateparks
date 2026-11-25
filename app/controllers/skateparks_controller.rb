@@ -16,17 +16,13 @@ class SkateparksController < ApplicationController
     @title = @skatepark.seo_title
     @meta_description = @skatepark.seo_description
     @meta_image = url_for(@skatepark.cover_image)
-    @location_friendly_name = location_name
+    @location_friendly_name = @skatepark.location_name(with_flag: true)
   end
 
   def available_cities
     @cities = cities_for_country
 
     respond_to do |format|
-      format.json do
-        render json: @cities.map { |city| { id: city['id'], name: CityDataset.localized_name(city) } }
-      end
-
       format.turbo_stream do
         render turbo_stream: turbo_stream.replace('city_select', partial: 'city_select', locals: { cities: @cities })
       end
@@ -37,21 +33,21 @@ class SkateparksController < ApplicationController
 
   def set_skatepark
     skatepark_id = params[:id].to_s.split('-', 2).first
-    @skatepark = Skatepark.published.includes(
-      :active_skatepark_videos,
-      cover_image_attachment: :blob,
-      skatepark_images: { image_attachment: :blob }
-    ).find(skatepark_id)
+    @skatepark = published_skateparks_with_media.find(skatepark_id)
 
     return if @skatepark.to_param == params[:id].to_s
 
-    redirect_to root_path, alert: t('skateparks.not_found')
+    redirect_to skatepark_path(@skatepark, request.query_parameters.symbolize_keys), status: :moved_permanently
   rescue ActiveRecord::RecordNotFound, ArgumentError
     redirect_to root_path, alert: t('skateparks.not_found')
   end
 
-  def skatepark_params
-    params.expect(skatepark: [:name, :lat, :lng, :country_code, :city_geoname_id, { images: [] }])
+  def published_skateparks_with_media
+    Skatepark.published.includes(
+      :active_skatepark_videos,
+      cover_image_attachment: :blob,
+      skatepark_images: { image_attachment: :blob }
+    )
   end
 
   def filtered_skateparks
@@ -64,14 +60,6 @@ class SkateparksController < ApplicationController
         ISO3166::Country[code] if code.present?
       end
     end
-  end
-
-  def location_name
-    country = ISO3166::Country[@skatepark.country_code]
-    country_name = country&.translation(I18n.locale) || @skatepark.country_code
-
-    [@skatepark.city_name, @skatepark.region_name, "#{country_name} #{country&.emoji_flag}".strip]
-      .compact_blank.join(', ')
   end
 
   def skateparks_for_filters

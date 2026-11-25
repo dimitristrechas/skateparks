@@ -30,11 +30,7 @@ Rails.application.routes.draw do
     end
     resources :site_announcements, only: %i[index new create edit update destroy]
 
-    constraints lambda { |request|
-      session_token = request.cookie_jar.signed[:session_token]
-      session = Session.find_by(session_token: session_token) if session_token
-      session && !session.expired? && session.user.active? && session.user.admin?
-    } do
+    constraints ->(request) { Session.find_active_by_token(request.cookie_jar.signed[:session_token])&.user&.admin? } do
       mount Sidekiq::Web => '/sidekiq'
     end
 
@@ -47,11 +43,11 @@ Rails.application.routes.draw do
     get '/skateparks/32-elefsina' => redirect('/skateparks/35-elefsina', status: 301)
   end
 
-  resources :skateparks do
+  resources :skateparks, only: %i[index show] do
     resource :video_suggestion, only: :create, module: :skateparks
   end
 
-  get 'available_cities(/:country_code)', to: 'skateparks#available_cities'
+  get 'available_cities(/:country_code)', to: 'skateparks#available_cities', as: :available_cities
 
   get 'healthcheck' => 'rails/health#show', as: :rails_health_check
 

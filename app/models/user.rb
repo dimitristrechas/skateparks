@@ -17,6 +17,7 @@ class User < ApplicationRecord
   validates :role, presence: true
   validates :email_address, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
   validates :password, length: { minimum: 12 }, if: :password_digest_changed?
+  validate :password_not_blank, if: :blank_password_assigned?, on: :update
 
   after_update :destroy_sessions_on_role_change, if: :saved_change_to_role?
 
@@ -35,11 +36,20 @@ class User < ApplicationRecord
     end
   end
 
-  def generate_password_reset_token
-    signed_id(expires_in: 15.minutes, purpose: :password_reset)
+  def password=(value)
+    @blank_password_assigned = value.blank?
+    super
   end
 
   private
+
+  def blank_password_assigned?
+    @blank_password_assigned
+  end
+
+  def password_not_blank
+    errors.add(:password, :blank)
+  end
 
   def destroy_sessions_on_role_change
     sessions.destroy_all
