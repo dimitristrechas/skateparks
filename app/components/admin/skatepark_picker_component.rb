@@ -1,7 +1,6 @@
 module Admin
   class SkateparkPickerComponent < ViewComponent::Base
-    # rubocop:disable-next Metrics/ParameterLists
-    def initialize(input_name:, input_id:, label:, search_url:,
+    def initialize(input_name:, input_id:, label:, search_url:, # rubocop:disable Metrics/ParameterLists
                    placeholder: nil, selected_id: nil, selected_name: nil, required: false,
                    no_results_text: nil, results_count_one: nil, results_count_other: nil,
                    selection_required_text: nil)

@@ -1,16 +1,11 @@
 module LocaleHelper
-  LOCALES = {
+  LOCALE_NAMES = {
     el: 'Ελληνικά',
     en: 'English',
   }.freeze
 
-  def locale_selector
-    content_tag :div, class: 'relative' do
-      safe_join([
-                  content_tag(:div, LOCALES[I18n.locale], class: 'cursor-pointer'),
-                  locale_list,
-                ])
-    end
+  def locale_name(locale)
+    LOCALE_NAMES.fetch(locale.to_sym)
   end
 
   def locale_switch_url_options(locale)
@@ -22,20 +17,8 @@ module LocaleHelper
       lng: params[:lng],
       sort: params[:sort],
       page: params[:page],
-    }
-    options[:locale] = locale unless locale == I18n.default_locale
-    options.compact
-  end
-
-  private
-
-  def locale_list
-    content_tag(:ul, class: 'absolute inset-x-0 bottom-0 bg-white') do
-      safe_join(I18n.available_locales.map { |locale| content_tag(:li, locale_link(locale)) })
-    end
-  end
-
-  def locale_link(locale)
-    link_to LOCALES[locale], locale_switch_url_options(locale)
+    }.compact
+    options[:locale] = locale.to_sym == I18n.default_locale ? nil : locale
+    options
   end
 end

@@ -6,6 +6,6 @@
     options: [[t("all_countries"), ""]] + countries.map { |c| [c.translations[I18n.locale], c.alpha2] },
     selected: params[:country_code],
     large: true,
-    data: { "skateparks--filters-target": "countrySelect" }
+    data: { action: "change->skateparks--filters#handleCountryChange" }
   ) %>
 </div>

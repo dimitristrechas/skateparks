@@ -30,7 +30,7 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
 
   test 'should access edit form with valid token' do
     user = create(:user)
-    token = user.generate_password_reset_token
+    token = user.password_reset_token
     get edit_password_reset_url(token)
 
     assert_response :success
@@ -38,7 +38,8 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
 
   test 'should reject expired token' do
     user = create(:user)
-    token = user.signed_id(expires_in: -1.minute, purpose: :password_reset)
+    token = user.password_reset_token
+    travel 16.minutes
     get edit_password_reset_url(token)
 
     assert_redirected_to new_password_reset_path
@@ -54,7 +55,7 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
 
   test 'should update password with valid token' do
     user = create(:user)
-    token = user.generate_password_reset_token
+    token = user.password_reset_token
     new_password = 'newpassword12345'
 
     patch password_reset_url(token), params: {
@@ -67,9 +68,59 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
     assert user.reload.authenticate(new_password)
   end
 
+  test 'should reject token after it was used to reset the password' do
+    user = create(:user)
+    token = user.password_reset_token
+    new_password = 'newpassword12345'
+
+    patch password_reset_url(token), params: { password: new_password, password_confirmation: new_password }
+    get edit_password_reset_url(token)
+
+    assert_redirected_to new_password_reset_path
+    assert_equal I18n.t('authentication.password_reset_invalid_token'), flash[:alert]
+  end
+
+  test 'should reject a concurrent redemption whose token was consumed while waiting for the lock' do
+    user = create(:user)
+    session_record = user.sessions.create!(expires_at: 1.day.from_now)
+    token = user.password_reset_token
+    # The before_action sees a valid token; by the time the row lock is acquired another
+    # request has already reset the password, so the in-lock re-check no longer matches.
+    User.stubs(:find_by_password_reset_token).with(token).returns(user).then.returns(nil)
+
+    patch password_reset_url(token), params: { password: 'newpassword12345', password_confirmation: 'newpassword12345' }
+
+    assert_redirected_to new_password_reset_path
+    assert_equal I18n.t('authentication.password_reset_invalid_token'), flash[:alert]
+    assert user.reload.authenticate('password123456')
+    assert Session.exists?(session_record.id)
+  end
+
+  test 'should reject blank password' do
+    user = create(:user)
+    session_record = user.sessions.create!(expires_at: 1.day.from_now)
+    token = user.password_reset_token
+
+    patch password_reset_url(token), params: { password: '', password_confirmation: '' }
+
+    assert_redirected_to edit_password_reset_path(token)
+    assert_equal "Password can't be blank", flash[:alert]
+    assert Session.exists?(session_record.id)
+  end
+
+  test 'should reject missing password' do
+    user = create(:user)
+    token = user.password_reset_token
+
+    patch password_reset_url(token)
+
+    assert_redirected_to edit_password_reset_path(token)
+    assert_equal "Password can't be blank", flash[:alert]
+  end
+
   test 'should reject mismatched passwords' do
     user = create(:user)
-    token = user.generate_password_reset_token
+    token = user.password_reset_token
 
     patch password_reset_url(token), params: {
       password: 'newpassword12345',
@@ -77,7 +128,7 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
     }
 
     assert_redirected_to edit_password_reset_path(token)
-    assert_equal I18n.t('authentication.password_reset_failed'), flash[:alert]
+    assert_equal "Password confirmation doesn't match Password", flash[:alert]
   end
 
   test 'should rate limit password reset requests per ip' do
@@ -114,7 +165,7 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
 
   test 'should rate limit password reset completion' do
     user = create(:user)
-    token = user.generate_password_reset_token
+    token = user.password_reset_token
 
     10.times do
       patch password_reset_url(token), params: {

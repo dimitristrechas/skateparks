@@ -54,6 +54,13 @@ class SkateparkVideo < ApplicationRecord # rubocop:disable Metrics/ClassLength
     candidate if candidate&.match?(YOUTUBE_VIDEO_ID_REGEX)
   end
 
+  def self.duplicate_error_key_for(skatepark, youtube_video_id)
+    existing = skatepark.skatepark_videos.find_by(youtube_video_id: youtube_video_id, status: %i[pending active])
+    return :already_submitted if existing.blank?
+
+    existing.active? ? :already_published : :already_pending
+  end
+
   def self.next_active_position_for(skatepark)
     skatepark.skatepark_videos.active.maximum(:position).to_i + 1
   end

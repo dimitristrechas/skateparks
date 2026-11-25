@@ -16,22 +16,22 @@ module Admin
       if activate_video_on!(target_skatepark)
         redirect_to admin_video_suggestions_path, notice: activation_notice_for(target_skatepark)
       else
-        render_activation_failure
+        render_index_with_errors
       end
     rescue ActiveRecord::RecordNotFound
       redirect_to admin_video_suggestions_path, alert: t('admin.video_suggestions.invalid_skatepark')
     rescue ActiveRecord::RecordNotUnique
-      @video_suggestion.errors.add(:youtube_url, duplicate_youtube_url_error_key(target_skatepark))
-      render_activation_failure
+      @video_suggestion.errors.add(
+        :youtube_url, SkateparkVideo.duplicate_error_key_for(target_skatepark, @video_suggestion.youtube_video_id)
+      )
+      render_index_with_errors
     end
 
     def reject
       if @video_suggestion.update(status: :rejected)
         redirect_to admin_video_suggestions_path, notice: t('admin.video_suggestions.rejected_notice')
       else
-        flash.now[:alert] = @video_suggestion.errors.full_messages.to_sentence
-        index
-        render :index, status: :unprocessable_content
+        render_index_with_errors
       end
     end
 
@@ -71,21 +71,10 @@ module Admin
       end
     end
 
-    def render_activation_failure
+    def render_index_with_errors
       flash.now[:alert] = @video_suggestion.errors.full_messages.to_sentence
       index
       render :index, status: :unprocessable_content
-    end
-
-    def duplicate_youtube_url_error_key(target_skatepark)
-      existing = target_skatepark.skatepark_videos.find_by(
-        youtube_video_id: @video_suggestion.youtube_video_id,
-        status: %i[pending active]
-      )
-
-      return :already_submitted if existing.blank?
-
-      existing.active? ? :already_published : :already_pending
     end
   end
 end

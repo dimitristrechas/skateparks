@@ -39,22 +39,8 @@ module SchemaHelper
       name: 'skateparks.gr',
       url: root_url(protocol: 'https'),
       description: t('application.meta_description'),
-      inLanguage: %w[el en],
-      potentialAction: {
-        '@type': 'SearchAction',
-        target: {
-          '@type': 'EntryPoint',
-          urlTemplate: search_action_url_template,
-        },
-        'query-input': 'required name=search_term_string',
-      },
+      inLanguage: I18n.available_locales.map(&:to_s),
     }
-  end
-
-  def search_action_url_template
-    base = skateparks_url(protocol: 'https')
-    joiner = base.include?('?') ? '&' : '?'
-    "#{base}#{joiner}search={search_term_string}"
   end
 
   def webpage_schema(title: nil, meta_description: nil, meta_image: nil)
@@ -111,10 +97,13 @@ module SchemaHelper
       addressCountry: skatepark.country_code,
     }
 
-    address[:addressLocality] = skatepark.city_name if skatepark.city_geoname_id.present?
-    address[:addressRegion] = skatepark.region_name if skatepark.region_name.present?
+    city = skatepark.city
+    return address unless city
 
-    address
+    address[:addressLocality] = CityDataset.localized_name(city)
+    address[:addressRegion] = CityDataset.region_name(city, skatepark.country)
+
+    address.compact_blank
   end
 
   def collection_page_schema(skateparks)

@@ -1,14 +1,11 @@
 class HomeController < ApplicationController
   def index
-    @skateparks = Skatepark.published.order(created_at: :desc)
     @skateparks_latest = Rails.cache.fetch(Skatepark.homepage_latest_cache_key, expires_in: 1.year) do
       Skatepark.latest.includes(:skatepark_images, cover_image_attachment: :blob).to_a
     end
     @skateparks_popular = Rails.cache.fetch(Skatepark.homepage_popular_cache_key, expires_in: 1.year) do
       Skatepark.popular.includes(:skatepark_images, cover_image_attachment: :blob).to_a
     end
-
-    @locale = params['locale']
   end
 
   def about

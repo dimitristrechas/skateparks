@@ -27,20 +27,7 @@ module Authentication
   end
 
   def resume_session
-    session = find_session_by_cookie
-    return nil unless session
-    return nil unless session.user.active?
-
-    Current.session = session
-  end
-
-  def find_session_by_cookie
-    return nil unless cookies.signed[:session_token]
-
-    session = Session.find_by(session_token: cookies.signed[:session_token])
-    return nil if session&.expired?
-
-    session
+    Current.session ||= Session.find_active_by_token(cookies.signed[:session_token])
   end
 
   def request_authentication
@@ -59,20 +46,28 @@ module Authentication
   def start_new_session_for(user)
     return unless user.active?
 
+    reset_session_preserving_return_to
+
     user.sessions.create!(
       user_agent: request.user_agent,
       ip_address: request.remote_ip,
       expires_at: 2.weeks.from_now
-    ).tap do |session|
-      Current.session = session
+    ).tap do |user_session|
+      Current.session = user_session
       cookies.signed[:session_token] = {
-        value: session.session_token,
+        value: user_session.session_token,
         expires: 2.weeks,
         httponly: true,
         secure: Rails.env.production?,
         same_site: :lax,
       }
     end
+  end
+
+  def reset_session_preserving_return_to
+    return_to = session[:return_to_after_authenticating]
+    reset_session
+    session[:return_to_after_authenticating] = return_to if return_to
   end
 
   def terminate_session

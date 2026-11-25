@@ -24,7 +24,7 @@ export default class extends Controller {
   ];
 
   static values = {
-    locale: String,
+    citiesUrl: String,
     confirmDelete: String,
     confirmDeleteVideo: String,
     imageAltPattern: String,
@@ -79,13 +79,10 @@ export default class extends Controller {
     const picker = this.cityPickerTarget.querySelector('[data-controller~="admin--skatepark-picker"]');
     if (!picker) return;
 
-    const params = new URLSearchParams();
-    if (countryCode) params.set("country_code", countryCode);
-    if (this.localeValue && this.localeValue !== "en") params.set("locale", this.localeValue);
+    const url = new URL(this.citiesUrlValue, window.location.origin);
+    if (countryCode) url.searchParams.set("country_code", countryCode);
 
-    picker.dataset.adminSkateparkPickerSearchUrlValue = params.toString()
-      ? `/admin/cities?${params.toString()}`
-      : "/admin/cities";
+    picker.setAttribute("data-admin--skatepark-picker-search-url-value", `${url.pathname}${url.search}`);
 
     const input = picker.querySelector('[data-admin--skatepark-picker-target="input"]');
     if (input) input.disabled = !countryCode;

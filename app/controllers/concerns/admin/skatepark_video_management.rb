@@ -6,30 +6,11 @@ module Admin
     private
 
     def attach_new_videos(skatepark)
-      ordered_new_videos(skatepark).each do |youtube_url, position|
+      ordered_new_items(new_video_urls, new_video_positions,
+                        records: skatepark.skatepark_videos,
+                        existing_attributes: existing_video_attributes).each do |youtube_url, position|
         skatepark.skatepark_videos.build(youtube_url: youtube_url, position: position, status: :active)
       end
-    end
-
-    def ordered_new_videos(skatepark)
-      positions = new_video_positions
-      positions = fallback_new_video_positions(skatepark) if positions.empty?
-
-      new_video_urls.zip(positions).filter_map do |youtube_url, position|
-        next if youtube_url.blank? || position.blank?
-
-        [youtube_url, position.to_i]
-      end
-    end
-
-    def fallback_new_video_positions(skatepark)
-      starting_position = existing_video_positions(skatepark).max.to_i + 1
-
-      new_video_urls.each_index.map { |index| starting_position + index }
-    end
-
-    def existing_video_positions(skatepark)
-      requested_positions(existing_video_attributes, skatepark.skatepark_videos)
     end
 
     def existing_video_attributes

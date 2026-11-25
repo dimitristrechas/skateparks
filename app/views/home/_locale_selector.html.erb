@@ -4,7 +4,7 @@
       <li>
         <% locale_url = url_for(locale_switch_url_options(locale)) %>
 
-        <%= render LinkComponent.new(title: LOCALES[locale], url: locale_url, current: I18n.locale == locale) %>
+        <%= render LinkComponent.new(title: locale_name(locale), url: locale_url, current: I18n.locale == locale) %>
       </li>
     <% end %>
   </ul>

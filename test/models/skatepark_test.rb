@@ -8,6 +8,15 @@ class SkateparkTest < ActiveSupport::TestCase
     assert_not skatepark.save
   end
 
+  def test_requires_english_name_regardless_of_current_locale
+    skatepark = build(:skatepark, name_en: nil)
+
+    I18n.with_locale(:el) do
+      assert_not skatepark.valid?
+      assert_predicate skatepark.errors[:name_en], :present?
+    end
+  end
+
   def test_requires_cover_image_to_be_present
     skatepark = build(:skatepark)
     skatepark.cover_image = nil
@@ -120,6 +129,15 @@ class SkateparkTest < ActiveSupport::TestCase
     assert_equal 'test-skatepark', skatepark.slug
   end
 
+  def test_popular_scope_excludes_unpublished_skateparks
+    published = create(:skatepark)
+    draft = create(:skatepark, :draft)
+    create(:popular_skatepark, skatepark: published)
+    create(:popular_skatepark, skatepark: draft)
+
+    assert_equal [published], Skatepark.popular.to_a
+  end
+
   def test_updates_slug_when_name_changes
     skatepark = create(:skatepark, name_en: 'Test Skatepark', name_el: 'Test Skatepark')
     skatepark.update(name_en: 'Updated Name')
@@ -131,6 +149,12 @@ class SkateparkTest < ActiveSupport::TestCase
     skatepark = build(:skatepark)
 
     assert_equal 'Athens, Attica, Greece', skatepark.location_name
+  end
+
+  def test_location_name_can_include_country_flag
+    skatepark = build(:skatepark)
+
+    assert_equal "Athens, Attica, Greece #{ISO3166::Country['GR'].emoji_flag}", skatepark.location_name(with_flag: true)
   end
 
   def test_location_name_localizes_city_region_and_country

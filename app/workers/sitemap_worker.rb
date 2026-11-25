@@ -1,12 +1,11 @@
-require 'rake'
-
 class SitemapWorker
   include Sidekiq::Worker
 
+  CONFIG_FILE = Rails.root.join('config/sitemap.rb').to_s
+
   def perform
     ensure_public_directory
-    Rails.application.load_tasks
-    Rake::Task['sitemap:refresh:no_ping'].invoke
+    SitemapGenerator::Interpreter.run(config_file: CONFIG_FILE, verbose: false)
   end
 
   def ensure_public_directory

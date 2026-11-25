@@ -1,7 +1,7 @@
 <div
   class="relative mb-8 sm:mb-12"
   data-controller="skateparks--filters skateparks--geolocation"
-  data-skateparks--filters-locale-value="<%= I18n.locale %>"
+  data-skateparks--filters-cities-url-value="<%= available_cities_path %>"
   data-skateparks--geolocation-default-distance-value="<%= default_distance_filter %>"
   data-skateparks--geolocation-denied-message-value="<%= t("geolocation_denied") %>"
   data-skateparks--geolocation-unavailable-message-value="<%= t("geolocation_unavailable") %>"
@@ -10,11 +10,6 @@
   <%= render "skatepark_sort" %>
 
   <details open class="group">
-    <% selected_distance = location_params_present? ? params[:distance].to_s : "" %>
-    <% current_sort = selected_sort_option %>
-    <% has_coords = coordinates_valid? %>
-    <% distance_option_classes = "relative z-10 flex w-full min-w-0 cursor-pointer items-center justify-center whitespace-nowrap rounded-lg px-2 py-2 text-center text-sm font-medium text-neutral-500 transition-colors duration-200 hover:bg-white/70 hover:text-neutral-800 peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-neutral-700 peer-checked:text-neutral-800 peer-checked:hover:bg-transparent peer-checked:hover:text-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-600/35 dark:hover:text-neutral-100 dark:peer-focus-visible:outline-neutral-200 dark:peer-checked:text-neutral-900 dark:peer-checked:hover:bg-transparent dark:peer-checked:hover:text-neutral-900 sm:px-4" %>
-
     <summary
       class="
         flex min-h-11 w-fit cursor-pointer list-none items-center gap-2 font-medium select-none group-open:mb-4
@@ -40,11 +35,11 @@
                   method: :get,
                   class: "clear-both flex flex-col gap-6 md:grid md:grid-cols-2 md:items-start lg:grid-cols-[14rem_14rem_minmax(0,1fr)_auto] lg:items-end lg:gap-x-6 lg:gap-y-2",
                   data: { action: "submit->skateparks--geolocation#handleSubmit" } do |form| %>
-      <%= form.hidden_field :locale, value: I18n.locale %>
+      <%= form.hidden_field :locale, value: I18n.locale, disabled: I18n.locale == I18n.default_locale %>
 
       <%= form.hidden_field :sort,
-                            value: current_sort,
-                            disabled: current_sort == "alphabetical" && selected_distance.blank?,
+                            value: selected_sort_option,
+                            disabled: selected_sort_option == "alphabetical" && selected_distance.blank?,
                             data: { "skateparks--geolocation-target": "filterSort" } %>
 
       <%= render "country_select", countries: countries %>
@@ -76,7 +71,7 @@
                                      "skateparks--geolocation-target": "distanceRadio"
                                    } %>
 
-              <%= label_tag distance_id, t("within_distance", distance: distance), class: distance_option_classes %>
+              <%= label_tag distance_id, t("within_distance", distance: distance), class: segmented_option_classes("px-2 sm:px-4") %>
             </div>
           <% end %>
 
@@ -91,18 +86,18 @@
                                    "skateparks--geolocation-target": "distanceRadio"
                                  } %>
 
-            <%= label_tag "distance_all", t("all_distances"), class: distance_option_classes %>
+            <%= label_tag "distance_all", t("all_distances"), class: segmented_option_classes("px-2 sm:px-4") %>
           </div>
         </div>
 
         <%= form.hidden_field :lat,
                               value: params[:lat],
-                              disabled: !has_coords || (selected_distance.blank? && current_sort != "nearest"),
+                              disabled: !coordinates_valid? || (selected_distance.blank? && selected_sort_option != "nearest"),
                               data: { "skateparks--geolocation-target": "latitude" } %>
 
         <%= form.hidden_field :lng,
                               value: params[:lng],
-                              disabled: !has_coords || (selected_distance.blank? && current_sort != "nearest"),
+                              disabled: !coordinates_valid? || (selected_distance.blank? && selected_sort_option != "nearest"),
                               data: { "skateparks--geolocation-target": "longitude" } %>
       </fieldset>
 
@@ -110,9 +105,9 @@
         <%= render LinkButtonComponent.new(
           title: t("reset_filters"),
           url: skateparks_path(
-            sort: current_sort == "alphabetical" ? nil : current_sort,
-            lat: current_sort == "nearest" ? params[:lat] : nil,
-            lng: current_sort == "nearest" ? params[:lng] : nil
+            sort: selected_sort_option == "alphabetical" ? nil : selected_sort_option,
+            lat: selected_sort_option == "nearest" ? params[:lat] : nil,
+            lng: selected_sort_option == "nearest" ? params[:lng] : nil
           )
         ) %>
 

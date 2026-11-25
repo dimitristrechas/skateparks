@@ -1,48 +1,29 @@
 import { Controller } from "@hotwired/stimulus";
 
 export default class extends Controller {
-  static targets = ["countrySelect"];
-
   static values = {
-    locale: String,
+    citiesUrl: String,
   };
 
-  connect() {
-    if (this.hasCountrySelectTarget) {
-      this.countrySelectTarget.addEventListener("change", this.handleCountryChange);
-    }
+  handleCountryChange(event) {
+    this.fetchAvailableCities(event.target.value);
   }
 
-  handleCountryChange = (event) => {
-    const countryCode = event.target.value;
-
-    this.fetchAvailableCities(countryCode);
-  };
-
-  submitForm = (event) => {
-    const form = event.target.form;
-    if (!form) return;
-
-    form.requestSubmit();
-  };
-
-  fetchAvailableCities(countryCode) {
-    this.fetchTurboStream(`/available_cities/${encodeURIComponent(countryCode)}`);
+  submitForm(event) {
+    event.target.form?.requestSubmit();
   }
 
-  fetchTurboStream(path) {
-    const url = new URL(path, window.location.origin);
-    if (this.localeValue && this.localeValue !== "en") {
-      url.searchParams.set("locale", this.localeValue);
-    }
+  async fetchAvailableCities(countryCode) {
+    const url = new URL(this.citiesUrlValue, window.location.origin);
+    if (countryCode) url.searchParams.set("country_code", countryCode);
 
-    fetch(url.toString(), {
-      method: "GET",
-      headers: {
-        Accept: "text/vnd.turbo-stream.html",
-      },
-    })
-      .then((response) => response.text())
-      .then((html) => Turbo.renderStreamMessage(html));
+    try {
+      const response = await fetch(url, { headers: { Accept: "text/vnd.turbo-stream.html" } });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+      Turbo.renderStreamMessage(await response.text());
+    } catch (error) {
+      console.error("Failed to load cities", error);
+    }
   }
 }

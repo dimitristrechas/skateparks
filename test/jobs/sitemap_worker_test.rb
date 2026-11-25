@@ -6,33 +6,25 @@ class SitemapWorkerTest < ActiveSupport::TestCase
   end
 
   def test_perform_ensures_public_directory_exists
-    rake_task = mock
-    rake_task.expects(:invoke)
+    SitemapGenerator::Interpreter.stubs(:run)
     @worker.expects(:ensure_public_directory)
-    Rails.application.expects(:load_tasks)
-    Rake::Task.expects(:[]).with('sitemap:refresh:no_ping').returns(rake_task)
 
     @worker.perform
   end
 
-  def test_perform_loads_rake_tasks
-    rake_task = mock
-    rake_task.expects(:invoke)
+  def test_perform_runs_sitemap_generator_with_config_file
     @worker.stubs(:ensure_public_directory)
-    Rails.application.expects(:load_tasks)
-    Rake::Task.stubs(:[]).returns(rake_task)
+    SitemapGenerator::Interpreter.expects(:run)
+                                 .with(config_file: Rails.root.join('config/sitemap.rb').to_s, verbose: false)
 
     @worker.perform
   end
 
-  def test_perform_invokes_sitemap_refresh_task
-    rake_task = mock
-    rake_task.expects(:invoke)
+  def test_perform_regenerates_on_every_run_in_same_process
     @worker.stubs(:ensure_public_directory)
-    Rails.application.stubs(:load_tasks)
-    Rake::Task.expects(:[]).with('sitemap:refresh:no_ping').returns(rake_task)
+    SitemapGenerator::Interpreter.expects(:run).twice
 
-    @worker.perform
+    2.times { SitemapWorker.new.tap { |worker| worker.stubs(:ensure_public_directory) }.perform }
   end
 
   def test_ensure_public_directory_creates_directory

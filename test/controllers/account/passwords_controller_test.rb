@@ -87,6 +87,18 @@ module Account
       assert_response :unprocessable_content
     end
 
+    test 'update password rejects blank new password' do
+      user = create(:user)
+      sign_in_as(user)
+      patch account_password_url, params: {
+        user: { current_password: 'password123456', password: '', password_confirmation: '' },
+      }
+
+      assert_response :unprocessable_content
+      assert user.reload.authenticate('password123456')
+      assert_predicate user.sessions, :exists?
+    end
+
     private
 
     def sign_in_as(user)

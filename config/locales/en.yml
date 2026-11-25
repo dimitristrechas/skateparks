@@ -412,6 +412,8 @@ en:
     attributes:
       skatepark:
         city_geoname_id: "City"
+        name_en: "Name in English"
+        description_en: "Description in English"
         skatepark_images: "Images"
         skatepark_videos: "Videos"
       skatepark_video:

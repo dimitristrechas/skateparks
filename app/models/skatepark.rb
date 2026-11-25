@@ -1,5 +1,4 @@
-# rubocop:disable-next Metrics/ClassLength
-class Skatepark < ApplicationRecord
+class Skatepark < ApplicationRecord # rubocop:disable Metrics/ClassLength
   extend Mobility
   include SkateparkVideoUrlUniqueness
 
@@ -30,7 +29,7 @@ class Skatepark < ApplicationRecord
   enum :status, { draft: 0, published: 1, archived: 2 }
 
   scope :latest, -> { published.order(created_at: :desc).limit(3) }
-  scope :popular, -> { joins(:popular_skatepark).merge(PopularSkatepark.all) }
+  scope :popular, -> { published.joins(:popular_skatepark).merge(PopularSkatepark.all) }
   scope :available_for_popular, -> { where.not(id: PopularSkatepark.select(:skatepark_id)) }
   scope :most_popular, -> { order(visits_count: :desc).i18n.order(:name).order(id: :asc) }
   scope :newest, -> { order(created_at: :desc, id: :desc) }
@@ -65,20 +64,21 @@ class Skatepark < ApplicationRecord
     Rails.cache.delete(homepage_popular_cache_key)
   end
 
-  validates :name, presence: true
+  validates :name_en, presence: true
   validates :cover_image, presence: true
   validates :lat, presence: true
   validates :lng, presence: true
-  validates :description, presence: true
+  validates :description_en, presence: true
   validates :status, presence: true, inclusion: { in: statuses.keys }
   validates :country_code, presence: true, inclusion: { in: ISO3166::Country.codes }
   validates :city_geoname_id, presence: true
   validate :minimum_skatepark_images
   validate :unique_uploaded_image_checksums
 
-  after_validation :set_slug, only: %i[create update]
-  after_destroy :clear_countries_cache, :clear_location_caches, :clear_skateparks_latest_cache
-  after_save :clear_countries_cache, :clear_location_caches, :clear_skateparks_latest_cache
+  before_validation :set_slug
+  after_destroy :clear_countries_cache, :clear_location_caches
+  after_save :clear_countries_cache, :clear_location_caches
+  after_commit :clear_homepage_caches
 
   def to_param
     "#{id}-#{slug}"
@@ -88,22 +88,21 @@ class Skatepark < ApplicationRecord
     ISO3166::Country[country_code]
   end
 
-  def city_name
-    return if city_geoname_id.blank?
+  def city
+    CityDataset.find(country_code, city_geoname_id) if city_geoname_id.present?
+  end
 
-    city = CityDataset.find(country_code, city_geoname_id)
+  def city_name
     CityDataset.localized_name(city) if city
   end
 
   def region_name
-    return if city_geoname_id.blank?
-
-    city = CityDataset.find(country_code, city_geoname_id)
     CityDataset.region_name(city, country) if city
   end
 
-  def location_name
-    [city_name, region_name, translated_country_name].compact_blank.join(', ')
+  def location_name(with_flag: false)
+    country_label = [translated_country_name, (country&.emoji_flag if with_flag)].compact_blank.join(' ')
+    [city_name, region_name, country_label].compact_blank.join(', ')
   end
 
   def seo_title
@@ -187,9 +186,7 @@ class Skatepark < ApplicationRecord
     Rails.cache.delete("skateparks_cities_#{code}")
   end
 
-  def clear_skateparks_latest_cache
-    return unless destroyed? || saved_change_to_country_code? || saved_change_to_status?
-
+  def clear_homepage_caches
     self.class.clear_homepage_caches
   end
 end
