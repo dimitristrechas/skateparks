@@ -22,8 +22,25 @@ ensure_agent_browser() {
 }
 
 # Read a value from .env without sourcing it (values may contain shell metacharacters).
+# Follows Compose rules: quoted values end at the closing quote; unquoted values drop " # comments".
 dotenv_value() {
-    grep -E "^$1=" .env 2>/dev/null | tail -1 | cut -d= -f2- | sed -E "s/^[\"']//; s/[\"']$//"
+    local line value
+    line=$(grep -E "^[[:space:]]*(export[[:space:]]+)?$1=" .env 2>/dev/null | tail -1)
+    value="${line#*=}"
+    case "$value" in
+        \"*)
+            value="${value#\"}"
+            value="${value%%\"*}"
+            ;;
+        \'*)
+            value="${value#\'}"
+            value="${value%%\'*}"
+            ;;
+        *)
+            value=$(printf '%s' "$value" | sed -E 's/^[[:space:]]+//; s/[[:space:]]+#.*$//; s/[[:space:]]+$//')
+            ;;
+    esac
+    printf '%s' "$value"
 }
 
 ab() {

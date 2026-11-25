@@ -337,6 +337,10 @@ map_app_file_to_test() {
     local candidate=""
 
     case "$file" in
+        test/application_system_test_case.rb)
+            echo "test/system"
+            return
+            ;;
         test/*_test.rb)
             candidate="$file"
             ;;
@@ -409,8 +413,20 @@ run_tests_changed() {
 
     echo -e "${GREEN}Running targeted tests:${NC}"
     echo "$tests"
-    # shellcheck disable=SC2086
-    test_run bash -c "bin/rails db:prepare && DISABLE_SIMPLECOV=1 bin/rails test $tests"
+
+    local system_tests other_tests status=0
+    system_tests=$(printf '%s\n' "$tests" | grep '^test/system' || true)
+    other_tests=$(printf '%s\n' "$tests" | grep -v '^test/system' || true)
+
+    if [ -n "$other_tests" ]; then
+        # shellcheck disable=SC2086
+        test_run bash -c "bin/rails db:prepare && DISABLE_SIMPLECOV=1 bin/rails test $other_tests" || status=1
+    fi
+    if [ -n "$system_tests" ]; then
+        # shellcheck disable=SC2086
+        run_system_tests $system_tests || status=1
+    fi
+    return $status
 }
 
 run_lint_changed() {
